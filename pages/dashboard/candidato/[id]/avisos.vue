@@ -15,12 +15,20 @@
 </script>
 
 <template>
+  <v-row no-gutters>
+    <v-col cols="12">
+      <div class="d-flex flex-column">
+        <span>Olá, Nome do candidato!</span>
+        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+      </div>
+    </v-col>
+  </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
         <v-card-text class="pa-0">
           <v-list>
-            <v-list-subheader class="text-h6 font-weight-bold text-secondary">Avisos</v-list-subheader>
+            <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Avisos</v-list-subheader>
             <template
               v-for="(item, index) in items"
               :key="item.id"

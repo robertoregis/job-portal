@@ -17,13 +17,21 @@ const vaga = ref({
 </script>
 
 <template>
+  <v-row no-gutters>
+    <v-col cols="12">
+      <div class="d-flex flex-column">
+        <span>Olá, Nome do candidato!</span>
+        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+      </div>
+    </v-col>
+  </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
             <v-icon class="mr-2">mdi-briefcase</v-icon>
-            <h2 class="text-h6 font-weight-bold text-secondary">Candidatura</h2>
+            <h2 class="text-h6 font-weight-bold text-gradient-primary">Candidatura</h2>
           </div>
         </v-card-title>
         <v-divider></v-divider>
@@ -55,7 +63,7 @@ const vaga = ref({
         <v-card-title>
           <div class="d-flex align-center">
             <v-icon class="mr-2">mdi-briefcase</v-icon>
-            <h2 class="text-h6 font-weight-bold text-secondary">Informações da vaga</h2>
+            <h2 class="text-h6 font-weight-bold text-gradient-primary">Informações da vaga</h2>
           </div>
         </v-card-title>
         <v-divider></v-divider>

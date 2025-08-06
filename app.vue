@@ -3,6 +3,7 @@
 
   const info = useInfo();
   const router = useRouter();
+  const supabase = useNuxtApp().$supabase
 
   const getUser = () => {
     const user: any = localStorage.getItem('user')
@@ -11,7 +12,7 @@
       info.setUser(userStorage)
       if(userStorage.type === 'company') {
         router.push('/dashboard/empresa/123')
-      } else if(userStorage.type === 'user') {
+      } else if(userStorage.type === 'candidate') {
         router.push('/dashboard/candidato/123')
       } else if(userStorage.type === 'admin') {
         router.push('/dashboard/admin/123')

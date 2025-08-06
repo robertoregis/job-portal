@@ -10,7 +10,7 @@
   ]
 
   const navigation = (link: string) => {
-    router.push('/dashboard/candidato/123/minhas-candidaturas/123')
+    router.push('/dashboard/empresa/123/minhas-vagas/123')
   }
 </script>
 
@@ -28,7 +28,7 @@
       <v-card>
         <v-card-text class="pa-0">
           <v-list>
-          <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas</v-list-subheader>
+          <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Vagas</v-list-subheader>
           <v-list-item
             v-for="item in items"
             :key="item.id"

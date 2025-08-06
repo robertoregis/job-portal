@@ -36,11 +36,19 @@ const submit = () => {
 </script>
 
 <template>
+  <v-row no-gutters>
+    <v-col cols="12">
+      <div class="d-flex flex-column">
+        <span>Olá, Nome do candidato!</span>
+        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+      </div>
+    </v-col>
+  </v-row>
   <v-row class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
         <v-card-title class="text-h6">
-          Cadastrar nova vaga
+          Criar nova vaga
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
