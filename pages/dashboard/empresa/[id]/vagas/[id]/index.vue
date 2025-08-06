@@ -1,0 +1,98 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'dashboard'
+})
+
+const vaga = ref({
+  cargo: 'Desenvolvedor Full Stack',
+  tipo_contrato: 'CLT',
+  formato: 'Remoto',
+  faixa_salarial: 'R$ 5.000 - R$ 7.000',
+  carga_horaria: '40h semanais',
+  dias_da_semana: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'],
+  escolaridade_minima: 'Superior completo',
+  beneficios: 'Plano de saúde, VR, VT, Gympass',
+  descricao: 'Buscamos alguém com experiência em Vue, Node.js, e bancos de dados relacionais.',
+})
+</script>
+
+<template>
+  <v-row no-gutters class="mt-5">
+    <v-col cols="12" class="mt-4">
+      <div class="d-flex">
+        <v-btn
+          color="deep-purple-accent-4"
+          text="Editar vaga"
+          variant="flat"
+          @click="$router.push('/dashboard/candidato/123/meu-perfil/vaga')"
+        />
+      </div>
+    </v-col>
+
+    <v-col cols="12" class="border mt-4">
+      <v-row no-gutters>
+        <v-col cols="12" class="px-4 pa-2">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2">mdi-briefcase</v-icon>
+            <h2 class="text-h6 font-weight-bold text-secondary">Informações da vaga</h2>
+          </div>
+        </v-col>
+        <v-col cols="12" class="px-4 pa-2">
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
+            <span class="text-body-2 ml-2">{{ vaga.cargo }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Tipo de contrato:</span>
+            <span class="text-body-2 ml-2">{{ vaga.tipo_contrato }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Formato:</span>
+            <span class="text-body-2 ml-2">{{ vaga.formato }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Faixa salarial:</span>
+            <span class="text-body-2 ml-2">{{ vaga.faixa_salarial }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Carga horária:</span>
+            <span class="text-body-2 ml-2">{{ vaga.carga_horaria }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
+            <span class="text-body-2 ml-2">{{ vaga.dias_da_semana.join(', ') }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <span class="text-subtitle-2 font-weight-bold">Escolaridade mínima:</span>
+            <span class="text-body-2 ml-2">{{ vaga.escolaridade_minima }}</span>
+          </div>
+        </v-col>
+      </v-row>
+    </v-col>
+
+    <v-col cols="12" class="border mt-4">
+      <v-list>
+        <v-list-item class="mt-2" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Benefícios</v-list-item-title>
+            <span class="text-body-2">
+              {{ vaga.beneficios }}
+            </span>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="mt-2" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Descrição da vaga</v-list-item-title>
+            <span class="text-body-2">
+              {{ vaga.descricao }}
+            </span>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-col>
+  </v-row>
+</template>
+
+<style scoped lang="scss">
+// Estilo opcional
+</style>

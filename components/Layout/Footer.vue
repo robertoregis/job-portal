@@ -1,0 +1,67 @@
+<script setup lang="ts">
+
+</script>
+<template>
+  <v-sheet width="100%" class="bg-gradient-primary mt-4 text-white">
+    <v-container class="py-5">
+      <v-row>
+        <v-col cols="12">
+          <v-row class="flex-md-row flex-column align-center align-md-start justify-md-space-between">
+            <!-- BLOCO DE LINKS - Vai pra cima em telas pequenas -->
+            <v-col
+              cols="12" md="6"
+              class="d-flex justify-center justify-md-end"
+              order="1"
+              order-md="2"
+            >
+              <!-- container dos links -->
+              <v-row class="max-w-400" no-gutters>
+                <v-col cols="6" class="d-flex">
+                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
+                </v-col>
+                <v-col cols="6" class="d-flex">
+                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
+                </v-col>
+                <v-col cols="6" class="d-flex">
+                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link para testar o tamanho</NuxtLink>
+                </v-col>
+                <v-col cols="6" class="d-flex">
+                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
+                </v-col>
+              </v-row>
+            </v-col>
+
+            <!-- BLOCO DE REDES SOCIAIS - Vai pra baixo em telas pequenas -->
+            <v-col
+              cols="12" md="6"
+              class="d-flex justify-center justify-md-start"
+              order="2"
+              order-md="1"
+            >
+              <div>
+                <NuxtLink to="/" class="no-underline mr-2">
+                  <v-icon color="white" icon="mdi-instagram" size="large" />
+                </NuxtLink>
+                <NuxtLink to="/" class="no-underline mr-2">
+                  <v-icon color="white" icon="mdi-facebook" size="large" />
+                </NuxtLink>
+                <NuxtLink to="/" class="no-underline mr-2">
+                  <v-icon color="white" icon="mdi-linkedin" size="large" />
+                </NuxtLink>
+              </div>
+            </v-col>
+          </v-row>
+
+        </v-col>
+        <v-col cols="12">
+          <div class="d-flex justify-center">
+            <span class="text-body-2">Todos os direitos reservados - Copyright © 2025 </span>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-sheet>
+</template>
+
+<style lang="scss" scoped>
+</style>
