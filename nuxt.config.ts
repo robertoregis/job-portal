@@ -53,8 +53,8 @@ export default defineNuxtConfig({
     SUPABASE_SERVICE_ROLE_KEY: process.env.NUXT_SUPABASE_ROLE_KEY, // SOMENTE BACKEND
 
     public: {
-      SUPABASE_URL: process.env.NUXT_SUPABASE_URL,
-      SUPABASE_ANON_KEY: process.env.NUXT_SUPABASE_ANON_KEY
+      SUPABASE_URL: process.env.NUXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY
     }
   }
 })
