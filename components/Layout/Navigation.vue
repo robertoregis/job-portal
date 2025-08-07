@@ -21,8 +21,8 @@
           <v-avatar color="surface-variant" size="50"></v-avatar>
           <div class="d-flex flex-column align-center mt-6">
             <v-avatar color="surface-variant" size="70"></v-avatar>
-            <span>Nome do candidato</span>
-            <span class="text-caption">email@email.com</span>
+            <span>João Avelar</span>
+            <span class="text-caption">joaoavelar@email.com</span>
           </div>
         </div>
       </v-col>
@@ -83,8 +83,8 @@
           <v-avatar color="surface-variant" size="50"></v-avatar>
           <div class="d-flex flex-column align-center mt-6">
             <v-avatar color="surface-variant" size="70"></v-avatar>
-            <span>Nome da empresa</span>
-            <span class="text-caption">email@email.com</span>
+            <span>Empresa X</span>
+            <span class="text-caption">empresax@email.com</span>
           </div>
         </div>
       </v-col>
