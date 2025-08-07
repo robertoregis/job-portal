@@ -1,31 +1,53 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
+  definePageMeta({
+    layout: 'dashboard'
+  })
 
-const router = useRouter()
+  const router = useRouter()
 
-// Filtro
-const statusOptions = ['Em análise', 'Aprovado', 'Rejeitado']
-const selectedStatus = ref('')
+  // Opções de status das candidaturas (com ícones)
+  const candidaturaStatusOptions = [
+    { name: 'Enviada', icon: 'mdi-send' },
+    { name: 'Em análise', icon: 'mdi-magnify' },
+    { name: 'Em entrevista', icon: 'mdi-account-question' },
+    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
+    { name: 'Aprovado', icon: 'mdi-check-circle' },
+    { name: 'Rejeitado', icon: 'mdi-close-circle' },
+    { name: 'Arquivada', icon: 'mdi-archive' },
+    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+  ]
 
-// Lista de candidaturas (mock)
-const allItems = ref([
-  { id: 1, date: '12h30 12/09/2025', title: 'Desenvolvedor Front-end', status: 'Em análise' },
-  { id: 2, date: '14h10 15/10/2025', title: 'Designer UI/UX', status: 'Aprovado' },
-  { id: 3, date: '09h20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
-])
+  const selectedStatus = ref<string | null>(null)
+  const selectedIconStatus = ref<string>('')
 
-// Filtradas
-const filteredItems = computed(() => {
-  if (!selectedStatus.value) return allItems.value
-  return allItems.value.filter(item => item.status === selectedStatus.value)
-})
+  const onStatusSelect = (selected: string | null) => {
+    if (!selected) {
+      selectedIconStatus.value = ''
+      return
+    }
+    const result = candidaturaStatusOptions.find(option => option.name === selected)
+    selectedIconStatus.value = result ? result.icon : ''
+  }
 
-// Navegação para detalhes
-const navigation = (id: number) => {
-  router.push(`/dashboard/candidato/123/minhas-candidaturas/${id}`)
-}
+  // Lista fictícia de candidaturas do usuário
+  const allItems = ref([
+    { id: 1, date: '12:30 12/09/2025', title: 'Desenvolvedor Front-end', status: 'Em análise' },
+    { id: 2, date: '14:10 15/10/2025', title: 'Designer UI/UX', status: 'Aprovado' },
+    { id: 3, date: '09:20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
+    { id: 4, date: '11:00 22/09/2025', title: 'Analista de Dados', status: 'Em entrevista' },
+    { id: 5, date: '16:45 30/07/2025', title: 'Gerente de Projetos', status: 'Arquivada' },
+  ])
+
+  // Computed para filtrar candidaturas conforme status selecionado
+  const filteredItems = computed(() => {
+    if (!selectedStatus.value) return allItems.value
+    return allItems.value.filter(item => item.status === selectedStatus.value)
+  })
+
+  // Navegação para detalhes da candidatura
+  const navigation = (id: number) => {
+    router.push(`/dashboard/candidato/123/minhas-candidaturas/${id}`)
+  }
 </script>
 
 <template>
@@ -43,11 +65,16 @@ const navigation = (id: number) => {
     <v-col cols="12" md="4" class="pr-md-2 mb-4 mb-md-0">
       <v-select
         v-model="selectedStatus"
-        :items="statusOptions"
+        :items="candidaturaStatusOptions"
+        item-title="name"
+        item-value="name"
         label="Filtrar por status"
-        density="compact"
         clearable
+        variant="outlined"
         hide-details
+        class="mb-2"
+        dense
+        @update:modelValue="onStatusSelect"
       />
     </v-col>
   </v-row>
@@ -62,9 +89,9 @@ const navigation = (id: number) => {
           color="success"
           variant="flat"
         >
-        <v-icon icon="mdi-server-plus" start></v-icon>
-        Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
-      </v-chip>
+          <v-icon :icon="selectedIconStatus" start></v-icon>
+          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
+        </v-chip>
       </div>
     </v-col>
     <v-col cols="12" class="border">

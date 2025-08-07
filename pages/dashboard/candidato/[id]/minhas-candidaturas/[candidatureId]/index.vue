@@ -14,14 +14,19 @@ const vaga = ref({
   beneficios: 'Plano de saúde, VR, VT, Gympass',
   descricao: 'Buscamos alguém com experiência em Vue, Node.js, e bancos de dados relacionais.',
 })
+
+const candidature = ref<any>({
+    status: 'Enviada',
+    icon_status: 'mdi-send'
+  })
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span>Candidatura!</span>
+        <span class="text-caption font-weight-bold">Veja a sua candidatura</span>
       </div>
     </v-col>
   </v-row>
@@ -30,7 +35,7 @@ const vaga = ref({
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
-            <v-icon class="mr-2">mdi-briefcase</v-icon>
+            <v-icon class="mr-2 text-gradient-primary">mdi-briefcase</v-icon>
             <h2 class="text-h6 font-weight-bold text-gradient-primary">Candidatura</h2>
           </div>
         </v-card-title>
@@ -39,14 +44,12 @@ const vaga = ref({
           <v-row no-gutters>
             <v-col cols="12">
               <div class="d-flex align-center">
-                <span class="text-subtitle-2 font-weight-bold">Status:</span>
                 <v-chip
-                  class="ml-2"
-                  color="success"
+                  class="bg-gradient-primary"
                   variant="flat"
                 >
-                  <v-icon icon="mdi-server-plus" start></v-icon>
-                  Server Status
+                  <v-icon :icon="candidature.icon_status" start></v-icon>
+                  Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ candidature.status }}</span>
                 </v-chip>
               </div>
               <div class="d-flex align-center">
@@ -62,7 +65,7 @@ const vaga = ref({
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
-            <v-icon class="mr-2">mdi-briefcase</v-icon>
+            <v-icon class="mr-2 text-gradient-primary">mdi-briefcase</v-icon>
             <h2 class="text-h6 font-weight-bold text-gradient-primary">Informações da vaga</h2>
           </div>
         </v-card-title>

@@ -5,38 +5,40 @@ definePageMeta({
 
 const router = useRouter()
 
-// Filtro
-  const candidaturaStatusOptions = [
-    { name: 'Enviada', icon: 'mdi-send' },
-    { name: 'Em análise', icon: 'mdi-magnify' },
-    { name: 'Em entrevista', icon: 'mdi-account-question' },
-    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
-    { name: 'Aprovado', icon: 'mdi-check-circle' },
-    { name: 'Rejeitado', icon: 'mdi-close-circle' },
-    { name: 'Arquivada', icon: 'mdi-archive' },
-    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
-  ]
-  const selectedStatus = ref<string | null>(null)
-  const selectedIconStatus = ref<string>('')
-  const onStatusSelect = (selected: any) => {
-    const result: any = candidaturaStatusOptions.find(option => option.name === selected)
-    selectedIconStatus.value = result.icon
-  }
+const candidaturaStatusOptions = [
+  { name: 'Enviada', icon: 'mdi-send' },
+  { name: 'Em análise', icon: 'mdi-magnify' },
+  { name: 'Em entrevista', icon: 'mdi-account-question' },
+  { name: 'Avaliação final', icon: 'mdi-progress-clock' },
+  { name: 'Aprovado', icon: 'mdi-check-circle' },
+  { name: 'Rejeitado', icon: 'mdi-close-circle' },
+  { name: 'Arquivada', icon: 'mdi-archive' },
+  { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+]
 
-// Lista de candidaturas (mock)
+const selectedStatus = ref<string | null>(null)
+const selectedIconStatus = ref<string>('')
+
+const onStatusSelect = (selected: string | null) => {
+  if (!selected) {
+    selectedIconStatus.value = ''
+    return
+  }
+  const result = candidaturaStatusOptions.find(option => option.name === selected)
+  selectedIconStatus.value = result ? result.icon : ''
+}
+
 const allItems = ref([
   { id: 1, date: '12h30 12/09/2025', title: 'Desenvolvedor Front-end', status: 'Em análise' },
   { id: 2, date: '14h10 15/10/2025', title: 'Designer UI/UX', status: 'Aprovado' },
   { id: 3, date: '09h20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
 ])
 
-// Filtradas
 const filteredItems = computed(() => {
   if (!selectedStatus.value) return allItems.value
   return allItems.value.filter(item => item.status === selectedStatus.value)
 })
 
-// Navegação para detalhes
 const navigation = (id: number) => {
   router.push(`/dashboard/empresa/123/minhas-vagas/123/candidaturas/${id}`)
 }
@@ -46,8 +48,8 @@ const navigation = (id: number) => {
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem-vindo ao seu dashboard</span>
+        <span>Candidaturas da vaga</span>
+        <span class="text-caption font-weight-bold">Confira os candidatos inscritos nesta vaga</span>
       </div>
     </v-col>
   </v-row>
@@ -97,9 +99,9 @@ const navigation = (id: number) => {
           color="success"
           variant="flat"
         >
-        <v-icon :icon="selectedIconStatus" start></v-icon>
-        Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
-      </v-chip>
+          <v-icon :icon="selectedIconStatus" start></v-icon>
+          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
+        </v-chip>
       </div>
     </v-col>
     <v-col cols="12" class="border">
@@ -137,3 +139,4 @@ const navigation = (id: number) => {
 
 <style lang="scss" scoped>
 </style>
+

@@ -1,28 +1,29 @@
 <script setup lang="ts">
-  definePageMeta({
-    layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
-  })
-  const items = [
-    { id: 1, date: '12h30 12/09/2025', headline: 'Brunch this weekend?', subtitle: `I'll be in your neighborhood doing errands this weekend. Do you want to hang out?`, title: 'Ali Connors' },
-    { id: 2, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 3, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 4, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 5, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 6, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-  ]
+definePageMeta({
+  layout: 'dashboard'
+})
 
-  const selected = shallowRef([2])
+const items = [
+  { id: 1, date: '08:30 01/08/2025', headline: 'Nova vaga publicada', subtitle: `A vaga para Desenvolvedor Front-end foi publicada com sucesso.`, title: 'Sistema' },
+  { id: 2, date: '14:15 25/07/2025', headline: 'Candidatura recebida', subtitle: `Você recebeu uma nova candidatura para a vaga de Designer UI/UX.`, title: 'Sistema' },
+  { id: 3, date: '10:00 20/07/2025', headline: 'Atualização do perfil', subtitle: `Carlos Alberto atualizou seus dados no perfil da empresa.`, title: 'Sistema' },
+  { id: 4, date: '09:45 15/07/2025', headline: 'Aviso de manutenção', subtitle: `O sistema passará por manutenção na próxima sexta-feira.`, title: 'Administração' },
+  { id: 5, date: '11:30 10/07/2025', headline: 'Relatório mensal disponível', subtitle: `O relatório de desempenho de julho está disponível para download.`, title: 'Sistema' },
+]
+
+const selected = shallowRef([2])
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="">Avisos do dashboard</span>
+        <span class="text-caption font-weight-bold">Confira as últimas atualizações da sua empresa</span>
       </div>
     </v-col>
   </v-row>
+
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
@@ -42,7 +43,7 @@
                   {{ item.subtitle }}
                 </v-list-item-subtitle>
 
-                <template v-slot:append="{ isSelected }">
+                <template v-slot:append>
                   <v-list-item-action class="flex-column align-end">
                     <small class="mb-4 opacity-60">{{ item.date }}</small>
                   </v-list-item-action>
@@ -58,5 +59,4 @@
 </template>
 
 <style lang="scss" scoped>
-
 </style>

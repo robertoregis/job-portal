@@ -2,9 +2,9 @@
   const router = useRouter();
   const dialog = ref<boolean>(false)
 
-  const navigation = (id: number) => {
+  const navigation = (type: string) => {
     dialog.value = false;
-    router.push(`/cadastrar/empresa`)
+    router.push(`/cadastrar/${type}`)
   }
   
 </script>
@@ -64,7 +64,7 @@
         variant="flat"
         color="success"
         class="mb-1 w-100"
-        @click="dialog = false"
+        @click="navigation('candidato')"
       >
         Sou um candidato
       </v-btn>
@@ -73,7 +73,7 @@
         variant="flat"
         color="success"
         class="w-100"
-        @click="navigation"
+        @click="navigation('empresa')"
       >
         Sou uma empresa
       </v-btn>

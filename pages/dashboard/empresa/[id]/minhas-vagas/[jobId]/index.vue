@@ -19,11 +19,6 @@
     icon: 'mdi-briefcase-plus'     // novo campo
   })
 
-  const salvarAlteracoes = () => {
-    console.log('Vaga atualizada:', vaga.value)
-    // Aqui você pode usar useFetch, axios ou algo semelhante para enviar ao backend
-  }
-
   const jobStatusOptions = [
     { name: 'Aberta para inscrição', icon: 'mdi-briefcase-plus' },
     { name: 'Inscrições encerradas', icon: 'mdi-briefcase-remove' },
@@ -34,24 +29,32 @@
     { name: 'Cancelada', icon: 'mdi-cancel' },
   ]
 
+  const selectedStatus = ref(jobStatusOptions.find(o => o.name === vaga.value.status) || jobStatusOptions[0])
 
   const onStatusSelect = (selected: any) => {
     vaga.value.status = selected.name
     vaga.value.icon = selected.icon
+    selectedStatus.value = selected
+  }
+
+  const salvarAlteracoes = () => {
+    console.log('Vaga atualizada:', vaga.value)
+    // Aqui você pode usar useFetch, axios ou algo semelhante para enviar ao backend
   }
 
   const navigation = (id: number) => {
     router.push(`/dashboard/empresa/123/minhas-vagas/123/candidaturas`)
   }
-
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span>Detalhes da vaga</span>
+        <span class="text-caption font-weight-bold">
+          Confira todas as informações e gerencie esta vaga
+        </span>
       </div>
     </v-col>
   </v-row>
@@ -79,7 +82,7 @@
             :color="`${vaga.ativa ? 'success' : 'error'}`"
             variant="flat"
           >
-          <v-icon :icon="`${vaga.ativa ? 'mdi-power' : 'mdi-power-off	'}`" start></v-icon>
+          <v-icon :icon="`${vaga.ativa ? 'mdi-power' : 'mdi-power-off'}`" start></v-icon>
           {{ vaga.ativa ? 'Ativada' : 'Desativada' }}
         </v-chip>
       </div>
@@ -160,7 +163,7 @@
           <v-col cols="12" md="6">
             <v-select
               :items="jobStatusOptions"
-              :value="vaga.status"
+              v-model="selectedStatus"
               item-title="name"
               return-object
               density="comfortable"

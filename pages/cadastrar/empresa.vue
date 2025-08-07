@@ -35,7 +35,7 @@
 
   const submit = handleSubmit(async (values) => {
     //alert(JSON.stringify(values, null, 2))
-    const { data, pending, error } = await useFetch('/api/profiles', {
+    const { data, pending, error } = await useFetch('/api/auth/register', {
       method: 'POST',
       body: {
         name: values.name,

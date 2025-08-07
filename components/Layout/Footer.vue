@@ -17,16 +17,10 @@
               <!-- container dos links -->
               <v-row class="max-w-400" no-gutters>
                 <v-col cols="6" class="d-flex">
-                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
+                  <NuxtLink to="/cadastrar/candidato" class="text-white no-underline text-subtitle-1 pa-1">Cadastrar candidato</NuxtLink>
                 </v-col>
                 <v-col cols="6" class="d-flex">
-                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
-                </v-col>
-                <v-col cols="6" class="d-flex">
-                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link para testar o tamanho</NuxtLink>
-                </v-col>
-                <v-col cols="6" class="d-flex">
-                  <NuxtLink to="/" class="text-white no-underline text-subtitle-1 pa-1">Link</NuxtLink>
+                  <NuxtLink to="/cadastrar/empresa" class="text-white no-underline text-subtitle-1 pa-1">Cadastrar empresa</NuxtLink>
                 </v-col>
               </v-row>
             </v-col>

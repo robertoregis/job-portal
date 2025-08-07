@@ -3,15 +3,43 @@
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
   const items = [
-    { id: 1, date: '12h30 12/09/2025', headline: 'Brunch this weekend?', subtitle: `I'll be in your neighborhood doing errands this weekend. Do you want to hang out?`, title: 'Ali Connors' },
-    { id: 2, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 3, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 4, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 5, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-    { id: 6, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
-  ]
+  {
+    id: 1,
+    date: '08:30 01/08/2025',
+    headline: 'Nova oportunidade disponível',
+    subtitle: `A vaga para Analista de Marketing foi publicada. Confira e candidate-se!`,
+    title: 'Sistema'
+  },
+  {
+    id: 2,
+    date: '14:15 25/07/2025',
+    headline: 'Candidatura recebida',
+    subtitle: `Sua candidatura para a vaga de Desenvolvedor Front-end foi recebida com sucesso.`,
+    title: 'Sistema'
+  },
+  {
+    id: 3,
+    date: '10:00 20/07/2025',
+    headline: 'Entrevista agendada',
+    subtitle: `Sua entrevista para a vaga de Designer UI/UX está marcada para 03/08 às 15h.`,
+    title: 'RH'
+  },
+  {
+    id: 4,
+    date: '09:45 15/07/2025',
+    headline: 'Atualização do perfil',
+    subtitle: `Lembre-se de atualizar seu currículo para aumentar suas chances.`,
+    title: 'Sistema'
+  },
+  {
+    id: 5,
+    date: '11:30 10/07/2025',
+    headline: 'Mensagem do recrutador',
+    subtitle: `O recrutador da vaga de Analista de Dados enviou uma mensagem. Verifique seu chat.`,
+    title: 'RH'
+  },
+]
 
-  const selected = shallowRef([2])
 </script>
 
 <template>
