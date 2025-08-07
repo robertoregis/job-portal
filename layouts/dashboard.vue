@@ -25,5 +25,7 @@
         </div>
       </v-main>
     </v-layout>
+    <GlobalSnackbar />
+    <GlobalOverlay />
   </v-app>
 </template>

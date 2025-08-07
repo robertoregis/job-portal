@@ -9,7 +9,7 @@
     { id: 2, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
   ]
 
-  const navigation = (link: string) => {
+  const navigation = (link: any) => {
     router.push('/dashboard/candidato/123/minhas-candidaturas/123')
   }
 </script>
@@ -74,29 +74,30 @@
         <v-card>
           <v-card-text class="pa-0">
             <v-list>
-              <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas recentes</v-list-subheader>
+              <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">
+                Candidaturas recentes
+              </v-list-subheader>
+
               <v-list-item
                 v-for="item in items"
                 :key="item.id"
-                style="min-height: unset"
+                class="py-2"
               >
-                <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation">
-                  <div class="d-flex justify-space-between align-start">
-                    <!-- Título + Subtítulo -->
+                <v-card class="pa-3 border" elevation="2" ripple hover @click="navigation(item.id)">
+                  <div class="d-flex justify-space-between">
                     <div>
-                      <div class="text-subtitle-1 font-weight-medium">Título aqui</div>
+                      <div class="text-subtitle-1 font-weight-medium">{{ item.title }}</div>
+                      <div class="text-caption">Status: {{ item.headline }}</div>
                     </div>
-
-                    <!-- Data no canto superior direito -->
-                    <div class="text-caption text-grey-darken-1">eeee</div>
+                    <div class="text-caption text-grey-darken-1">{{ item.date }}</div>
                   </div>
                 </v-card>
-
               </v-list-item>
             </v-list>
           </v-card-text>
         </v-card>
       </v-col>
+
   </v-row>
 </template>
 

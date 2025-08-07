@@ -1,8 +1,17 @@
 <script setup lang="ts">
   import { useInfo } from '#imports';
   const authentication: any = useInfo();
-
+  const router = useRouter();
   const value = ref(45);
+
+  const logout = async () => {
+    const supabase = useNuxtApp().$supabase
+    await supabase.auth.signOut()
+    alert('Empresa deslogada')
+    authentication.setUser({})
+    localStorage.removeItem('user')
+    router.push('/entrar/empresa')
+  }
 </script>
 <template>
   <v-navigation-drawer class="bg-gradient-primary" style="height: 100vh; overflow: hidden;">
@@ -59,6 +68,7 @@
           </v-progress-circular>
           <span class="mt-1 text-caption">Seu progresso...</span>
           <v-btn
+            @click="logout"
             color="white"
             text="Sair"
             variant="flat"
@@ -126,6 +136,7 @@
           </v-progress-circular>
           <span class="mt-1 text-caption">Seu progresso...</span>
           <v-btn
+            @click="logout"
             color="white"
             text="Sair"
             variant="flat"

@@ -1,5 +1,12 @@
 <script setup lang="ts">
+  const router = useRouter();
   const dialog = ref<boolean>(false)
+
+  const navigation = (id: number) => {
+    dialog.value = false;
+    router.push(`/cadastrar/empresa`)
+  }
+  
 </script>
 <template>
   <v-sheet width="100%" class="border-b-sm border-secondary">
@@ -66,7 +73,7 @@
         variant="flat"
         color="success"
         class="w-100"
-        @click="dialog = false"
+        @click="navigation"
       >
         Sou uma empresa
       </v-btn>

@@ -22,7 +22,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         connect: {
           dark: false,
           colors: {
-            primary: '#1E88E5',
+            primary: '#C724F2',
             secondary: '#C724F2',
             titleDark: '#0f0f0fff',
             titleLight: '#464343ff',
@@ -33,6 +33,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             success: '#4CAF50',
             warning: '#FB8C00',
             white: '#FFFFFF',
+            navigation: '#546E7A',
           },
         },
       },

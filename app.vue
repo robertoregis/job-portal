@@ -3,7 +3,7 @@
 
   const info = useInfo();
   const router = useRouter();
-  const supabase = useNuxtApp().$supabase
+
 
   const getUser = () => {
     const user: any = localStorage.getItem('user')
@@ -20,7 +20,18 @@
     }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    const supabase = useNuxtApp().$supabase
+
+  const { data: { session } } = await supabase.auth.getSession()
+  console.log(session)
+  if (session) {
+    // usuário logado, tem sessão válida
+    console.log('Usuário:', session.user)
+  } else {
+    console.log('dddd')
+    // não está logado
+  }
     getUser()
   })
 </script>

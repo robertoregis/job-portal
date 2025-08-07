@@ -1,4 +1,4 @@
-import supabase from '@/server/utils/supabase'
+/*import supabase from '@/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   const method = event.req.method
@@ -41,5 +41,5 @@ export default defineEventHandler(async (event) => {
   }
 
   throw createError({ statusCode: 405, statusMessage: 'Method not allowed' })
-})
+})*/
 

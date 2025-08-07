@@ -6,8 +6,22 @@ definePageMeta({
 const router = useRouter()
 
 // Filtro
-const statusOptions = ['Em análise', 'Aprovado', 'Rejeitado']
-const selectedStatus = ref('')
+  const candidaturaStatusOptions = [
+    { name: 'Enviada', icon: 'mdi-send' },
+    { name: 'Em análise', icon: 'mdi-magnify' },
+    { name: 'Em entrevista', icon: 'mdi-account-question' },
+    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
+    { name: 'Aprovado', icon: 'mdi-check-circle' },
+    { name: 'Rejeitado', icon: 'mdi-close-circle' },
+    { name: 'Arquivada', icon: 'mdi-archive' },
+    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+  ]
+  const selectedStatus = ref<string | null>(null)
+  const selectedIconStatus = ref<string>('')
+  const onStatusSelect = (selected: any) => {
+    const result: any = candidaturaStatusOptions.find(option => option.name === selected)
+    selectedIconStatus.value = result.icon
+  }
 
 // Lista de candidaturas (mock)
 const allItems = ref([
@@ -24,7 +38,7 @@ const filteredItems = computed(() => {
 
 // Navegação para detalhes
 const navigation = (id: number) => {
-  router.push(`/dashboard/candidato/123/minhas-candidaturas/${id}`)
+  router.push(`/dashboard/empresa/123/minhas-vagas/123/candidaturas/${id}`)
 }
 </script>
 
@@ -40,20 +54,41 @@ const navigation = (id: number) => {
 
   <!-- Filtros -->
   <v-row no-gutters class="mt-5">
-    <v-col cols="12" md="4" class="pr-md-2 mb-4 mb-md-0">
+    <v-col cols="12">
+      <div class="d-flex flex-wrap">
+        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas</div>
+          <div class="text-h4 font-weight-bold">9</div>
+        </v-card>
+        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas enviadas</div>
+          <div class="text-h4 font-weight-bold">3</div>
+        </v-card>
+        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas em análise</div>
+          <div class="text-h4 font-weight-bold">1</div>
+        </v-card>
+      </div>
+    </v-col>
+    <v-col cols="12" md="4" class="mt-4">
       <v-select
         v-model="selectedStatus"
-        :items="statusOptions"
+        :items="candidaturaStatusOptions"
+        item-title="name"
+        item-value="name"
         label="Filtrar por status"
-        density="compact"
         clearable
+        variant="outlined"
         hide-details
+        class="mb-2"
+        dense
+        @update:modelValue="onStatusSelect"
       />
     </v-col>
   </v-row>
 
   <!-- Lista de candidaturas -->
-  <v-row no-gutters class="mt-2">
+  <v-row no-gutters class="mt-4">
     <v-col v-if="selectedStatus" cols="12" class="mb-2">
       <div class="d-flex align-center">
         <v-chip
@@ -62,7 +97,7 @@ const navigation = (id: number) => {
           color="success"
           variant="flat"
         >
-        <v-icon icon="mdi-server-plus" start></v-icon>
+        <v-icon :icon="selectedIconStatus" start></v-icon>
         Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
       </v-chip>
       </div>

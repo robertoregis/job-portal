@@ -13,6 +13,8 @@ const vacancy = ref({
   education_required: null,
   benefits: '',
   description: '',
+  status: 'Aberta para inscrição',
+  icon_status: 'mdi-briefcase-plus'
 })
 
 const tiposContrato = ['CLT', 'PJ', 'Freelancer', 'Estágio']
@@ -32,6 +34,37 @@ const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado
 const submit = () => {
   console.log('Vaga cadastrada:', vacancy.value)
   alert('Vaga salva com sucesso! 🎉')
+}
+
+const createJob = async () => {
+  const newJob = {
+    position: 'Developer',
+    contract_type: 'Full-time',
+    work_format: 'Remote',
+    salary_range: '5000-7000',
+    workload: '40h',
+    weekdays: 'Mon-Fri',
+    education_level: 'Bachelor',
+    description: 'Vaga para desenvolvedor frontend.',
+    is_active: true,
+    is_closed: false,
+    benefits: ['Health insurance', 'Home office'],
+    company_id: 'abc123',
+    status: 'Aberta para inscrição',
+    icon_status: 'mdi-briefcase-plus'
+  }
+
+  const { data: createdJob, error } = await useFetch('/api/jobs', {
+    method: 'POST',
+    body: newJob
+  })
+
+  if (error.value) {
+    console.error('Erro ao criar job:', error.value)
+  } else {
+    console.log('Job criado:', createdJob.value)
+  }
+
 }
 </script>
 
@@ -144,6 +177,7 @@ const submit = () => {
               color="primary"
               type="submit"
               class="mt-2"
+              @click="createJob"
             >
               Salvar
             </v-btn>

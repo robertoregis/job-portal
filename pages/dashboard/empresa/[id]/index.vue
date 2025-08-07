@@ -5,15 +5,28 @@
 
   const router = useRouter();
   const items = [
-    { id: 1, date: '12h30 12/09/2025', headline: 'Brunch this weekend?', subtitle: `I'll be in your neighborhood doing errands this weekend. Do you want to hang out?`, title: 'Ali Connors' },
-    { id: 2, date: '2 hr', headline: 'Summer BBQ', subtitle: `Wish I could come, but I'm out of town this weekend.`, title: 'me, Scrott, Jennifer' },
+    {
+      id: 1,
+      date: '12h30 12/09/2025',
+      status: 'Ativa',
+      ativa: 'Sim',
+      title: 'Desenvolvedor Front-end'
+    },
+    {
+      id: 2,
+      date: '2 hr',
+      status: 'Encerrada',
+      ativa: 'Não',
+      title: 'Designer UX'
+    }
   ]
 
-  const navigation = (link: string) => {
+
+  const navigation = (link: any) => {
     router.push('/dashboard/empresa/123/minhas-vagas/123')
   }
 
-  const { data, pending, error } = await useFetch('/api/educations')
+  /*const { data, pending, error } = await useFetch('/api/educations')
   //const { data, pending, error } = await useFetch('/api/educations?candidate_id=abc123')
   
 
@@ -22,7 +35,7 @@
     if (data.value) {
       console.log('Educações carregadas:', data.value)
     }
-  })
+  })*/
 
 </script>
 
@@ -79,7 +92,7 @@
                 </v-list-item-title>
 
                 <v-list-item-subtitle class="text-body-2">
-                  {{ item.subtitle }}
+                  item.subtitle
                 </v-list-item-subtitle>
 
                 <template v-slot:append="{ isSelected }">
@@ -103,15 +116,27 @@
                 :key="item.id"
                 style="min-height: unset"
               >
-                <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation">
+                <v-card
+                  class="pa-2 border mb-2"
+                  elevation="2"
+                  ripple
+                  hover
+                  @click="navigation(item.id)"
+                >
                   <div class="d-flex justify-space-between align-start">
-                    <!-- Título + Subtítulo -->
                     <div>
-                      <div class="text-subtitle-1 font-weight-medium">Título aqui</div>
+                      <div class="text-subtitle-1 font-weight-medium">
+                        {{ item.title }}
+                      </div>
+                      <div class="text-caption text-grey">
+                        Status: {{ item.status }} |
+                        Ativa: {{ item.ativa ? 'Sim' : 'Não' }}
+                      </div>
                     </div>
 
-                    <!-- Data no canto superior direito -->
-                    <div class="text-caption text-grey-darken-1">eeee</div>
+                    <div class="text-caption text-grey-darken-1">
+                      {{ item.date }}
+                    </div>
                   </div>
                 </v-card>
 

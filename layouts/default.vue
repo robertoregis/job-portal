@@ -7,7 +7,8 @@
   <slot/>
 
   <LayoutFooter />
-
+    <GlobalSnackbar />
+    <GlobalOverlay />
   </v-app>
 </template>
 
