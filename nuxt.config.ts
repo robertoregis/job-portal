@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@nuxt/icon', '@nuxt/test-utils', '@pinia/nuxt'],
+  modules: ['@nuxt/icon', '@nuxt/test-utils', '@pinia/nuxt', 'nuxt3-notifications'],
   app: {
     head: {
       title: 'Conect One RH',

@@ -2,7 +2,58 @@
   import { useInfo } from '#imports';
   const authentication: any = useInfo();
   const router = useRouter();
-  const value = ref(45);
+
+  const profilePoints = {
+    name: 15,
+    cnpj: 15,
+    phone: 10,
+    email: 10,
+    benefits: 20,
+    others: 20,
+    state: 5,
+    city: 5
+  }
+
+  const profile = {
+    name: null,
+    cnpj: null,
+    phone: 'dkdkdkd',
+    email: null,
+    benefits: [],
+    others: ['ssss'],
+    state: null,
+    city: null
+  }
+
+  const calculateProfileScore = (profile: any, profilePoints: any) => {
+    let total = 0
+
+    for (const key in profilePoints) {
+      const value = profile[key]
+      const points = profilePoints[key]
+
+      const isFilled =
+        value !== null &&
+        value !== '' &&
+        !(Array.isArray(value) && value.length === 0)
+
+      if (isFilled) {
+        total += points
+      }
+    }
+    const interval = setInterval(() => {
+      if(value.value < total) {
+        value.value = value.value + 2
+      } else {
+        clearInterval(interval)
+      }
+    }, 100)
+
+    //return total
+    //value.value = total
+  }
+
+  const value = ref(0);
 
   const logout = async () => {
     const supabase = useNuxtApp().$supabase
@@ -12,6 +63,10 @@
     localStorage.removeItem('user')
     router.push('/entrar/empresa')
   }
+
+  onMounted(() => {
+    calculateProfileScore(profile, profilePoints)
+  })
 </script>
 <template>
   <v-navigation-drawer class="bg-gradient-primary" style="height: 100vh; overflow: hidden;">

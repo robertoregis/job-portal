@@ -60,7 +60,7 @@
             <v-col cols="12">
               <div class="d-flex align-center">
                 <v-chip
-                  class="bg-gradient-primary"
+                  class="bg-gradient-status"
                   variant="flat"
                 >
                   <v-icon :icon="candidature.icon_status" start></v-icon>

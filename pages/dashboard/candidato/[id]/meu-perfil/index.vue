@@ -1,8 +1,10 @@
 <script setup lang="ts">
+  import { useShow } from '#imports';
   definePageMeta({
     layout: 'dashboard'
   })
-
+  const show = useShow();
+  const { notify } = useNotification();
   const router = useRouter();
   const navigation = (link: string) => {
     router.push('/dashboard/candidato/123/meu-perfil/editar')
@@ -27,9 +29,23 @@
       { nome: 'Espanhol', nivel: 'Básico' }
     ]
   }
+
+  const notification = () => {
+    show.setOverlayDashboard(true)
+    setTimeout(() => {
+      show.setOverlayDashboard(false)
+    }, 2000)
+    /*(notify({
+			title: "Pronto",
+			type: "Success",
+			speed: 1000,
+			text: "Sua mensagem foi enviada com sucesso",
+		});*/
+  }
 </script>
 
 <template>
+  <button @click="notification">notificação</button>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
@@ -130,7 +146,7 @@
                     :key="idx"
                     class="mr-2 my-1 d-flex align-center"
                     label
-                    color="accent"
+                    color="language"
                     variant="flat"
                   >
                     <span>{{ idioma.nome }}</span>

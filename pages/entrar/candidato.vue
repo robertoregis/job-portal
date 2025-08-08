@@ -44,7 +44,7 @@
       }
       localStorage.setItem('user', JSON.stringify(user))
       authentication.setUser(user)
-      router.push(`/dashboard/candidato/${data.session.user.id}`)
+      //router.push(`/dashboard/candidato/${data.session.user.id}`)
       console.log('Usuário logado:', data.session.user)
     }
     /*const { data, error, pending } = await useFetch('/api/auth/login', {

@@ -15,6 +15,7 @@
     email: '',
     phone: '',
     date_of_birth: '',
+    cpf: '',
     state: null,
     city: null,
     about: ''
@@ -365,7 +366,19 @@
                     v-mask="'(##) #####-####'"
                   />
 
+                  <v-text-field
+                    v-model="formdata.cpf"
+                    label="CPF"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                    type="tel"
+                    :counter="15"
+                    v-mask="'###.###.###-##'"
+                  />
+
                   <v-select
+                    v-model="formdata.marital_status"
                     label="Estado Cívil"
                     :items="['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)']"
                     density="compact"

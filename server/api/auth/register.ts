@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const { name, email, password, type } = await readBody(event)
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !type) {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields' })
   }
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
     password,
-    email_confirm: true, // opcional, para pular confirmação (cuidado)
+    email_confirm: true,
   })
 
   if (authError) {
@@ -23,15 +23,36 @@ export default defineEventHandler(async (event) => {
   }
 
   // Cria perfil na tabela 'profiles'
-  const { data, error } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .insert([{ id: authData.user.id, name, email, type }])
     .select()
     .single()
 
-  if (error) {
-    throw createError({ statusCode: 500, statusMessage: error.message })
+  if (profileError) {
+    throw createError({ statusCode: 500, statusMessage: profileError.message })
   }
 
-  return data
+  // Dependendo do tipo, cria um registro em companies ou candidates
+  if (type === 'company') {
+    const { error: companyError } = await supabase
+      .from('companies')
+      .insert([{ name, email, profile_id: profile.id }])
+
+    if (companyError) {
+      throw createError({ statusCode: 500, statusMessage: companyError.message })
+    }
+  } 
+  else if (type === 'candidate') {
+    const { error: candidateError } = await supabase
+      .from('candidates')
+      .insert([{ name, email, profile_id: profile.id }])
+
+    if (candidateError) {
+      throw createError({ statusCode: 500, statusMessage: candidateError.message })
+    }
+  }
+
+  return profile
 })
+

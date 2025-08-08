@@ -34,9 +34,22 @@ const allItems = ref([
   { id: 3, date: '09h20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
 ])
 
+const itemsPerPage = 2
+const currentPage = ref(1)
+
 const filteredItems = computed(() => {
   if (!selectedStatus.value) return allItems.value
   return allItems.value.filter(item => item.status === selectedStatus.value)
+})
+
+const paginatedItems = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredItems.value.slice(start, end)
+})
+
+watch([selectedStatus], () => {
+  currentPage.value = 1 // reset page ao mudar filtro
 })
 
 const navigation = (id: number) => {
@@ -95,8 +108,7 @@ const navigation = (id: number) => {
       <div class="d-flex align-center">
         <v-chip
           v-if="selectedStatus"
-          class="ma-2"
-          color="success"
+          class="bg-gradient-status"
           variant="flat"
         >
           <v-icon :icon="selectedIconStatus" start></v-icon>
@@ -104,14 +116,14 @@ const navigation = (id: number) => {
         </v-chip>
       </div>
     </v-col>
-    <v-col cols="12" class="border">
+    <v-col cols="12">
       <v-card>
         <v-card-text class="pa-0">
           <v-list>
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas</v-list-subheader>
 
             <v-list-item
-              v-for="item in filteredItems"
+              v-for="item in paginatedItems"
               :key="item.id"
               style="min-height: unset"
             >
@@ -127,16 +139,28 @@ const navigation = (id: number) => {
               </v-card>
             </v-list-item>
 
-            <v-list-item v-if="filteredItems.length === 0">
+            <v-list-item v-if="paginatedItems.length === 0">
               <v-list-item-title class="text-body-2">Nenhuma candidatura encontrada.</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>
     </v-col>
+    <v-col v-if="currentPage < Math.ceil(filteredItems.length / itemsPerPage)" cols="12">
+      <v-pagination
+        v-model="currentPage"
+        :length="Math.ceil(filteredItems.length / itemsPerPage)"
+        :total-visible="5"
+        color="primary"
+        class="my-4"
+        rounded
+      />
+    </v-col>
   </v-row>
 </template>
 
 <style lang="scss" scoped>
+.cd {
+  background: #b2670c;
+}
 </style>
-

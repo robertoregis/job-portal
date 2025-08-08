@@ -10,28 +10,27 @@
     const userStorage = JSON.parse(user);
     if(userStorage) {
       info.setUser(userStorage)
-      if(userStorage.type === 'company') {
+      /*if(userStorage.type === 'company') {
         router.push('/dashboard/empresa/123')
       } else if(userStorage.type === 'candidate') {
         router.push('/dashboard/candidato/123')
       } else if(userStorage.type === 'admin') {
         router.push('/dashboard/admin/123')
-      }
+      }*/
     }
   }
 
   onMounted(async () => {
     const supabase = useNuxtApp().$supabase
-
-  const { data: { session } } = await supabase.auth.getSession()
-  console.log(session)
-  if (session) {
-    // usuário logado, tem sessão válida
-    console.log('Usuário:', session.user)
-  } else {
-    console.log('dddd')
-    // não está logado
-  }
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log(session)
+    if (session) {
+      // usuário logado, tem sessão válida
+      console.log('Usuário:', session.user)
+    } else {
+      console.log('dddd')
+      // não está logado
+    }
     getUser()
   })
 </script>
@@ -40,6 +39,7 @@
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+      <notifications position="bottom center" :speed="500" />
   </div>
 </template>
 <style>

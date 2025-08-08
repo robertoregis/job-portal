@@ -39,8 +39,8 @@
     }
   ]
 
-  const navigation = (id: number) => {
-    router.push(`/dashboard/candidato/123/minhas-candidaturas/${id}`)
+  const navigation = (link: any) => {
+    router.push(link)
   }
 </script>
 
@@ -58,6 +58,7 @@
     <v-col cols="12">
       <div class="d-flex align-center">
         <v-card
+          hover ripple @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
           elevation="2"
           width="220"
@@ -136,7 +137,7 @@
                 elevation="2"
                 ripple
                 hover
-                @click="navigation(candidatura.id)"
+                @click="navigation(`/dashboard/candidato/123/minhas-candidaturas/${candidatura.id}`)"
               >
                 <div class="d-flex justify-space-between">
                   <div>

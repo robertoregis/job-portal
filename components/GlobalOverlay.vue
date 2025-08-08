@@ -1,6 +1,6 @@
 <template>
   <v-overlay
-    :model-value="state.loading.show"
+    :model-value="isShow"
     persistent
     class="d-flex justify-center align-center"
   >
@@ -14,5 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import { feedbackState as state } from '@/composables/useFeedback'
+  import { useShow } from '#imports';
+
+  const show = useShow();
+  const isShow = computed(() => {
+    return show.overlayDashboard || show.overlaySite;
+  })
 </script>

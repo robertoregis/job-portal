@@ -107,7 +107,7 @@ const navigation = () => {
                   <v-chip
                     class="mr-2 my-1 d-flex align-center"
                     label
-                    color="accent"
+                    color="language"
                     variant="flat"
                   >
                     <span>Inglês</span>
@@ -116,7 +116,7 @@ const navigation = () => {
                   <v-chip
                     class="mr-2 my-1 d-flex align-center"
                     label
-                    color="accent"
+                    color="language"
                     variant="flat"
                   >
                     <span>Espanhol</span>

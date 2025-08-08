@@ -71,7 +71,7 @@
     <v-col cols="12" class="mt-4">
       <div class="d-flex align-center">
         <v-chip
-          class="ma-2 bg-gradient-primary"
+          class="ma-2 bg-gradient-status"
           variant="flat"
         >
           <v-icon :icon="vaga.icon" start></v-icon>
