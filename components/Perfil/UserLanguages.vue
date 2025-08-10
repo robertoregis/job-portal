@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
+    import { useShow } from '@/stores/show';
+    const { notify } = useNotification();
     const info: any = useInfo();
+    const show = useShow();
     //// Idiomas
     const languagesArray = [
         { name: 'Português', code: 'pt' },
@@ -31,7 +34,7 @@
 
     const changeLanguage = () => {
         if (!language.value.name || !language.value.level) {
-            alert('Selecione idioma e nível')
+            notify({ title: 'Erro', text: 'Selecione idioma e nível', type: 'error' })
             return
         }
 
@@ -40,7 +43,7 @@
         )
 
         if (exists) {
-            alert('Idioma com esse nível já adicionado')
+            notify({ title: 'Erro', text: 'Idioma com esse nível já adicionado', type: 'error' })
             return
         }
 
@@ -49,6 +52,7 @@
 
 
     const createLanguage = async () => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch('/api/languages', {
             method: 'POST',
             body: {
@@ -58,12 +62,13 @@
             }
         })
 
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao criar education:', error.value)
-            return null
+            notify({ title: 'Erro', text: 'Erro ao criar o idioma', type: 'error' })
+            return
         }
 
-        console.log('Language criada:', data.value)
+        notify({ title: 'Parabéns!', text: 'O idioma foi criada com sucesso', type: 'success' })
         getLanguages()
         clearLanguage()
         
@@ -86,16 +91,18 @@
     }
 
     const removeLanguage = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/languages/${id}`, {
             method: 'DELETE'
         })
 
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao remover education:', error.value)
-            return false
+            notify({ title: 'Erro', text: 'Erro ao remover o idioma', type: 'error' })
+            return
         }
 
-        console.log('Language removida:', data.value)
+        notify({ title: 'Parabéns!', text: 'O idioma foi removida com sucesso', type: 'success' })
         getLanguages()
     }
 
@@ -107,10 +114,8 @@
     })
 
     if (error.value) {
-        console.error('Erro ao carregar languages:', error.value)
     } else {
         languageList.value = languages.value
-        console.log('Languages:', languages.value)
     }
 </script>
 

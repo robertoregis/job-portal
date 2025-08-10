@@ -82,7 +82,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-navigation-drawer class="bg-gradient-primary" style="height: 100vh; overflow: hidden;">
+  <v-navigation-drawer
+    v-model="show.navigation"
+    class="bg-gradient-primary"
+    :temporary="$vuetify.display.smAndDown"
+    :permanent="$vuetify.display.mdAndUp"
+    style="height: 100vh; overflow: hidden;"
+  >
+
     <v-row v-if="authentication.user.type === 'candidate'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">

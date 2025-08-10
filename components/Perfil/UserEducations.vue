@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
+    import { useShow } from '@/stores/show';
+    const { notify } = useNotification();
     const info: any = useInfo();
+    const show = useShow();
     //// Escolaridade
     const dialogEducation = ref(false)
     const educationsList = ref<any>([])
@@ -47,7 +50,7 @@
 
     const changeEducation = () => {
         if (!education.value.level || !education.value.course || !education.value.period || !education.value.institution) {
-            alert('Apenas o campo notas é opcional')
+            notify({ title: 'Erro', text: 'Apenas o campo notas é opcional', type: 'error' })
             return
         }
         // Opção 1: verificar se não é null nem undefined
@@ -59,6 +62,7 @@
     }
 
     const createEducation = async () => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch('/api/educations', {
             method: 'POST',
             body: {
@@ -70,13 +74,13 @@
                 candidate_id: info.user.id
             }
         })
-
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao criar education:', error.value)
-            return null
+            notify({ title: 'Erro', text: 'Erro ao criar a escolaridade', type: 'error' })
+            return
         }
 
-        console.log('Education criada:', data.value)
+        notify({ title: 'Parabéns!', text: 'A escolaridade foi criada com sucesso', type: 'success' })
         getEducations()
         clearEducation()
         
@@ -103,13 +107,13 @@
             method: 'PATCH',
             body: education.value
         })
-
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao editar education:', error.value)
-            return null
+            notify({ title: 'Erro', text: 'Erro ao editar a escolaridade', type: 'error' })
+            return
         }
 
-        console.log('Education editada:', data.value)
+        notify({ title: 'Parabéns!', text: 'A escolaridade foi editada com sucesso', type: 'success' })
         getEducations()
         clearEducation()
     }
@@ -118,13 +122,13 @@
         const { data, error } = await useFetch(`/api/educations/${id}`, {
             method: 'DELETE'
         })
-
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao remover education:', error.value)
-            return false
+            notify({ title: 'Erro', text: 'Erro ao remover a escolaridade', type: 'error' })
+            return
         }
 
-        console.log('Education removida:', data.value)
+        notify({ title: 'Parabéns!', text: 'A escolaridade foi removida com sucesso', type: 'success' })
         getEducations()
     }
 
@@ -136,10 +140,8 @@
     })
 
     if (error.value) {
-        console.error('Erro ao carregar educations:', error.value)
     } else {
         educationsList.value = educations.value
-        console.log('Educations:', educations.value)
     }
 
 </script>
