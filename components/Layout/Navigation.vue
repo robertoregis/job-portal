@@ -1,28 +1,107 @@
 <script setup lang="ts">
-  import { useInfo } from '#imports';
-  const authentication: any = useInfo();
-  const router = useRouter();
-  const value = ref(45);
+import { useInfo } from '@/stores/info'
+import { useShow } from '@/stores/show'
 
-  const logout = async () => {
+const { notify } = useNotification()
+const authentication: any = useInfo()
+const router = useRouter()
+const show = useShow()
+
+const profilePoints = {
+  name: 15,
+  cpf: 10,
+  phone: 10,
+  email: 10,
+  about: 20,
+  birth_date: 10,
+  marital_status: 5,
+  state: 5,
+  city: 5,
+  image_id: 10,
+}
+
+const profilePointsCompany = {
+  name: 15,
+  cnpj: 15,
+  representative_name: 10,
+  representative_email: 15,
+  representative_cpf: 15,
+  email: 10,
+  state: 5,
+  city: 5,
+  image_id: 10,
+}
+
+const value = ref(0)
+
+const calculateProfileScore = (profile: any, profilePoints: any) => {
+  let total = 0
+
+  for (const key in profilePoints) {
+    const fieldValue = profile[key]
+    const points = profilePoints[key]
+
+    const isFilled =
+      fieldValue !== null &&
+      fieldValue !== '' &&
+      !(Array.isArray(fieldValue) && fieldValue.length === 0)
+    if (isFilled) {
+      total += points
+    }
+  }
+
+  const interval = setInterval(() => {
+    if (value.value < total) {
+      value.value += 2
+    } else {
+      clearInterval(interval)
+    }
+  }, 100)
+}
+
+const logout = async () => {
+  show.setOverlayDashboard(true)
+  setTimeout(async () => {
+    router.push('/')
+    show.setOverlayDashboard(false)
     const supabase = useNuxtApp().$supabase
     await supabase.auth.signOut()
-    alert('Empresa deslogada')
     authentication.setUser({})
+    authentication.setProfile({})
     localStorage.removeItem('user')
-    router.push('/entrar/empresa')
+  }, 1000)
+}
+
+onMounted(() => {
+  if (authentication.user?.type === 'candidate') {
+    calculateProfileScore(authentication.user, profilePoints)
+  } else if (authentication.user?.type === 'company') {
+    calculateProfileScore(authentication.user, profilePointsCompany)
   }
+})
 </script>
+
 <template>
   <v-navigation-drawer class="bg-gradient-primary" style="height: 100vh; overflow: hidden;">
     <v-row v-if="authentication.user.type === 'candidate'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">
-          <v-avatar color="surface-variant" size="50"></v-avatar>
+          <v-avatar color="white" size="50"></v-avatar>
           <div class="d-flex flex-column align-center mt-6">
-            <v-avatar color="surface-variant" size="70"></v-avatar>
-            <span>João Avelar</span>
-            <span class="text-caption">joaoavelar@email.com</span>
+            <v-avatar v-if="authentication.user.image_url" size="70">
+              <v-img
+                alt=""
+                :src="authentication.user.image_url"
+              ></v-img>
+            </v-avatar>
+            <v-avatar v-else size="70">
+              <v-img
+                alt=""
+                src="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/blank-profile-picture-973460_640.png"
+              ></v-img>
+            </v-avatar>
+            <span>{{ authentication.user.name }}</span>
+            <span class="text-caption">{{ authentication.user.email }}</span>
           </div>
         </div>
       </v-col>
@@ -73,6 +152,15 @@
             text="Sair"
             variant="flat"
             class="mt-4"
+            size="small"
+          ></v-btn>
+          <v-btn
+            @click="router.push('/')"
+            color="white"
+            text="Ir para o site"
+            variant="flat"
+            class="mt-2"
+            size="small"
           ></v-btn>
         </div>
       </v-col>
@@ -80,11 +168,18 @@
     <v-row v-if="authentication.user.type === 'company'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">
-          <v-avatar color="surface-variant" size="50"></v-avatar>
+          <v-avatar color="white" size="50"></v-avatar>
           <div class="d-flex flex-column align-center mt-6">
-            <v-avatar color="surface-variant" size="70"></v-avatar>
-            <span>Empresa X</span>
-            <span class="text-caption">empresax@email.com</span>
+            <v-avatar v-if="authentication.user.image_url" size="70">
+              <v-img
+                alt="John"
+                :src="authentication.user.image_url"
+              ></v-img>
+            </v-avatar>
+            <v-avatar v-else color="white" size="70">
+            </v-avatar>
+            <span>{{ authentication.user.name }}</span>
+            <span class="text-caption">{{ authentication.user.email }}</span>
           </div>
         </div>
       </v-col>
@@ -141,6 +236,15 @@
             text="Sair"
             variant="flat"
             class="mt-4"
+            size="small"
+          ></v-btn>
+          <v-btn
+            @click="router.push('/')"
+            color="white"
+            text="Ir para o site"
+            variant="flat"
+            class="mt-2"
+            size="small"
           ></v-btn>
         </div>
       </v-col>

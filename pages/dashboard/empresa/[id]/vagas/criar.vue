@@ -1,79 +1,127 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
 
-const vacancy = ref({
-  cargo: '',
-  type_contract: null,
-  work_format: null,
-  salary: '',
-  workload: '',
-  days: [],
-  education_required: null,
-  benefits: '',
-  description: '',
-  status: 'Aberta para inscrição',
-  icon_status: 'mdi-briefcase-plus'
-})
+  definePageMeta({
+    layout: 'dashboard'
+  })
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
 
-const tiposContrato = ['CLT', 'PJ', 'Freelancer', 'Estágio']
-const work_formats = ['Presencial', 'Remoto', 'Híbrido']
-const educations = [
-  'Fundamental',
-  'Médio',
-  'Técnico',
-  'Tecnólogo',
-  'Superior',
-  'Pós-graduação',
-  'Mestrado',
-  'Doutorado',
-]
-const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
-
-const submit = () => {
-  console.log('Vaga cadastrada:', vacancy.value)
-  alert('Vaga salva com sucesso! 🎉')
-}
-
-const createJob = async () => {
-  const newJob = {
-    position: 'Developer',
-    contract_type: 'Full-time',
-    work_format: 'Remote',
-    salary_range: '5000-7000',
-    workload: '40h',
-    weekdays: 'Mon-Fri',
-    education_level: 'Bachelor',
-    description: 'Vaga para desenvolvedor frontend.',
-    is_active: true,
-    is_closed: false,
-    benefits: ['Health insurance', 'Home office'],
-    company_id: 'abc123',
+  const router = useRouter();
+  const job = ref({
+    position: null,
+    contract_type: null,
+    work_format: null,
+    salary: null,
+    workload: null,
+    weekdays: [],
+    education_level: null,
+    benefits: null,
+    benefits_simple: null,
+    undergraduate_areas: null,
+    undergraduate_areas_simple: null,
+    knowledge: null,
+    knowledge_simple: null,
+    description: null,
     status: 'Aberta para inscrição',
-    icon_status: 'mdi-briefcase-plus'
-  }
-
-  const { data: createdJob, error } = await useFetch('/api/jobs', {
-    method: 'POST',
-    body: newJob
+    icon_status: 'mdi-briefcase-plus',
+    is_active: false,
+    is_closed: false,
+    update_fields_at: null
   })
 
-  if (error.value) {
-    console.error('Erro ao criar job:', error.value)
-  } else {
-    console.log('Job criado:', createdJob.value)
+  const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
+  const work_formats = ['Presencial', 'Remoto', 'Híbrido']
+  const educations = [
+    'Ensino Fundamental',
+    'Ensino Médio',
+    'Ensino Técnico',
+    'Tecnólogo',
+    'Ensino Superior',
+    'Pós-graduação',
+    'Mestrado',
+    'Doutorado',
+  ]
+  const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+
+  const createJob = async () => {
+    show.setOverlayDashboard(true)
+    let benefitsArray: any = job.value.benefits_simple
+    if (job.value.benefits_simple) {
+      benefitsArray = benefitsArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+    }
+    job.value.benefits = benefitsArray
+    let undergraduate_areasArray: any = job.value.undergraduate_areas_simple
+    if (job.value.undergraduate_areas_simple) {
+      undergraduate_areasArray = undergraduate_areasArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+    }
+    job.value.undergraduate_areas = undergraduate_areasArray
+    let knowledgeArray: any = job.value.knowledge_simple
+    if (job.value.knowledge_simple) {
+      knowledgeArray = knowledgeArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+    }
+    job.value.knowledge = knowledgeArray
+    const { data, error } = await useFetch('/api/jobs', {
+      method: 'POST',
+      body: {
+        ...job.value,
+        company_id: info.user.id
+      }
+    })
+    if (error.value) {
+      console.error('Erro ao criar vaga:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao criar a vaga', type: 'error' })
+    } else {
+      createNotice({
+        title: 'Vaga criada',
+        description: `Parabéns, você acabou de criar a vaga ${job.value.position}`,
+        subtitle: 'Vaga',
+        profile_id: info.profile.id,
+        type: 'info'
+      })
+      show.setOverlayDashboard(false)
+      notify({ title: 'Parabéns!', text: 'A vaga foi criada com sucesso', type: 'success' })
+      router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
+      resetJob()
+    }
   }
 
-}
+  const resetJob = () => {
+    job.value = {
+      position: null,
+      contract_type: null,
+      work_format: null,
+      salary: null,
+      workload: null,
+      weekdays: [],
+      education_level: null,
+      benefits: null,
+      benefits_simple: null,
+      undergraduate_areas: null,
+      undergraduate_areas_simple: null,
+      knowledge: null,
+      knowledge_simple: null,
+      description: null,
+      status: 'Aberta para inscrição',
+      icon_status: 'mdi-briefcase-plus',
+      is_active: false,
+      is_closed: false,
+      update_fields_at: null
+    }
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Criar vaga</span>
+        <span class="text-caption">Aumente o seu time criando uma vaga</span>
       </div>
     </v-col>
   </v-row>
@@ -85,9 +133,9 @@ const createJob = async () => {
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-form @submit.prevent="submit">
+          <v-form @submit.prevent="createJob">
             <v-text-field
-              v-model="vacancy.cargo"
+              v-model="job.position"
               label="Cargo"
               density="compact"
               hide-details
@@ -96,8 +144,8 @@ const createJob = async () => {
             />
 
             <v-select
-              v-model="vacancy.type_contract"
-              :items="tiposContrato"
+              v-model="job.contract_type"
+              :items="contractTypes"
               label="Tipo de contrato"
               density="compact"
               hide-details
@@ -106,7 +154,7 @@ const createJob = async () => {
             />
 
             <v-select
-              v-model="vacancy.work_format"
+              v-model="job.work_format"
               :items="work_formats"
               label="Formato"
               density="compact"
@@ -116,7 +164,7 @@ const createJob = async () => {
             />
 
             <v-text-field
-              v-model="vacancy.salary"
+              v-model="job.salary"
               label="Faixa salarial"
               placeholder="Ex: R$ 3.000 - R$ 5.000"
               density="compact"
@@ -125,7 +173,7 @@ const createJob = async () => {
             />
 
             <v-text-field
-              v-model="vacancy.workload"
+              v-model="job.workload"
               label="Carga horária semanal"
               placeholder="Ex: 40h"
               density="compact"
@@ -134,7 +182,7 @@ const createJob = async () => {
             />
 
             <v-select
-              v-model="vacancy.days"
+              v-model="job.weekdays"
               :items="days_of_week"
               label="Dias da semana"
               multiple
@@ -145,7 +193,7 @@ const createJob = async () => {
             />
 
             <v-select
-              v-model="vacancy.education_required"
+              v-model="job.education_level"
               :items="educations"
               label="Escolaridade mínima"
               density="compact"
@@ -154,7 +202,19 @@ const createJob = async () => {
             />
 
             <v-textarea
-              v-model="vacancy.benefits"
+              v-model="job.description"
+              label="Descrição da vaga"
+              placeholder="Conte mais sobre a oportunidade"
+              auto-grow
+              density="compact"
+              hide-details
+              class="mb-3"
+            />
+
+            <span class="text-caption mb-2">Os campos abaixo pode ser separados por vírgula (,)</span>
+
+            <v-textarea
+              v-model="job.benefits_simple"
               label="Benefícios"
               placeholder="Ex: Vale transporte, alimentação, plano de saúde..."
               auto-grow
@@ -164,9 +224,19 @@ const createJob = async () => {
             />
 
             <v-textarea
-              v-model="vacancy.description"
-              label="Descrição da vaga"
-              placeholder="Conte mais sobre a oportunidade"
+              v-model="job.knowledge_simple"
+              label="Conhecimentos"
+              placeholder="Ex: Planilhas, Informática, Design..."
+              auto-grow
+              density="compact"
+              hide-details
+              class="mb-3"
+            />
+
+            <v-textarea
+              v-model="job.undergraduate_areas_simple"
+              label="Áreas de graduação"
+              placeholder="Ex: Engenharia, Robôtica..."
               auto-grow
               density="compact"
               hide-details
@@ -174,10 +244,8 @@ const createJob = async () => {
             />
 
             <v-btn
-              color="primary"
               type="submit"
-              class="mt-2"
-              @click="createJob"
+              class="mt-2 bg-gradient-primary"
             >
               Salvar
             </v-btn>

@@ -1,51 +1,80 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useInfo } from '#imports'
+  import { useInfo } from '@/stores/info';
+  const candidateId = 'e00eef55-050b-4a3f-8732-973bb27a2dc8';
+  const router = useRouter();
+  const route = useRoute();
+  const loading = ref<boolean>(true)
+  const job= ref<any>({})
+  const info: any = useInfo()
+  const dialog = ref<boolean>(false)
+  const dialogCreateCandidature = ref<boolean>(false)
 
   definePageMeta({
     layout: 'default'
   })
 
-  const info: any = useInfo()
-  const vaga = ref<any>({
-    id: 1,
-    title: 'Engenheiro de Software',
-    company: 'Petrobras',
-    description: 'Desenvolvimento e manutenção de sistemas internos para automação de processos. Foco em qualidade e performance.',
-    created_date: '18/09/2025',
-    location: 'Campinas',
-    salary: 12000,
-    salary_formatted: 'R$ 12.000,00',
-    prerequisites: {
-      experiencia: 'Mínimo 3 anos em desenvolvimento de software',
-      escolaridade: 'Superior completo em Engenharia da Computação, Ciência da Computação ou áreas afins',
-      areasGraduacao: 'Engenharia, Ciência da Computação, Sistemas de Informação',
-      conhecimento: 'Java, Spring Boot, REST APIs, Banco de Dados relacionais',
-      habilidadesInterpessoais: 'Trabalho em equipe, comunicação eficaz, proatividade'
-    },
-    additionalInfo: {
-      beneficios: 'Vale-refeição, plano de saúde, seguro de vida',
-      horario: 'Segunda a sexta, 8h às 18h',
-      contrato: 'CLT – Efetivo',
-      localTrabalho: 'Híbrido (3 dias presencial, 2 dias remoto)'
-    },
-    mainActivities: [
-      'Desenvolver novas funcionalidades conforme demandas do time de produto.',
-      'Realizar manutenção e melhorias no código existente.',
-      'Participar de reuniões de planejamento e revisões de código.',
-      'Auxiliar na definição da arquitetura do sistema.'
-    ]
-  })
-
-  const dialog = ref<boolean>(false)
-
   const apply = () => {
     if (info.user && info.user.id) {
-      // aqui pode abrir outro diálogo ou redirecionar
-      // dialog.value = true;
+      dialogCreateCandidature.value = true
     } else {
       dialog.value = true
     }
+  }
+
+  const candidature = ref<any>({
+    candidate_name: 'Nome',
+    state: null,
+    city: null,
+    status: 'Enviada',
+    icon_status: 'mdi-send',
+    title: null
+  })
+
+  const resetCandidature = () => {
+    candidature.value = {
+      candidate_name: 'Nome',
+      state: null,
+      city: null,
+      status: 'Enviada',
+      icon_status: 'mdi-send',
+      title: null
+    }
+  }
+
+  const createCandidature = async () => {
+    const { data, error } = await useFetch('/api/candidatures', {
+      method: 'POST',
+      body: {
+        ...candidature.value,
+        candidate_id: candidateId,
+        job_id: job.value.id,
+        title: job.value.position
+      }
+    })
+    if (error.value) {
+      console.error('Erro ao criar candidatura:', error.value)
+    } else {
+      router.push(`/dashboard/candidato/123/minhas-candidaturas/${data.value.id}`)
+      console.log('Candidatura criada:', data.value)
+      resetCandidature()
+    }
+  }
+
+  const { data, error, pending } = await useFetch(`/api/jobs/${route.params.id}`, {
+    method: 'GET'
+  })
+
+  const navigation = (id: number) => {
+    dialog.value = false;
+    router.push(`/cadastrar/candidato`)
+  }
+
+  if (error.value) {
+    console.error('Erro ao carregar vaga:', error.value)
+  } else {
+    console.log('Vaga única:', data.value)
+    job.value = data.value
+    loading.value = false;
   }
 </script>
 
@@ -53,15 +82,15 @@
   <main>
     <v-sheet width="100%" class="mt-4">
       <v-container>
-        <v-row>
+        <v-row v-if="!loading">
           <v-col cols="12">
             <v-card class="mb-6 bg-gradient-primary" elevation="2">
               <v-card-text>
-                <p class="text-h4 font-weight-black">{{ vaga.title }}</p>
-                <p>{{ vaga.company }}</p>
+                <p class="text-h4 font-weight-black">{{ job.position }}</p>
+                <p>{{ job.company_name }}</p>
                 <div class="d-flex align-center">
                   <span>Salário:</span>
-                  <span class="text-subtitle-1 ml-2 font-weight-bold">{{ vaga.salary_formatted }}</span>
+                  <span class="text-subtitle-1 ml-2 font-weight-bold">{{ job.salary }}</span>
                 </div>
               </v-card-text>
             </v-card>
@@ -73,21 +102,30 @@
                     <v-list-item style="min-height: unset">
                       <div class="d-flex align-center">
                         <v-icon class="mr-2">mdi-office-building</v-icon>
-                        <span>{{ vaga.company }}</span>
+                        <div class="d-flex align-center">
+                          <span class="text-body-2 font-weight-bold">Empresa:</span>
+                          <span class="text-body-2 ml-1">{{ job.company_name }}</span>
+                        </div>
                       </div>
                     </v-list-item>
 
                     <v-list-item class="ma-0" style="min-height: unset">
                       <div class="d-flex align-center">
                         <v-icon class="mr-2">mdi-map-marker</v-icon>
-                        <span>{{ vaga.location }} / SP</span>
+                        <div class="d-flex align-center">
+                          <span class="text-body-2 font-weight-bold">Endereço:</span>
+                          <span class="text-body-2 ml-1">{{ job.address }}</span>
+                        </div>
                       </div>
                     </v-list-item>
 
                     <v-list-item class="ma-0" style="min-height: unset">
                       <div class="d-flex align-center">
                         <v-icon class="mr-2">mdi-calendar</v-icon>
-                        <span>{{ vaga.created_date }}</span>
+                        <div class="d-flex align-center">
+                          <span class="text-body-2 font-weight-bold">Data de abertura:</span>
+                          <span class="text-body-2 ml-1">{{ job.created_at_formatted }}</span>
+                        </div>
                       </div>
                     </v-list-item>
 
@@ -95,21 +133,21 @@
                       <v-list-item-content>
                         <v-list-item-title class="text-h6 font-weight-bold">Descrição da Vaga</v-list-item-title>
                         <span class="text-body-1">
-                          {{ vaga.description }}
+                          {{ job.description }}
                         </span>
                       </v-list-item-content>
                     </v-list-item>
 
-                    <v-list-item class="mt-2" style="min-height: unset">
+                    <!--<v-list-item class="mt-2" style="min-height: unset">
                       <v-list-item-content>
                         <v-list-item-title class="text-h6 font-weight-bold">Principais Atividades</v-list-item-title>
                         <div class="d-flex flex-column">
-                          <span v-for="(atividade, i) in vaga.mainActivities" :key="i" class="text-body-1">
+                          <span v-for="(atividade, i) in job.mainActivities" :key="i" class="text-body-1">
                             • {{ atividade }}
                           </span>
                         </div>
                       </v-list-item-content>
-                    </v-list-item>
+                    </v-list-item>-->
                   </v-list>
                 </v-col>
               </v-row>
@@ -121,30 +159,44 @@
                 <v-col cols="12" class="px-4 pa-2">
                   <div class="d-flex align-center">
                     <v-icon class="mr-2">mdi-account-check</v-icon>
-                    <h2 class="text-h6 font-weight-bold">Pré-requisitos</h2>
+                    <h2 class="text-h6 font-weight-bold">Informações</h2>
                   </div>
                 </v-col>
 
                 <v-col cols="12" class="px-4 pa-2">
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Experiência:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.prerequisites.experiencia }}</span>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
+                    <span class="text-body-2 ml-2">{{ job.position }}</span>
                   </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Nível de escolaridade:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.prerequisites.escolaridade }}</span>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Tipo de contrato:</span>
+                    <span class="text-body-2 ml-2">{{ job.contract_type }}</span>
                   </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Áreas de graduação:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.prerequisites.areasGraduacao }}</span>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Formato:</span>
+                    <span class="text-body-2 ml-2">{{ job.work_format }}</span>
                   </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Conhecimento específico:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.prerequisites.conhecimento }}</span>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Faixa salarial:</span>
+                    <span class="text-body-2 ml-2">{{ job.salary }}</span>
                   </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Habilidades interpessoais:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.prerequisites.habilidadesInterpessoais }}</span>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Carga horária:</span>
+                    <span class="text-body-2 ml-2">{{ job.workload }}</span>
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
+                    <div class="d-flex flex-wrap ml-2">
+                      <template v-for="(day, index) in job.weekdays" :key="index">
+                        <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
+                          {{day}}
+                        </v-chip>
+                      </template>
+                    </div>
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <span class="text-subtitle-2 font-weight-bold">Escolaridade mínima:</span>
+                    <span class="text-body-2 ml-2">{{ job.education_level }}</span>
                   </div>
                 </v-col>
 
@@ -155,27 +207,43 @@
                 <v-col cols="12" class="px-4 pa-2">
                   <div class="d-flex align-center">
                     <v-icon class="mr-2">mdi-information-outline</v-icon>
-                    <h2 class="text-h6 font-weight-bold">Informações Adicionais</h2>
+                    <h2 class="text-h6 font-weight-bold">Benefícios e Pré-requisitos</h2>
                   </div>
                 </v-col>
 
-                <v-col cols="12" class="px-4 pa-2">
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Benefícios:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.additionalInfo.beneficios }}</span>
-                  </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Horário:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.additionalInfo.horario }}</span>
-                  </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Contrato:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.additionalInfo.contrato }}</span>
-                  </div>
-                  <div class="d-flex align-center mb-1">
-                    <span class="text-subtitle-1 font-weight-bold">Local de trabalho:</span>
-                    <span class="text-body-1 ml-2">{{ vaga.additionalInfo.localTrabalho }}</span>
-                  </div>
+                <v-col cols="12" class="pa-2">
+                  <v-list>
+                    <v-list-item class="mt-2" style="min-height: unset">
+                      <v-list-item-content>
+                        <v-list-item-title class="text-subtitle-1 font-weight-bold">Benefícios</v-list-item-title>
+                        <ul>
+                          <template v-for="(benefit, index) in job.benefits" :key="index">
+                            <li class="text-body-2">- {{ benefit }};</li>
+                          </template>
+                        </ul>
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item class="mt-2" style="min-height: unset">
+                      <v-list-item-content>
+                        <v-list-item-title class="text-subtitle-1 font-weight-bold">Conhecimentos</v-list-item-title>
+                        <ul>
+                          <template v-for="(knowledge, index) in job.knowledge" :key="index">
+                            <li class="text-body-2">- {{ knowledge }};</li>
+                          </template>
+                        </ul>
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item class="mt-2" style="min-height: unset">
+                      <v-list-item-content>
+                        <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de graduação</v-list-item-title>
+                        <ul>
+                          <template v-for="(area, index) in job.undergraduate_areas" :key="index">
+                            <li class="text-body-2">- {{ area }};</li>
+                          </template>
+                        </ul>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
                 </v-col>
 
                 <v-col cols="12">
@@ -198,6 +266,29 @@
     </v-sheet>
 
     <v-dialog
+      v-model="dialogCreateCandidature"
+      max-width="400"
+      persistent
+    >
+      <v-card
+        text="Se você curtiu a vaga não perca tempo e faça a sua candidatura."
+        title="Candidata-se!"
+      >
+        <template v-slot:actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="error" variant="flat" @click="dialogCreateCandidature = false">
+            Não
+          </v-btn>
+
+          <v-btn color="success" variant="flat" @click="createCandidature">
+            Sim
+          </v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
       v-model="dialog"
       max-width="400"
     >
@@ -209,7 +300,7 @@
         <template v-slot:actions>
           <v-spacer></v-spacer>
 
-          <v-btn variant="flat" color="success" @click="dialog = false">
+          <v-btn variant="flat" color="success" @click="navigation">
             Faça o cadastro
           </v-btn>
         </template>

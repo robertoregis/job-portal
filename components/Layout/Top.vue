@@ -1,10 +1,28 @@
 <script setup lang="ts">
+  import { useInfo } from '#imports';
+  import { useShow } from '@/stores/show'
+  const authentication: any = useInfo();
+  const show = useShow()
   const router = useRouter();
   const dialog = ref<boolean>(false)
 
   const navigation = (type: string) => {
     dialog.value = false;
     router.push(`/cadastrar/${type}`)
+  }
+
+  const navigationDashboard = () => {
+    router.push(`/dashboard/${authentication.user.type === 'candidate' ? 'candidato' : 'empresa'}/${authentication.user.id}`)
+  }
+
+  const logout = async () => {
+    show.setOverlayDashboard(true)
+    const supabase = useNuxtApp().$supabase
+    await supabase.auth.signOut()
+    authentication.setUser({})
+    localStorage.removeItem('user')
+    show.setOverlayDashboard(false)
+    router.push('/')
   }
   
 </script>
@@ -23,7 +41,7 @@
                 <NuxtLink to="/" class="no-underline text-title text-subtitle-1">Home</NuxtLink>
               </li>
               <li class="mx-2">
-                <NuxtLink to="/sobre" class="no-underline text-title text-subtitle-1">Sobre</NuxtLink>
+                <NuxtLink to="/sobre" class="no-underline text-title text-subtitle-1">Sobre nós</NuxtLink>
               </li>
               <li class="mx-2">
                 <NuxtLink to="/vagas" class="no-underline text-title text-subtitle-1">Vagas</NuxtLink>
@@ -34,7 +52,9 @@
               
             </ul>
           </div>
-          <v-btn @click="dialog = true" rounded="xl" class="ml-5 bg-gradient-primary">Login</v-btn>
+          <v-btn v-if="authentication.user && authentication.user.id" @click="navigationDashboard" rounded="xl" class="ml-5 bg-gradient-status">Dashboard</v-btn>
+          <v-btn v-if="authentication.user && authentication.user.id" @click="logout" rounded="xl" class="ml-2" color="error">Sair</v-btn>
+          <v-btn v-else @click="dialog = true" rounded="xl" :class="`${authentication.user && authentication.user.id ? 'ml-2' : 'ml-5'}`" class="bg-gradient-primary">Login</v-btn>
         </div>
 
       </div>

@@ -1,11 +1,26 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
-const router = useRouter()
-const navigation = () => {
-  router.push('/dashboard/empresa/123/meu-perfil/editar')
-}
+  import { useShow } from '@/stores/show';
+  import { useInfo } from '@/stores/info';
+  definePageMeta({
+    layout: 'dashboard'
+  })
+  const show = useShow();
+  const info: any = useInfo();
+  const { notify } = useNotification();
+  const router = useRouter();
+  const company = ref<any>({})
+  const navigation = () => {
+    router.push(`/dashboard/empresa/${info.user.id}/meu-perfil/editar`)
+  }
+
+  const { data, error, pending } = await useFetch(`/api/companies/${info.user.id}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    company.value = data.value
+  }
 </script>
 
 <template>
@@ -44,31 +59,31 @@ const navigation = () => {
             <v-col cols="12">
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
-                <span class="text-body-2 ml-2">Empresa Exemplo Ltda</span>
+                <span class="text-body-2 ml-2">{{ company.name }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Razão social:</span>
-                <span class="text-body-2 ml-2">Empresa Exemplo Ltda</span>
+                <span class="text-body-2 ml-2">{{ company.legal_name }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">CNPJ:</span>
-                <span class="text-body-2 ml-2">12.345.678/0001-90</span>
+                <span class="text-body-2 ml-2">{{ company.cnpj }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Nome do representante:</span>
-                <span class="text-body-2 ml-2">Carlos Alberto</span>
+                <span class="text-body-2 ml-2">{{ company.representative_name }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">E-mail do representante:</span>
-                <span class="text-body-2 ml-2">carlos.alberto@empresaexemplo.com</span>
+                <span class="text-body-2 ml-2">{{ company.representative_email }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">CPF do representante:</span>
-                <span class="text-body-2 ml-2">123.456.789-00</span>
+                <span class="text-body-2 ml-2">{{ company.representative_cpf }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>
-                <span class="text-body-2 ml-2">Av. Paulista, 1000 - São Paulo, SP</span>
+                <span class="text-body-2 ml-2">{{ company.address }}</span>
               </div>
             </v-col>
           </v-row>

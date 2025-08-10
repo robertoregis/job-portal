@@ -27,6 +27,8 @@ export default defineNuxtPlugin((nuxtApp) => {
             titleDark: '#0f0f0fff',
             titleLight: '#464343ff',
             title: '#201f1fff',
+            language: '#1146a9',
+            status: '#b2670c',
             accent: '#82B1FF',
             error: '#FF5252',
             info: '#2196F3',

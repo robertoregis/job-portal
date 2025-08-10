@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { useInfo } from '@/stores/info';
+
   export default {
     props: {
 			job: {
@@ -9,33 +11,52 @@
     setup(props: any, {emit}) {
       const dialog = ref<boolean>(false)
       const job = toRef(props, 'job')
+      const dialogCreateCandidature = ref<boolean>(false)
+      const info: any = useInfo()
+      const router = useRouter();
+
+      const apply = () => {
+        if (info.user && info.user.id) {
+          dialogCreateCandidature.value = true
+        } else {
+          dialog.value = true
+        }
+      }
+
+      const navigation = (id: number) => {
+        dialog.value = false;
+        router.push(`/cadastrar/candidato`)
+      }
 
       return {
         dialog,
-        job
+        job,
+        dialogCreateCandidature,
+        navigation,
+        apply
       }
     }
   }
 </script>
 <template>
   <v-col cols="12" md="6" class="">
-    <NuxtLink to="/vagas/1" class="no-underline">
+    <NuxtLink :to="`/vagas/${job.id}`" class="no-underline">
       <v-card class="mx-auto">
         <v-card-title class="d-flex justify-space-between align-center">
           <div class="d-flex align-center">
             <v-avatar class="mr-2">
               <v-img
                 alt="John"
-                src="https://cdn.vuetifyjs.com/images/john.jpg"
+                :src="job.company_image_url"
               ></v-img>
             </v-avatar>
-            <span>{{ job.title }}</span>
+            <span>{{ job.position }}</span>
           </div>
-          <span class="text-caption text-titleLight">{{ job.created_date }}</span>
+          <span class="text-caption text-titleLight">{{ job.created_at_formatted }}</span>
         </v-card-title>
 
         <v-card-subtitle>
-          <span class="text-subtitle-1">{{ job.company }}</span>
+          <span class="text-subtitle-1">{{ job.company_name }}</span>
         </v-card-subtitle>
 
         <v-card-text>
@@ -44,7 +65,7 @@
 
         <v-card-actions>
           <v-btn
-            @click.prevent="dialog = true"
+            @click.prevent="apply"
             class="bg-gradient-primary"
             text="Candidatar-me"
             variant="flat"
@@ -53,6 +74,30 @@
       </v-card>
     </NuxtLink>
   </v-col>
+
+  <v-dialog
+    v-model="dialogCreateCandidature"
+    max-width="400"
+    persistent
+  >
+    <v-card
+      text="Se você curtiu a vaga não perca tempo e faça a sua candidatura."
+      title="Candidata-se!"
+    >
+      <template v-slot:actions>
+        <v-spacer></v-spacer>
+
+        <v-btn color="error" variant="flat" @click="dialogCreateCandidature = false">
+          Não
+        </v-btn>
+
+        <v-btn color="success" variant="flat" @click="dialogCreateCandidature = false">
+          Sim
+        </v-btn>
+      </template>
+    </v-card>
+  </v-dialog>
+
   <v-dialog
       v-model="dialog"
       max-width="400"
@@ -65,7 +110,7 @@
         <template v-slot:actions>
           <v-spacer></v-spacer>
 
-          <v-btn variant="flat" color="success" @click="dialog = false">
+          <v-btn variant="flat" color="success" @click="navigation">
             Faça o cadastro
           </v-btn>
         </template>

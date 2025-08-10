@@ -1,0 +1,219 @@
+<script setup lang="ts">
+    import { useInfo } from '@/stores/info';
+    const info: any = useInfo();
+    //// Idiomas
+    const languagesArray = [
+        { name: 'Português', code: 'pt' },
+        { name: 'Inglês', code: 'en' },
+        { name: 'Espanhol', code: 'es' },
+        { name: 'Francês', code: 'fr' },
+    ]
+    const levels = [
+        'Básico',
+        'Intermediário',
+        'Avançado',
+        'Fluente',
+        'Nativo',
+    ]
+    const dialogLanguage = ref(false)
+    const language = ref<any>({
+        name: null,
+        level: null
+    })
+    const languageList = ref<any>([])
+    const clearLanguage = () => {
+        language.value = {
+        language: null,
+        level: null
+        }
+        dialogLanguage.value = false
+    }
+
+    const changeLanguage = () => {
+        if (!language.value.name || !language.value.level) {
+            alert('Selecione idioma e nível')
+            return
+        }
+
+        const exists = languageList.value.some(
+            (l: any) => l.name === language.value.name && l.level === language.value.level
+        )
+
+        if (exists) {
+            alert('Idioma com esse nível já adicionado')
+            return
+        }
+
+        createLanguage()
+        }
+
+
+    const createLanguage = async () => {
+        const { data, error } = await useFetch('/api/languages', {
+            method: 'POST',
+            body: {
+                level: language.value.level,
+                name: language.value.name,
+                candidate_id: info.user.id
+            }
+        })
+
+        if (error.value) {
+            console.error('Erro ao criar education:', error.value)
+            return null
+        }
+
+        console.log('Language criada:', data.value)
+        getLanguages()
+        clearLanguage()
+        
+    }
+
+    const getLanguages = async () => {
+        const { data, error } = await useFetch('/api/languages', {
+            method: 'GET',
+            params: {
+                candidate_id: info.user.id
+            }
+        })
+
+        if (error.value) {
+            console.error('Erro ao carregar languages:', error.value)
+            return null
+        }
+
+        languageList.value = data.value
+    }
+
+    const removeLanguage = async (id: string) => {
+        const { data, error } = await useFetch(`/api/languages/${id}`, {
+            method: 'DELETE'
+        })
+
+        if (error.value) {
+            console.error('Erro ao remover education:', error.value)
+            return false
+        }
+
+        console.log('Language removida:', data.value)
+        getLanguages()
+    }
+
+    const { data: languages, error, refresh, pending } = await useFetch('/api/languages', {
+        method: 'GET',
+        params: {
+            candidate_id: info.user.id
+        }
+    })
+
+    if (error.value) {
+        console.error('Erro ao carregar languages:', error.value)
+    } else {
+        languageList.value = languages.value
+        console.log('Languages:', languages.value)
+    }
+</script>
+
+<template>
+    <v-card>
+        <v-card-title>
+            <div class="d-flex align-center">
+            <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
+            <h2 class="text-h6 font-weight-bold text-gradient-primary">Idiomas</h2>
+            </div>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+            <v-list two-line class="mt-2" v-if="languageList.length > 0">
+            <v-list-item
+                v-for="(item, i) in languageList"
+                :key="i"
+                class="pa-1 border mb-1"
+            >
+                <!-- Conteúdo principal -->
+                <v-list-item-content>
+                <v-list-item-title class="font-weight-bold">{{ item.name }}</v-list-item-title>
+                <v-list-item-subtitle v-if="item.level">{{ item.level }}</v-list-item-subtitle>
+                </v-list-item-content>
+
+                <!-- Botões de ação no canto superior direito -->
+                <template #append>
+                <div class="d-flex align-center justify-end ga-1">
+                    <v-btn
+                    icon="mdi-delete"
+                    size="x-small"
+                    color="error"
+                    @click="removeLanguage(item.id)"
+                    ></v-btn>
+                </div>
+                </template>
+            </v-list-item>
+            </v-list>
+
+            <v-btn class="bg-gradient-primary" @click="dialogLanguage = true">
+            Adicionar
+            </v-btn>
+
+        </v-card-text>
+    </v-card>
+
+    <v-dialog
+        v-model="dialogLanguage"
+        max-width="400"
+    >
+        <v-card
+        prepend-icon="mdi-star-circle"
+        :title="`Adicionar Idioma`"
+        >
+        <v-card-text>
+            <v-row dense>
+            <v-col cols="12">
+                <v-select
+                v-model="language.name"
+                :items="languagesArray"
+                item-title="name"
+                required
+                label="Idiomas"
+                density="compact"
+                hide-details
+                class="mb-1"
+                />
+            </v-col>
+
+            <v-col cols="12">
+                <v-select
+                v-model="language.level"
+                :items="levels"
+                label="Nível"
+                density="compact"
+                hide-details
+                class="mb-1"
+                />
+            </v-col>
+
+            </v-row>
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions>
+            <v-spacer />
+            <v-btn
+            text="Fechar"
+            color="error"
+            variant="flat"
+            @click="clearLanguage"
+            />
+            <v-btn
+            text="Adicionar"
+            color="success"
+            variant="flat"
+            @click="changeLanguage"
+            />
+        </v-card-actions>
+        </v-card>
+    </v-dialog>
+</template>
+
+<style lang="scss" scoped>
+</style>

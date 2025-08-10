@@ -1,38 +1,50 @@
 <script setup lang="ts">
   //import { vMask } from 'vue-the-mask';
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
 
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
-
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const route = useRoute();
   const states = ref<any[]>([])
   const stateSelected = ref<any>('')
   const citySelected = ref<any>('')
   const cities = ref<any[]>([])
   const loading = ref<boolean>(true)
   const formdata = ref<any>({
-    name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
+    name: null,
+    phone: null,
+    birth_date: null,
+    cpf: null,
     state: null,
     city: null,
-    about: ''
+    about: null,
+    marital_status: null,
   })
+  const imagePreview = ref<any>(null)
 
   const typeDate = ref<string>('')
-  const submit = () => {}
-
-  watch(stateSelected, async (newState) => {
+  
+  watch(stateSelected, async (newState, oldState) => {
     if (newState) {
-      formdata.value.state = newState;
-      await getCities(newState) // ou newState.id, dependendo da estrutura
-      citySelected.value = null
+      formdata.value.state = newState
+      await getCities(newState)
+      
+      if (newState !== oldState && (oldState !== null && oldState !== '')) {
+        citySelected.value = null
+      }
     } else {
       cities.value = []
       citySelected.value = null
     }
   })
+
   watch(citySelected, async (newCity) => {
     if (newCity) {
       formdata.value.city = newCity;
@@ -57,7 +69,6 @@
       }
   };
   const getCities = async (state: any) => {
-      formdata.value.city = '';
       // Buscar o estado selecionado
       const selectedState = states.value.find((s: any) => s.nome === state);
       if (!selectedState) {
@@ -72,10 +83,9 @@
           }
 
           const data = await res.json();
-
           cities.value = data.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
       } catch (err) {
-          console.error('Erro inesperado ao buscar cidades:', err);
+        console.error('Erro inesperado ao buscar cidades:', err);
       }
   };
 
@@ -83,14 +93,14 @@
 
   const onDateSelected = (val: any, type: string) => {
     if(type === `dateOfBirth`) {
-      formdata.value.date_of_birth = new Date(val).toLocaleDateString('pt-BR')
-    } else if(type === `dateEnd`) {
-      experience.value.dateEnd = new Date(val).toLocaleDateString('pt-BR')
-    } else if(type === `dateInitial`) {
-      experience.value.dateInitial = new Date(val).toLocaleDateString('pt-BR')
+      formdata.value.birth_date = val
     }
     pickerVisible.value = false
   }
+  const formattedBirthDate = computed(() => {
+    if (!formdata.value.birth_date) return ''
+    return new Date(formdata.value.birth_date).toLocaleDateString('pt-BR')
+  })
   const openDate = (type: string) => {
     typeDate.value =  type;
     pickerVisible.value = true;
@@ -101,230 +111,335 @@
     return phoneRegex.test(value) || 'Telefone inválido'
   }
 
-  //// Escolaridade
-  const dialogEducation = ref(false)
-  const educationsList = ref<any>([])
-  const education = ref({
-    level: null,
-    course: '',
-    institution: '',
-    period: '',
-    notes: ''
+  const updateCandidate = async () => {
+    show.setOverlayDashboard(true)
+    try {
+      const { data, error } = await useFetch(`/api/candidates/${info.user.id}`, {
+        method: 'PATCH',
+        body: formdata.value
+      })
+
+      if (error.value) {
+        console.error('Erro ao atualizar candidato:', error.value)
+        return
+      }
+      /*createNotice({
+        title: 'Novo Aviso',
+        description: 'Descrição do aviso',
+        subtitle: 'Destaque',
+        profile_id: info.profile.id,
+        type: 'Info'
+      })*/
+      show.setOverlayDashboard(false)
+      notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
+    } catch (err) {
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar', type: 'error' })
+    }
+  }
+
+  const { data, error, pending } = await useFetch(`/api/candidates/${info.user.id}`, {
+    method: 'GET'
   })
-  const educationLevels = [
-    "Fundamental Incompleto",
-    "Fundamental Completo",
-    "Médio Incompleto",
-    "Ensino Médio",
-    "Técnico",
-    "Tecnólogo",
-    "Graduação",
-    "Pós-graduação",
-    "Mestrado",
-    "Doutorado"
-  ]
-  const editingEducationIndex = ref<any>(null)
-  const editEducation = (index: any) => {
-    const item = educationsList.value[index]
-    education.value = { ...item }
-    editingEducationIndex.value = index
-    dialogEducation.value = true
+
+  if (error.value) {
+  } else {
+    formdata.value = {
+      name: data.value.name,
+      phone: data.value.phone,
+      birth_date: data.value.birth_date,
+      cpf: data.value.cpf,
+      state: data.value.state,
+      city: data.value.city,
+      about: data.value.about,
+      marital_status: data.value.marital_status,
+    }
+    if(info.user.image_url) {
+      imagePreview.value = info.user.image_url
+    }
+    await getStates()
+    if(data.value.state) {
+      stateSelected.value = data.value.state
+      await getCities(data.value.state)
+      citySelected.value = data.value.city
+    }
   }
-  const removeEducation = (index: any) => {
-    educationsList.value.splice(index, 1)
+
+  const file = ref<File | null>(null)
+  const fileInput: any = ref(null)
+  const triggerFileInput = () => {
+    fileInput.value?.click()
   }
-  const addEducation = () => {
-    if (!education.value.level || !education.value.course || !education.value.period || !education.value.institution) {
-      alert('Apenas o campo notas é opcional')
+
+  const previewImage = () => {
+    if (!file.value) {
+      imagePreview.value = null
       return
     }
-    if (editingEducationIndex.value !== null) {
-      educationsList.value[editingEducationIndex.value] = { ...education.value }
+    const selectedFile = file.value
+
+    if (selectedFile instanceof File) {
+      imagePreview.value = URL.createObjectURL(selectedFile)
+    } else if (Array.isArray(selectedFile)) {
+      imagePreview.value = selectedFile.length > 0 ? URL.createObjectURL(selectedFile[0]) : null
+    }
+  }
+
+  const uploadImage = async () => {
+    show.setOverlayDashboard(true)
+    if (!file.value) {
+      notify({ title: 'Erro', text: 'Selecione uma imagem', type: 'error' })
+      show.setOverlayDashboard(false)
+      return
+    }
+
+    const formDataTy = new FormData()
+    formDataTy.append('file', file.value)
+    const url = `/api/images?profile_id=${info.profile.id}&type=candidate`
+
+    const { data: imageData, error: imageError }: any = await useFetch(url, {
+      method: 'POST',
+      body: formDataTy
+    })
+
+    if (imageError.value) {
+      notify({ title: 'Erro', text: 'Erro ao enviar imagem', type: 'error' })
     } else {
-      educationsList.value.push({ ...education.value })
+      if(info.user.image_id) {
+        await deleteImage(false)
+      }
+      const candidate = info.user
+      setTimeout(() => {
+        info.setUser({
+          ...candidate,
+          image_url: imageData.value.image_url,
+          image_id: imageData.value.image_id
+        })
+        imagePreview.value = imageData.value.image_url
+        notify({ title: 'Parabéns!', text: 'A imagem foi enviada', type: 'success' })
+      }, 1500)
     }
+    setTimeout(() => {
+      show.setOverlayDashboard(false)
+    }, 1000)
+  }
 
-    clearEducation()
-  }
-  const clearEducation = () => {
-    education.value = {
-      level: null,
-      course: '',
-      institution: '',
-      period: '',
-      notes: ''
+  const deleteImage = async (isLoading: boolean) => {
+    if(isLoading) {
+      show.setOverlayDashboard(true)
     }
-    dialogEducation.value = false
-    editingEducationIndex.value = null
-  }
-  ////
+    const url = `/api/images?image_id=${encodeURIComponent(info.user.image_id)}&type=${info.user.type}&profile_id=${info.profile.id}`
+    const { data, error } = await useFetch(url, {
+      method: 'DELETE'
+    })
 
-  //// Soft Skill
-  const dialogSoftSkill = ref(false)
-  const softsList = ref<any>([])
-  const softSkill = ref({
-    name: '',
-    level: null,
-    notes: '',
-  })
-  const skillLevels = [
-    'Iniciante',
-    'Intermediário',
-    'Avançado',
-    'Especialista',
-  ]
-  const clearSoftSkill = () => {
-    softSkill.value = {
-      name: '',
-      level: null,
-      notes: '',
-    }
-    dialogSoftSkill.value = false
-    editingIndex.value = null
+    setTimeout(() => {
+      if(isLoading) {
+        if(error.value) {
+          notify({ title: 'Erro', text: 'Erro ao remover imagem', type: 'error' })
+        } else {
+          notify({ title: 'Parabéns!', text: 'A imagem foi removida', type: 'success' })
+        }
+        const candidate = info.user
+        info.setUser({
+          ...candidate,
+          image_url: null,
+          image_id: null
+        })
+        imagePreview.value = null
+        file.value = null
+        show.setOverlayDashboard(false)
+      }
+    }, 1000)
   }
-  const addSoftSkill = () => {
-    if (!softSkill.value.name) {
-      alert('Selecione o nome do soft skill')
+
+  const cancelChange = () => {
+    imagePreview.value = info.user.image_url
+    file.value = null
+  }
+
+  const filePDF = ref<File | null>(null)
+  const fileInputPDF = ref<HTMLInputElement | null>(null)
+
+  const uploadPDF = async () => {
+    if (!filePDF.value) {
+      notify({ title: 'Erro', text: 'Selecione um arquivo PDF', type: 'error' })
       return
     }
-    if (editingIndex.value !== null) {
-      softsList.value[editingIndex.value] = { ...softSkill.value }
+
+    // opcional: validar extensão e tipo mime no frontend
+    if (filePDF.value.type !== 'application/pdf') {
+      notify({ title: 'Erro', text: 'Apenas arquivos PDF são permitidos', type: 'error' })
+      return
+    }
+
+    show.setOverlayDashboard(true)
+
+    const formData = new FormData()
+    formData.append('file', filePDF.value)
+
+    // Aqui você manda o candidate_id e o type correto (candidate ou candidature)
+    // Exemplo usando candidate_id para candidato
+    const url = `/api/archives?candidate_id=${info.user.id}&type=candidate`
+
+    const { data: pdfData, error: pdfError }: any = await useFetch(url, {
+      method: 'POST',
+      body: formData
+    })
+
+    if (pdfError.value) {
+      notify({ title: 'Erro', text: 'Erro ao enviar arquivo', type: 'error' })
     } else {
-      softsList.value.push({ ...softSkill.value })
+      if(info.user.curriculum_id) {
+        await deletePDF(false, info.user.curriculum_id)
+      }
+      notify({ title: 'Sucesso', text: 'Currículo enviado com sucesso!', type: 'success' })
+      // Atualize seu store com o curriculum_url e curriculum_id retornados
+      // Exemplo:
+      setTimeout(() => {
+        info.setUser({
+          ...info.user,
+          curriculum_url: pdfData.value.curriculum_url,
+          curriculum_id: pdfData.value.curriculum_id
+        })
+        filePDF.value = null
+      }, 1000)
     }
-    clearSoftSkill()
-  }
-  const editingIndex = ref<any>(null)
-  const editSoftSkill = (index: any) => {
-    const item = softsList.value[index]
-    softSkill.value = { ...item }
-    editingIndex.value = index
-    dialogSoftSkill.value = true
-  }
-  const removeSoftSkill = (index: any) => {
-    softsList.value.splice(index, 1)
-  }
-  ////
 
-  //// Idiomas
-  const languages = [
-    { name: 'Português', code: 'pt' },
-    { name: 'Inglês', code: 'en' },
-    { name: 'Espanhol', code: 'es' },
-    { name: 'Francês', code: 'fr' },
-  ]
-  const levels = [
-    'Básico',
-    'Intermediário',
-    'Avançado',
-    'Fluente',
-    'Nativo',
-  ]
-  const dialogLanguage = ref(false)
-  const language = ref<any>({
-    name: null,
-    level: null
-  })
-  const languageList = ref<any>([])
-  function addLanguage() {
-    if (!language.value.name || !language.value.level) {
-      alert('Selecione idioma e nível')
+    setTimeout(() => {
+      show.setOverlayDashboard(false)
+    })
+  }
+
+  const deletePDF = async (isLoading: boolean, curriculumId: string) => {
+    if (!info.user.curriculum_id) {
+      notify({ title: 'Erro', text: 'Nenhum currículo para remover', type: 'error' })
       return
     }
-    const languageName = languages.find(
-      (l) => l.code === language.value.name
-    )?.name
-    // Evita adicionar idioma repetido
-    const exists = languageList.value.some(
-      (l: any) => l.languageName === languageName
-    )
-    if (exists) {
-      alert('Idioma já adicionado')
-      return
+    if(isLoading) {
+      show.setOverlayDashboard(true)
     }
-    languageList.value.push({ ...language.value })
-    clearLanguage()
-  }
-  const clearLanguage = () => {
-    language.value = {
-      language: null,
-      level: null
-    }
-    dialogLanguage.value = false
-  }
-  const removeLanguage = (index: any) => {
-    languageList.value.splice(index, 1)
-  }
-  ////
 
-  //// Experiência profissional
-  const periods = [
-    'Menos de 6 meses',
-    'Entre 6 meses e 1 ano',
-    'Entre 1 a 3 anos',
-    'Entre 3 a 5 anos',
-    'Mais de 5 anos',
-  ]
-  const experience = ref<any>({
-    period: null,
-    dateInitial: '',
-    dateEnd: '',
-    companyName: '',
-    description: ''
-  })
-  const dialogExperience = ref(false)
-  const experiencesList = ref<any>([])
-  const addExperience = () => {
-    if (!experience.value.period || !experience.value.companyName) {
-      alert('Selecione o nome da empresa e o período')
-      return
-    }
-    if (editingIndex.value !== null) {
-      experiencesList.value[editingExperienceIndex.value] = { ...experience.value }
-    } else {
-      experiencesList.value.push({ ...experience.value })
-    }
-    clearExperience()
-  }
-  const editingExperienceIndex = ref<any>(null)
-  const editExperience = (index: any) => {
-    const item = experiencesList.value[index]
-    experience.value = { ...item }
-    editingExperienceIndex.value = index
-    dialogExperience.value = true
-  }
-  const removeExperience = (index: any) => {
-    experiencesList.value.splice(index, 1)
-  }
-  const clearExperience = () => {
-    experience.value = {
-      period: null,
-      dateInitial: '',
-      dateEnd: '',
-      companyName: '',
-      description: ''
-    }
-    dialogExperience.value = false;
-    editingExperienceIndex.value = null
-  }
-  ////
+    const url = `/api/archives?curriculum_id=${encodeURIComponent(curriculumId)}&type=candidate&candidate_id=${info.user.id}`
+    const { error }: any = await useFetch(url, {
+      method: 'DELETE'
+    })
+    
+    setTimeout(() => {
+      if(isLoading) {
+        if(error.value) {
+          notify({ title: 'Erro', text: 'Erro ao remover currículo', type: 'error' })
+        } else {
+          console.log(3)
+          notify({ title: 'Sucesso', text: 'Currículo removido', type: 'success' })
+          const candidate = info.user
+          info.setUser({
+            ...candidate,
+            curriculum_url: null,
+            curriculum_id: null
+          })
+          filePDF.value = null
+        }
+        show.setOverlayDashboard(false)
+      }
+    }, 1000)
 
-  onMounted(() => {
-    getStates()
-  })
+  }
+
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Editar perfil</span>
+        <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
     </v-col>
   </v-row>
+
   <v-row no-gutters class="mt-5">
-      <v-col cols="12" class="border">
+    <v-col cols="12" class="border pa-2">
+      <div class="d-flex flex-column">
+        <span class="text-caption mb-2">Clique na foto para trocar:</span>
+        <div class="d-flex align-center">
+          <v-avatar v-if="imagePreview" size="70" @click="triggerFileInput" class="cursor-pointer">
+            <v-img alt="Foto" :src="imagePreview"></v-img>
+          </v-avatar>
+          <v-avatar v-else size="70" @click="triggerFileInput" class="cursor-pointer">
+            <v-img alt="Foto" src="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/blank-profile-picture-973460_640.png"></v-img>
+          </v-avatar>
+
+          <!-- Input de arquivo escondido -->
+          <v-file-input
+            ref="fileInput"
+            accept="image/*"
+            v-model="file"
+            style="display: none"
+            @change="previewImage"
+          ></v-file-input>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview !== info.user.image_url && imagePreview"
+                @click="uploadImage"
+                size="small"
+                :disabled="!file"
+                color="primary"
+                class="ml-2"
+                icon
+                aria-label="Upload"
+              >
+                <v-icon>mdi-upload</v-icon>
+              </v-btn>
+            </template>
+            <span>Trocar</span>
+          </v-tooltip>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview !== info.user.image_url && imagePreview"
+                @click="cancelChange"
+                size="small"
+                :disabled="!file"
+                color="grey"
+                class="ml-2"
+                icon
+                aria-label="Cancelar"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </template>
+            <span>Cancelar</span>
+          </v-tooltip>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview && info.user.image_id"
+                @click="deleteImage(true)"
+                size="small"
+                color="error"
+                class="ml-2"
+                icon
+                aria-label="Remover"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
+            <span>Remover</span>
+          </v-tooltip>
+
+        </div>
+      </div>
+    </v-col>
+
+      <v-col cols="12" class="border mt-4">
         <v-card>
           <v-card-title>
             <div class="d-flex align-center">
@@ -336,7 +451,7 @@
           <v-card-text>
             <v-row no-gutters>
               <v-col cols="12">
-                <form @submit.prevent="submit">
+                <form @submit.prevent="updateCandidate">
                   <v-text-field
                     v-model="formdata.name"
                     :counter="10"
@@ -346,13 +461,13 @@
                     class="mb-2"
                   />
 
-                  <v-text-field
+                  <!--<v-text-field
                     v-model="formdata.email"
                     label="E-mail"
                     density="compact"
                     hide-details
                     class="mb-2"
-                  />
+                  />-->
 
                   <v-text-field
                     v-model="formdata.phone"
@@ -365,7 +480,19 @@
                     v-mask="'(##) #####-####'"
                   />
 
+                  <v-text-field
+                    v-model="formdata.cpf"
+                    label="CPF"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                    type="tel"
+                    :counter="15"
+                    v-mask="'###.###.###-##'"
+                  />
+
                   <v-select
+                    v-model="formdata.marital_status"
                     label="Estado Cívil"
                     :items="['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)']"
                     density="compact"
@@ -397,7 +524,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.date_of_birth"
+                    :model-value="formattedBirthDate"
                     label="Data de nascimento"
                     readonly
                     @click="openDate(`dateOfBirth`)"
@@ -420,7 +547,7 @@
 
                   <v-textarea
                     label="Sobre mim"
-                    :model-value="formdata.about"
+                    v-model="formdata.about"
                     name="input-7-1"
                     variant="filled"
                     auto-grow
@@ -442,495 +569,72 @@
 
       <v-col cols="12" class="border mt-4">
         <v-card>
-          <v-card-title>
-            <div class="d-flex align-center">
-              <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold text-gradient-primary">Experiência profissional</h2>
-            </div>
-          </v-card-title>
+          <v-card-title>Currículo</v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <v-list v-if="experiencesList.length > 0" two-line class="mb-2">
-              <v-list-item
-                v-for="(item, i) in experiencesList"
-                :key="i"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{ item.name_company }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.period }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
+            <div class="d-flex flex-column">
+              <div v-if="info.user.curriculum_url" class="mb-4">
+                <a
+                  :href="info.user.curriculum_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-decoration-none text-subtitle-1"
+                >
+                  Ver currículo atual
+                </a>
+                <v-btn
+                  color="error"
+                  class="ml-4"
+                  @click="deletePDF(true, info.user.curriculum_id)"
+                  size="small"
+                >
+                  <v-icon left>mdi-delete</v-icon>
+                  Remover currículo
+                </v-btn>
+              </div>
+              <span class="text-caption mb-2">Envie seu currículo (PDF):</span>
 
-            <v-btn class="bg-gradient-primary" @click="dialogExperience = true">
-              Adicionar
-            </v-btn>
+              <v-file-input
+                ref="fileInputPDF"
+                accept="application/pdf"
+                v-model="filePDF"
+                :label="filePDF ? filePDF.name : (info.user.curriculum_url ? 'Arquivo selecionado' : 'Escolher arquivo PDF')"
+                show-size
+                prepend-icon="mdi-file-pdf-box"
+                clearable
+              />
+
+              <div class="d-flex align-start">
+                <v-btn
+                  class="mt-2 bg-gradient-primary"
+                  :disabled="!filePDF"
+                  @click="uploadPDF"
+                >
+                  <v-icon left>mdi-upload</v-icon>
+                  Enviar currículo
+                </v-btn>
+              </div>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
+
       <v-col cols="12" class="border mt-4">
-        <v-card>
-          <v-card-title>
-            <div class="d-flex align-center">
-              <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold text-gradient-primary">Softs Skill</h2>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-list v-if="softsList.length > 0" two-line class="mb-2">
-              <v-list-item
-                v-for="(item, i) in softsList"
-                :key="i"
-                class="pa-1 border mb-1"
-              >
-                <!-- Conteúdo principal -->
-                <v-list-item-content>
-                  <v-list-item-title class="font-weight-bold">{{ item.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="item.level">{{ item.level }}</v-list-item-subtitle>
-                </v-list-item-content>
+        <PerfilUserExperiences />
+      </v-col>
 
-                <!-- Botões de ação no canto superior direito -->
-                <template #append>
-                  <div class="d-flex align-center justify-end ga-1">
-                    <v-btn
-                      icon="mdi-pencil"
-                      size="x-small"
-                      @click="editSoftSkill(i)"
-                    ></v-btn>
-
-                    <v-btn
-                      icon="mdi-delete"
-                      size="x-small"
-                      color="error"
-                      @click="removeSoftSkill(i)"
-                    ></v-btn>
-                  </div>
-                </template>
-              </v-list-item>
-            </v-list>
-
-
-            <v-btn class="bg-gradient-primary" @click="dialogSoftSkill = true">
-              Adicionar
-            </v-btn>
-          </v-card-text>
-        </v-card>
+      <v-col cols="12" class="border mt-4">
+        <PerfilUserLanguages />
       </v-col>
       
       <v-col cols="12" class="border mt-4">
-        <v-card>
-          <v-card-title>
-            <div class="d-flex align-center">
-              <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold text-gradient-primary">Idiomas</h2>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-list two-line class="mt-2" v-if="languageList.length > 0">
-              <v-list-item
-                v-for="(item, i) in languageList"
-                :key="i"
-                class="pa-1 border mb-1"
-              >
-                <!-- Conteúdo principal -->
-                <v-list-item-content>
-                  <v-list-item-title class="font-weight-bold">{{ item.name }}</v-list-item-title>
-                  <v-list-item-subtitle v-if="item.level">{{ item.level }}</v-list-item-subtitle>
-                </v-list-item-content>
-
-                <!-- Botões de ação no canto superior direito -->
-                <template #append>
-                  <div class="d-flex align-center justify-end ga-1">
-                    <v-btn
-                      icon="mdi-delete"
-                      size="x-small"
-                      color="error"
-                      @click="removeLanguage(i)"
-                    ></v-btn>
-                  </div>
-                </template>
-              </v-list-item>
-            </v-list>
-
-            <v-btn class="bg-gradient-primary" @click="dialogLanguage = true">
-              Adicionar
-            </v-btn>
-
-          </v-card-text>
-        </v-card>
+        <PerfilUserEducations />
       </v-col>
 
       <v-col cols="12" class="border mt-4">
-        <v-card>
-          <v-card-title>
-            <div class="d-flex align-center">
-              <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold text-gradient-primary">Escolaridade</h2>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-list v-if="educationsList.length > 0" two-line class="mb-2">
-              <v-list-item
-                v-for="(item, i) in educationsList"
-                :key="i"
-                class="pa-1 border mb-1 rounded"
-              >
-                <!-- Conteúdo principal -->
-                <v-list-item-content>
-                  <v-list-item-title class="font-weight-bold">{{ item.course }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.level }}</v-list-item-subtitle>
-                </v-list-item-content>
-
-                <!-- Botões de ação no canto superior direito -->
-                <template #append>
-                  <div class="d-flex align-center justify-end ga-1">
-                    <v-btn
-                      icon="mdi-pencil"
-                      size="x-small"
-                      @click="editEducation(i)"
-                    ></v-btn>
-
-                    <v-btn
-                      icon="mdi-delete"
-                      size="x-small"
-                      color="error"
-                      @click="removeEducation(i)"
-                    ></v-btn>
-                  </div>
-                </template>
-              </v-list-item>
-            </v-list>
-
-            <v-btn class="bg-gradient-primary" @click="dialogEducation = true">
-              Adicionar
-            </v-btn>
-          </v-card-text>
-        </v-card>
+        <PerfilUserSoftsSkills />
       </v-col>
-
-
-      <v-dialog
-        v-model="dialogExperience"
-        max-width="400"
-      >
-        <v-card
-            prepend-icon="mdi-account"
-            title="Criar experiência profissional"
-          >
-            <v-card-text>
-              <v-row dense>
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="experience.companyName"
-                    required
-                    :counter="10"
-                    label="Nome da empresa"
-                    density="compact"
-                    hide-details
-                    class="mb-1"
-                  ></v-text-field>
-                </v-col>
-
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="experience.dateInitial"
-                    label="Data inicial"
-                    readonly
-                    @click="openDate(`dateInitial`)"
-                    density="compact"
-                    hide-details
-                    class="mb-1"
-                    required
-                  ></v-text-field>
-                </v-col>
-
-                <v-col
-                  cols="12"
-                >
-                  <v-text-field
-                    v-model="experience.dateEnd"
-                    label="Data final"
-                    readonly
-                    @click="openDate(`dateEnd`)"
-                    density="compact"
-                    hide-details
-                    class="mb-1"
-                    required
-                  ></v-text-field>
-                </v-col>
-
-                <v-col
-                  cols="12"
-                >
-                <v-select
-                  v-model="experience.period"
-                  :items="periods"
-                  label="Périodo"
-                  hide-details
-                  density="compact"
-                  class="mb-1"
-                />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                >
-                  <v-textarea
-                    label="Descrição"
-                    :model-value="experience.description"
-                    name="input-7-1"
-                    variant="filled"
-                    auto-grow
-                    hide-details
-                    density="compact"
-                    class="mb-1"
-                  ></v-textarea>
-                </v-col>
-              </v-row>
-
-            </v-card-text>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-
-              <v-btn
-                text="Fechar"
-                color="error"
-                variant="flat"
-                @click="clearExperience"
-              ></v-btn>
-
-              <v-btn
-                color="success"
-                :text="`${editingExperienceIndex !== null ? 'Salvar' : 'Adicionar'}`"
-                variant="flat"
-                @click="addExperience"
-              ></v-btn>
-            </v-card-actions>
-          </v-card>
-      </v-dialog>
-
-      <v-dialog
-        v-model="dialogSoftSkill"
-        max-width="400"
-      >
-        <v-card
-          prepend-icon="mdi-star-circle"
-          :title="`${editingIndex !== null ? 'Editar' : 'Adicionar'} Soft Skill`"
-        >
-          <v-card-text>
-            <v-row dense>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="softSkill.name"
-                  label="Nome da Soft Skill"
-                  required
-                  :counter="30"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-select
-                  v-model="softSkill.level"
-                  :items="skillLevels"
-                  label="Nível"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-textarea
-                  v-model="softSkill.notes"
-                  label="Notas (opcional)"
-                  variant="filled"
-                  auto-grow
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-            </v-row>
-          </v-card-text>
-
-          <v-divider />
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text="Fechar"
-              color="error"
-              variant="flat"
-              @click="clearSoftSkill"
-            />
-            <v-btn
-              :text="`${editingIndex !== null ? 'Salvar' : 'Adicionar'}`"
-              color="success"
-              variant="flat"
-              @click="addSoftSkill"
-            />
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog
-        v-model="dialogLanguage"
-        max-width="400"
-      >
-        <v-card
-          prepend-icon="mdi-star-circle"
-          :title="`Adicionar Idioma`"
-        >
-          <v-card-text>
-            <v-row dense>
-              <v-col cols="12">
-                <v-select
-                  v-model="language.name"
-                  :items="languages"
-                  item-title="name"
-                  required
-                  label="Idiomas"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-select
-                  v-model="language.level"
-                  :items="levels"
-                  label="Nível"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-
-            </v-row>
-          </v-card-text>
-
-          <v-divider />
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text="Fechar"
-              color="error"
-              variant="flat"
-              @click="clearLanguage"
-            />
-            <v-btn
-              text="Adicionar"
-              color="success"
-              variant="flat"
-              @click="addLanguage"
-            />
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog
-        v-model="dialogEducation"
-        max-width="400"
-      >
-        <v-card
-          prepend-icon="mdi-star-circle"
-          :title="`${editingEducationIndex !== null ? 'Editar' : 'Adicionar'} Escolaridade`"
-        >
-          <v-card-text>
-            <v-row dense>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="education.course"
-                  label="Curso"
-                  required
-                  :counter="30"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="education.institution"
-                  label="Instituição"
-                  required
-                  :counter="30"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="education.period"
-                  label="Périodo"
-                  required
-                  :counter="30"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-select
-                  v-model="education.level"
-                  :items="educationLevels"
-                  label="Nível"
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-textarea
-                  v-model="education.notes"
-                  label="Notas (opcional)"
-                  variant="filled"
-                  auto-grow
-                  density="compact"
-                  hide-details
-                  class="mb-1"
-                />
-              </v-col>
-            </v-row>
-          </v-card-text>
-
-          <v-divider />
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text="Fechar"
-              color="error"
-              variant="flat"
-              @click="clearEducation"
-            />
-            <v-btn
-              :text="`${editingEducationIndex !== null ? 'Salvar' : 'Adicionar'}`"
-              color="success"
-              variant="flat"
-              @click="addEducation"
-            />
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
 
   </v-row>
 </template>

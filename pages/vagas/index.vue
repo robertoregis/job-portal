@@ -1,51 +1,18 @@
 <script setup lang="ts">
   import { useInfo } from '#imports';
+  const page = ref(1)
+  const pageSize = ref(12)
+  const totalPages = ref(1)
+  const jobsList = ref<any[]>([])
 
   definePageMeta({
     layout: 'default' // ou outro nome, conforme os arquivos em layouts/
   })
 
   const info: any = useInfo();
-  const vagas = ref<any[]>([
-  {
-    id: 1,
-    title: 'Engenheiro de Software',
-    company: 'Tech Solutions',
-    description: 'Desenvolvimento de sistemas web utilizando JavaScript, TypeScript e Node.js. Conhecimento em arquitetura de software e metodologias ágeis.',
-    created_date: '15/07/2025'
-  },
-  {
-    id: 2,
-    title: 'Analista de Marketing Digital',
-    company: 'Agência Criativa',
-    description: 'Planejamento e execução de campanhas digitais, análise de métricas e otimização de resultados em plataformas como Google Ads e Facebook Ads.',
-    created_date: '20/08/2025'
-  },
-  {
-    id: 3,
-    title: 'Designer Gráfico',
-    company: 'Studio Arte Viva',
-    description: 'Criação de peças gráficas para mídias sociais, materiais impressos e branding. Domínio do pacote Adobe (Photoshop, Illustrator e InDesign).',
-    created_date: '05/09/2025'
-  },
-  {
-    id: 4,
-    title: 'Coordenador de RH',
-    company: 'Empresa ABC',
-    description: 'Responsável pelo recrutamento, seleção, treinamento e desenvolvimento de colaboradores. Experiência com legislação trabalhista e sistemas de RH.',
-    created_date: '10/09/2025'
-  },
-  {
-    id: 5,
-    title: 'Técnico de Suporte',
-    company: 'HelpDesk Solutions',
-    description: 'Atendimento a clientes, resolução de problemas técnicos, manutenção de hardware e software, suporte remoto e presencial.',
-    created_date: '12/09/2025'
-  },
-])
 
 
-  const estados = [
+  const states = [
     'São Paulo',
     'Rio de Janeiro',
     'Minas Gerais',
@@ -55,15 +22,85 @@
     'Rio Grande do Sul'
   ]
 
-  const datasCriacao = [
+  const dateCreated = [
     'Últimos 7 dias',
     'Últimos 30 dias',
     'Últimos 90 dias',
     'Mais de 90 dias'
   ]
 
-  const selectedEstado = ref<string | null>(null)
+  const selectedState = ref<string | null>(null)
   const selectedData = ref<string | null>(null)
+
+  watch([selectedState, selectedData], () => {
+    page.value = 1
+    getJobs()
+  })
+
+  watch(page, () => {
+    getJobs()
+  })
+
+  const getJobs = async () => {
+    const params: Record<string, any> = {
+      is_active: true,
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString(),
+    }
+
+    if (selectedState.value) {
+      params.state = selectedState.value
+    }
+
+    if (selectedData.value) {
+      // Passar um código para o backend saber o filtro de tempo:
+      // Pode enviar algo simples como:
+      // "7", "30", "90", "90+" para os períodos.
+      switch (selectedData.value) {
+        case 'Últimos 7 dias':
+          params.createdWithinDays = 7
+          break
+        case 'Últimos 30 dias':
+          params.createdWithinDays = 30
+          break
+        case 'Últimos 90 dias':
+          params.createdWithinDays = 90
+          break
+        case 'Mais de 90 dias':
+          params.createdMoreThanDays = 90
+          break
+      }
+    }
+
+    const { data, error } = await useFetch('/api/jobs', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+      console.error('Erro ao carregar jobs:', error.value)
+    } else {
+      jobsList.value = data.value?.data || []
+      totalPages.value = data.value?.totalPages || 1
+    }
+  }
+
+  const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
+    method: 'GET',
+    params: {
+      is_active: true,
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString()
+    }
+  })
+
+  if (error.value) {
+    console.error('Erro ao carregar jobs:', error.value)
+  } else {
+    jobsList.value = jobs.value?.data || []
+    totalPages.value = jobs.value?.totalPages || 1
+    console.log('Jobs:', jobs.value)
+  }
 </script>
 
 <template>
@@ -80,7 +117,7 @@
                 <div class="d-flex flex-wrap gap-3">
                   <v-select
                     v-model="selectedData"
-                    :items="datasCriacao"
+                    :items="dateCreated"
                     label="Data de criação"
                     clearable
                     dense
@@ -90,8 +127,8 @@
                     class="w-100 my-1 mr-2"
                   />
                   <v-select
-                    v-model="selectedEstado"
-                    :items="estados"
+                    v-model="selectedState"
+                    :items="states"
                     label="Estado"
                     clearable
                     dense
@@ -117,10 +154,24 @@
 
           <v-col cols="12">
             <v-row>
-              <template v-for="(vaga, indice) in vagas" :key="indice">
-                <JobsJob :job="vaga" />
+              <template v-for="(job, indice) in jobsList" :key="indice">
+                <JobsJob :job="job" />
               </template>
             </v-row>
+          </v-col>
+          <!-- Paginação -->
+          <v-col
+            v-if="totalPages > 1"
+            cols="12"
+            class="d-flex justify-center mt-4"
+          >
+            <v-pagination
+              v-model="page"
+              :length="totalPages"
+              :total-visible="5"
+              color="primary"
+              rounded
+            />
           </v-col>
         </v-row>
       </v-container>

@@ -1,48 +1,73 @@
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   definePageMeta({
-    layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
+    layout: 'dashboard'
   })
 
   const router = useRouter()
+  const info: any = useInfo();
+  const jobsList = ref<any[]>([])
+  const noticesList = ref<any[]>([])
+  const counts = ref<any>({
+    total: 0,
+    open: 0,
+    closedSignup: 0,
+    ended: 0
+  })
 
-  const candidateName = 'Empresa X' // nome fictício para o candidato
+  const navigation = (link: any) => {
+    router.push(link)
+  }
 
-  // Dados de avisos
-  const avisos = [
-    {
-      id: 1,
-      date: '12h30 12/09/2025',
-      title: 'Atualização do sistema',
-      subtitle: 'O sistema passará por manutenção no próximo sábado.'
-    },
-    {
-      id: 2,
-      date: '09h00 10/09/2025',
-      title: 'Nova funcionalidade',
-      subtitle: 'Agora você pode exportar relatórios em PDF.'
+  const getCounts = async () => {
+    const { data, error } = await useFetch('/api/jobs/counts', {
+      method: 'GET',
+      params: { company_id: info.user.id }
+    })
+    if (error.value) {
+      console.error('Erro ao buscar counts:', error.value)
+    } else {
+      counts.value = data.value || { total: 0, open: 0, closedSignup: 0, ended: 0 }
+      getNotices()
     }
-  ]
+  }
 
-  // Dados das vagas
-  const vagas = [
-    {
-      id: 1,
-      date: '12h30 12/09/2025',
-      status: 'Ativa',
-      ativa: true,
-      title: 'Desenvolvedor Front-end'
-    },
-    {
-      id: 2,
-      date: '2 hr',
-      status: 'Encerrada',
-      ativa: false,
-      title: 'Designer UX'
+  const getNotices = async () => {
+    const params: Record<string, any> = {
+      page: 1,
+      pageSize: 3
     }
-  ]
 
-  const navigation = (id: number) => {
-    router.push('/dashboard/empresa/123/minhas-vagas/123')
+    // Filtro por empresa (se houver)
+    if (info.profile.id) {
+      params.profile_id = info.profile.id
+    }
+
+    const { data, error } = await useFetch('/api/notices', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+      console.error('Erro ao carregar candidaturas:', error.value)
+    } else {
+      noticesList.value = data.value?.data || []
+    }
+  }
+
+  const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
+    method: 'GET',
+    params: {
+      candidate_id: info.user.id,
+      page: 1,
+      pageSize: 3
+    }
+  })
+
+  if (error.value) {
+  } else {
+    jobsList.value = jobs.value?.data || []
+    await getCounts()
   }
 </script>
 
@@ -50,8 +75,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, {{ candidateName }}!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bol">Olá, {{ info.user.name }}!</span>
+        <span class="text-caption">Seja bem vindo ao seu dashboard</span>
       </div>
     </v-col>
   </v-row>
@@ -60,13 +85,14 @@
     <v-col cols="12">
       <div class="d-flex align-center">
         <v-card
+          hover ripple @click="navigation('/dashboard/empresa/123/minhas-vagas')"
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
           elevation="2"
           width="220"
           style="min-height: 120px"
         >
-          <div class="text-h6" style="line-height: 1.2;">Vagas</div>
-          <div class="text-h3 font-weight-bold">9</div>
+          <div class="text-h6" style="line-height: 1.2;">Vagas abertas para inscrição</div>
+          <div class="text-h3 font-weight-bold">{{ counts.open }}</div>
         </v-card>
         <v-card
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 border border-secondary"
@@ -74,8 +100,8 @@
           width="220"
           style="min-height: 120px"
         >
-          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas selecionadas</div>
-          <div class="text-gradient-primary text-h3 font-weight-bold">3</div>
+          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas incrições encerradas</div>
+          <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.closedSignup }}</div>
         </v-card>
         <v-card
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
@@ -83,8 +109,8 @@
           width="220"
           style="min-height: 120px"
         >
-          <div class="text-h6" style="line-height: 1.2;">Vagas aprovadas</div>
-          <div class="text-h3 font-weight-bold">1</div>
+          <div class="text-h6" style="line-height: 1.2;">Vagas encerrada</div>
+          <div class="text-h3 font-weight-bold">{{ counts.ended }}</div>
         </v-card>
       </div>
     </v-col>
@@ -95,7 +121,7 @@
           color="deep-purple-accent-4"
           text="Criar vaga"
           variant="flat"
-          @click="$router.push('/dashboard/empresa/123/vagas/criar')"
+          @click="$router.push(`/dashboard/empresa/${info.user.name}/vagas/criar`)"
         />
       </div>
     </v-col>
@@ -107,21 +133,21 @@
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Últimos avisos</v-list-subheader>
 
             <v-list-item
-              v-for="aviso in avisos"
-              :key="aviso.id"
+              v-for="notice in noticesList"
+              :key="notice.id"
               class="py-3"
             >
               <v-list-item-title class="text-caption font-weight-bold">
-                {{ aviso.title }}
+                {{ notice.title }}
               </v-list-item-title>
 
               <v-list-item-subtitle class="text-body-2">
-                {{ aviso.subtitle }}
+                {{ notice.description }}
               </v-list-item-subtitle>
 
               <template v-slot:append="{ isSelected }">
                 <v-list-item-action class="flex-column align-end">
-                  <small class="mb-4 opacity-60">{{ aviso.date }}</small>
+                  <small class="mb-4 opacity-60">{{ notice.created_at_formatted }}</small>
                 </v-list-item-action>
               </template>
             </v-list-item>
@@ -138,8 +164,8 @@
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Vagas recentes</v-list-subheader>
 
             <v-list-item
-              v-for="vaga in vagas"
-              :key="vaga.id"
+              v-for="job in jobsList"
+              :key="job.id"
               style="min-height: unset"
             >
               <v-card
@@ -147,20 +173,20 @@
                 elevation="2"
                 ripple
                 hover
-                @click="navigation(vaga.id)"
+                @click="navigation(`/dashboard/empresa/${info.user.id}/minhas-vagas/${job.id}`)"
               >
                 <div class="d-flex justify-space-between align-start">
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">
-                      {{ vaga.title }}
+                      {{ job.position }}
                     </div>
                     <div class="text-caption text-grey">
-                      Status: {{ vaga.status }} | Ativa: {{ vaga.ativa ? 'Sim' : 'Não' }}
+                      Status: {{ job.status }} | Ativa: {{ job.is_active ? 'Sim' : 'Não' }}
                     </div>
                   </div>
 
                   <div class="text-caption text-grey-darken-1">
-                    {{ vaga.date }}
+                    {{ job.created_at_formatted }}
                   </div>
                 </div>
               </v-card>
