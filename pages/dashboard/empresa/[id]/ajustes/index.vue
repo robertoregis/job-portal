@@ -8,8 +8,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Olá, Nome do candidato!</span>
+        <span class="text-caption">Seja bem vindo ao seu dashboard</span>
       </div>
     </v-col>
   </v-row>

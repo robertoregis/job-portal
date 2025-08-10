@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import { useField, useForm } from 'vee-validate'
+  import { useField, useForm } from 'vee-validate';
+  import { useInfo } from '#imports';
+  import { useShow } from '@/stores/show'
+  const info: any = useInfo();
+  const show = useShow()
+  const { notify } = useNotification();
 
   interface FormSchema {
     name: string
@@ -33,8 +38,37 @@
   const password = useField<string>('password')
   const passwordConfirm = useField<string>('passwordConfirm')
 
+  const getProfile = async (id: string) => {
+    const { data, error } = await useFetch(`/api/profiles/${id}`, {
+      method: 'GET'
+    })
+
+    const profile = data.value
+    info.setProfile(data.value)
+
+    const { data: dataCandidate, error: errorCandidate } = await useFetch(`/api/candidates`, {
+        method: 'GET',
+        params: { profile_id: profile.id }
+      })
+
+      if (errorCandidate.value) {
+        console.error('Erro ao carregar candidato:', errorCandidate.value)
+        return
+      }
+
+      setTimeout(() => {
+        const candidate = dataCandidate.value
+        info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+
+        //localStorage.setItem('user', JSON.stringify(candidate))
+        notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
+        show.setOverlayDashboard(false)
+        router.push(`/dashboard/candidato/${candidate.id}/meu-perfil/editar`)
+      }, 1000)
+  }
+
   const submit = handleSubmit(async (values) => {
-      //alert(JSON.stringify(values, null, 2))
+      show.setOverlayDashboard(true)
       const { data, pending, error } = await useFetch('/api/auth/register', {
         method: 'POST',
         body: {
@@ -48,9 +82,9 @@
       // Tratamento de erros
       if (error.value) {
         console.error('Erro ao criar perfil:', error.value)
+        show.setOverlayDashboard(false)
       } else {
-        alert('Perfil criado com sucesso:')
-        console.log('Perfil criado com sucesso:', data.value)
+        getProfile(data.value.id)
       }
 
   })
@@ -67,7 +101,7 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h5 font-weight-bold">Cadastrar!</h1>
+            <h1 class="text-h5 font-weight-bold">Cadastrar Candidato!</h1>
           </v-col>
 
           <v-col cols="12">

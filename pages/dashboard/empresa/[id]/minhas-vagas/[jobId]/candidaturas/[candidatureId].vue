@@ -1,13 +1,18 @@
 <script setup lang="ts">
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
   definePageMeta({
     layout: 'dashboard'
   })
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const route = useRoute();
   const router = useRouter();
-
-  const candidature = ref<any>({
-    status: 'Enviada',
-    icon_status: 'mdi-send'
-  })
+  const candidature = ref<any>({})
+  const candidate = ref<any>({})
 
   const candidaturaStatusOptions = [
     { name: 'Enviada', icon: 'mdi-send' },
@@ -20,9 +25,51 @@
     { name: 'Desistiu', icon: 'mdi-close-box-outline' },
   ]
 
-  const salvarAlteracoes = () => {
-    console.log('candidatura atualizada:', candidature.value)
-    // Aqui você pode usar useFetch, axios ou algo semelhante para enviar ao backend
+  const getCandidate = async (candidateId: string) => {
+    const { data, error } = await useFetch(`/api/candidates/${candidateId}`, {
+      method: 'GET',
+    })
+
+    if (error.value) {
+    } else {
+      candidate.value = data.value
+    }
+  }
+
+  const updateCandidaturesStatus = async () => {
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
+      method: 'PATCH',
+      body: {
+        status: candidature.value.status,
+        icon_status: candidature.value.icon_status,
+      }
+    })
+
+    if (error.value) {
+      console.error('Erro ao atualizar candidatura:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a candidatura', type: 'error' })
+      return
+    }
+
+    createNotice({
+      title: 'Candidatura atualizada',
+      description: `A candidatura do candidato ${candidature.value.candidate_name} teve seu status atualizado`,
+      subtitle: 'Candidatura',
+      profile_id: info.profile.id,
+      type: 'info'
+    })
+    createNotice({
+      title: 'Candidatura atualizada',
+      description: `A sua candidatura da vaga ${candidature.value.title} teve o status atualizado para ${candidature.value.status}`,
+      subtitle: 'Candidatura',
+      profile_id: candidate.value.profile_id,
+      type: 'info'
+    })
+    show.setOverlayDashboard(false)
+    notify({ title: 'Parabéns!', text: 'A candidatura foi atualizada com sucesso', type: 'success' })
+    //router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
   }
 
   const onStatusSelect = (selected: any) => {
@@ -31,17 +78,26 @@
   }
 
   const navigation = (id: number) => {
-    router.push(`/dashboard/empresa/123/candidatos/123`)
+    router.push(`/dashboard/empresa/${info.user.id}/candidatos/${candidate.value.id}`)
   }
 
+  const { data, error, pending } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    candidature.value = data.value
+    getCandidate(candidature.value.candidate_id)
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">{{ candidate.name }}</span>
+        <span class="text-caption">Seja bem vindo ao seu dashboard</span>
       </div>
     </v-col>
   </v-row>
@@ -69,15 +125,15 @@
               </div>
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 font-weight-bold">Candidato:</span>
-                <span class="text-body-2 ml-2">--------</span>
+                <span class="text-body-2 ml-2">{{ candidature.candidate_name }}</span>
               </div>
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>
-                <span class="text-body-2 ml-2">--------</span>
+                <span class="text-body-2 ml-2">{{ candidature.address }}</span>
               </div>
               <div class="d-flex align-center">
                 <span class="text-subtitle-2 font-weight-bold">Data de criação:</span>
-                <span class="text-body-2 ml-2">--------</span>
+                <span class="text-body-2 ml-2">{{ candidature.created_at_formatted }}</span>
               </div>
             </v-col>
             <v-col cols="12">
@@ -110,7 +166,7 @@
               @update:modelValue="onStatusSelect"
               width="240"
             />
-            <v-btn class="mt-2 bg-gradient-primary" @click="salvarAlteracoes">
+            <v-btn class="mt-2 bg-gradient-primary" @click="updateCandidaturesStatus">
               Salvar
             </v-btn>
           </div>

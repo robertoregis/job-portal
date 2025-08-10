@@ -1,20 +1,66 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
-const router = useRouter()
+  import { useShow } from '@/stores/show';
+  import { useInfo } from '@/stores/info';
+  definePageMeta({
+    layout: 'dashboard'
+  })
+  const router = useRouter()
+  const route = useRoute()
+  const show = useShow();
+  const info: any = useInfo();
+  const { notify } = useNotification();
+  const candidate = ref<any>({})
+  const experiencesList = ref<any[]>([])
+  const languagesList = ref<any[]>([])
+  const educationsList = ref<any[]>([])
+  const softSkillsList = ref<any[]>([])
+  const loading = ref<boolean>(true)
 
-const navigation = () => {
-  router.back()
-}
+  const navigation = () => {
+    router.back()
+  }
+
+  const getDataCandidate = async (candidateId: string) => {
+    try {
+      // Busca educations
+      const { data: educationsData, error: educationsError } = await useFetch(`/api/educations?candidate_id=${candidateId}`)
+      if (educationsError.value) throw educationsError.value
+      educationsList.value = educationsData.value
+      // Busca experiences
+      const { data: experiencesData, error: experiencesError } = await useFetch(`/api/experiences?candidate_id=${candidateId}`)
+      if (experiencesError.value) throw experiencesError.value
+      experiencesList.value = experiencesData.value
+      // Busca languages
+      const { data: languagesData, error: languagesError } = await useFetch(`/api/languages?candidate_id=${candidateId}`)
+      if (languagesError.value) throw languagesError.value
+      languagesList.value = languagesData.value
+      // Busca soft_skills
+      const { data: softSkillsData, error: softSkillsError } = await useFetch(`/api/soft_skills?candidate_id=${candidateId}`)
+      if (softSkillsError.value) throw softSkillsError.value
+      softSkillsList.value = softSkillsData.value
+      loading.value = false;
+    } catch (e) {
+      notify({ title: 'Erro', text: 'Falha ao carregar dados do candidato', type: 'error' })
+    }
+  }
+  
+  const { data, error, pending } = await useFetch(`/api/candidates/${route.params.id}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    candidate.value = data.value
+    getDataCandidate(candidate.value.id)
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="">Dados do candidato</span>
-        <span class="text-caption font-weight-bold">Detalhes do candidato selecionado nesta candidatura</span>
+        <span class="text-gradient-primary font-weight-bold">{{ candidate.name }}</span>
+        <span class="text-caption">Detalhes do candidato selecionado nesta candidatura</span>
       </div>
     </v-col>
   </v-row>
@@ -36,36 +82,36 @@ const navigation = () => {
         <v-card-title>
           <div class="d-flex align-center">
             <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
-            <h2 class="text-h6 font-weight-bold text-gradient-primary">Editar dados</h2>
+            <h2 class="text-h6 font-weight-bold text-gradient-primary">Dados</h2>
           </div>
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12">
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
-                <span class="text-body-2 ml-2">João da Silva</span>
+                <span class="text-body-2 ml-2">{{ candidate.name }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Data de nascimento:</span>
-                <span class="text-body-2 ml-2">10/05/1985 (40 anos)</span>
+                <span class="text-body-2 ml-2">{{ candidate.birth_date }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Estado civil:</span>
-                <span class="text-body-2 ml-2">Casado</span>
+                <span class="text-body-2 ml-2">{{ candidate.marital_status }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>
-                <span class="text-body-2 ml-2">Rua das Flores, 123 - São Paulo, SP</span>
+                <span class="text-body-2 ml-2">{{ candidate.address }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">E-mail:</span>
-                <span class="text-body-2 ml-2">joao.silva@email.com</span>
+                <span class="text-body-2 ml-2">{{ candidate.email }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Telefone:</span>
-                <span class="text-body-2 ml-2">(11) 91234-5678</span>
+                <span class="text-body-2 ml-2">{{ candidate.phone }}</span>
               </div>
             </v-col>
           </v-row>
@@ -79,9 +125,9 @@ const navigation = () => {
           <v-list>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
-                <v-list-item-title class="text-subtitle-1 font-weight-bold">Sobre mim</v-list-item-title>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Sobre ele</v-list-item-title>
                 <span class="text-body-2">
-                  Profissional com mais de 10 anos de experiência em desenvolvimento de software, focado em soluções web e mobile.
+                  {{ candidate.about }}
                 </span>
               </v-list-item-content>
             </v-list-item>
@@ -89,13 +135,23 @@ const navigation = () => {
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Experiências profissionais</v-list-item-title>
-                <div class="d-flex flex-column">
-                  <span class="text-body-2 mb-1">
-                    Desenvolvedor Full Stack na Empresa XYZ (2015 - 2023)
-                  </span>
-                  <span class="text-body-2">
-                    Engenheiro de Software na Empresa ABC (2010 - 2015)
-                  </span>
+                <div class="d-flex flex-column mt-2">
+                  <div v-for="(experience, index) in experiencesList" :key="experience.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                    <span class="text-caption font-weight-bold">{{ experience.company_name }}</span>
+                    <span class="text-body-2">{{ experience.period }}</span>
+                  </div>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Escolaridade</v-list-item-title>
+                <div class="d-flex flex-column mt-2">
+                  <div v-for="(education, index) in educationsList" :key="education.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                    <span class="text-caption font-weight-bold">{{ education.course }}</span>
+                    <span class="text-body-2">{{ education.level }}</span>
+                  </div>
                 </div>
               </v-list-item-content>
             </v-list-item>
@@ -105,23 +161,28 @@ const navigation = () => {
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Idiomas</v-list-item-title>
                 <div class="d-flex flex-wrap">
                   <v-chip
+                    v-for="(candidate, idx) in languagesList"
+                    :key="idx"
                     class="mr-2 my-1 d-flex align-center"
                     label
                     color="language"
                     variant="flat"
                   >
-                    <span>Inglês</span>
-                    <span class="ml-1 text-caption">(Avançado)</span>
+                    <span>{{ candidate.name }}</span>
+                    <span class="ml-1 text-caption">({{ candidate.level.toLowerCase() }})</span>
                   </v-chip>
-                  <v-chip
-                    class="mr-2 my-1 d-flex align-center"
-                    label
-                    color="language"
-                    variant="flat"
-                  >
-                    <span>Espanhol</span>
-                    <span class="ml-1 text-caption">(Intermediário)</span>
-                  </v-chip>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Soft Skills</v-list-item-title>
+                <div class="d-flex flex-column mt-2">
+                  <div v-for="(softSkill, index) in softSkillsList" :key="softSkill.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                    <span class="text-caption font-weight-bold">{{ softSkill.name }}</span>
+                    <span class="text-body-2">{{ softSkill.level }}</span>
+                  </div>
                 </div>
               </v-list-item-content>
             </v-list-item>

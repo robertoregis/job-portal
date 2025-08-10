@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import { useField, useForm } from 'vee-validate'
+  import { useField, useForm } from 'vee-validate';
+  import { useInfo } from '#imports';
+  import { useShow } from '@/stores/show'
+  const info: any = useInfo();
+  const show = useShow()
+  const { notify } = useNotification();
 
   interface FormSchema {
     name: string
@@ -33,6 +38,33 @@
   const password = useField<string>('password')
   const passwordConfirm = useField<string>('passwordConfirm')
 
+  const getProfile = async (id: string) => {
+    const { data, error } = await useFetch(`/api/profiles/${id}`, {
+      method: 'GET'
+    })
+
+    const profile = data.value
+    info.setProfile(data.value)
+
+    const { data: dataCompany, error: errorCompany } = await useFetch(`/api/companies`, {
+        method: 'GET',
+        params: { profile_id: profile.id }
+      })
+
+      if (errorCompany.value) {
+        console.error('Erro ao carregar empresa:', errorCompany.value)
+        return
+      }
+
+      setTimeout(() => {
+        const company = dataCompany.value
+        info.setUser({ ...dataCompany.value[0], type: 'company' })
+        notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
+        show.setOverlayDashboard(false)
+        router.push(`/dashboard/empresa/${company.id}/meu-perfil/editar`)
+      }, 1000)
+  }
+
   const submit = handleSubmit(async (values) => {
     //alert(JSON.stringify(values, null, 2))
     const { data, pending, error } = await useFetch('/api/auth/register', {
@@ -48,9 +80,9 @@
     // Tratamento de erros
     if (error.value) {
       console.error('Erro ao criar perfil:', error.value)
+      show.setOverlayDashboard(false)
     } else {
-      alert('Perfil criado com sucesso:')
-      console.log('Perfil criado com sucesso:', data.value)
+      getProfile(data.value.id)
     }
 
   })
@@ -73,7 +105,7 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h5 font-weight-bold">Cadastrar!</h1>
+            <h1 class="text-h5 font-weight-bold">Cadastrar Empresa!</h1>
           </v-col>
 
           <v-col cols="12">

@@ -1,4 +1,8 @@
-/*import supabase from '@/server/utils/supabase'
+import supabase from '@/server/utils/supabase'
+
+function emptyStringToNull(value: any) {
+  return value === '' ? null : value
+}
 
 export default defineEventHandler(async (event) => {
   const method = event.req.method
@@ -25,9 +29,14 @@ export default defineEventHandler(async (event) => {
   if (method === 'PUT' || method === 'PATCH') {
     const body = await readBody(event)
 
+    // Converte todas strings vazias do body para null
+    const updateData = Object.fromEntries(
+      Object.entries(body).map(([key, val]) => [key, emptyStringToNull(val)])
+    )
+
     const { data, error } = await supabase
       .from('educations')
-      .update(body)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
@@ -53,4 +62,5 @@ export default defineEventHandler(async (event) => {
   }
 
   throw createError({ statusCode: 405, statusMessage: 'Method not allowed' })
-})*/
+})
+

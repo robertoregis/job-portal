@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import { useField, useForm } from 'vee-validate';
-  const authentication: any = useInfo();
+  import { useInfo } from '#imports';
+  import { useShow } from '@/stores/show'
+  const info: any = useInfo();
+  const show = useShow()
+  const { notify } = useNotification();
 
   interface FormSchema {
     email: string
@@ -24,6 +28,32 @@
   const email = useField<string>('email')
   const password = useField<string>('password')
 
+  const getProfile = async (id: string) => {
+    const { data, error } = await useFetch(`/api/profiles/${id}`, {
+      method: 'GET'
+    })
+
+    const profile = data.value
+    info.setProfile(data.value)
+
+    const { data: dataCandidate, error: errorCandidate } = await useFetch(`/api/candidates`, {
+        method: 'GET',
+        params: { profile_id: profile.id }
+      })
+
+      if (errorCandidate.value) {
+        console.error('Erro ao carregar candidato:', errorCandidate.value)
+        return
+      }
+
+      const candidate = dataCandidate.value
+      info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+
+      //localStorage.setItem('user', JSON.stringify(candidate))
+      notify({ title: '', text: 'Logado com sucesso', type: 'success' })
+      router.push(`/`)
+  }
+
   const submit = handleSubmit(async (values) => {
     //alert(JSON.stringify(values, null, 2))
     const supabase = useNuxtApp().$supabase
@@ -36,33 +66,8 @@
     if (error) {
       console.error('Erro ao logar:', error)
     } else {
-      alert('Candidato logado')
-      const user = {
-        id: data.session.user.id,
-        email: values.email,
-        type: 'candidate'
-      }
-      localStorage.setItem('user', JSON.stringify(user))
-      authentication.setUser(user)
-      //router.push(`/dashboard/candidato/${data.session.user.id}`)
-      console.log('Usuário logado:', data.session.user)
+      getProfile(data.session.user.id)
     }
-    /*const { data, error, pending } = await useFetch('/api/auth/login', {
-      method: 'POST',
-      body: {
-        email: values.email,
-        password: values.password,
-        type: 'company'
-      }
-    })
-
-    if (error.value) {
-      console.error('Erro no login:', error.value)
-    } else {
-      alert('Usuário logado:')
-      console.log('Usuário logado:', data.value)
-    }*/
-
   })
 
   const navigation = (id: number) => {
@@ -77,7 +82,7 @@
       <v-container>
         <v-row>
           <v-col cols="12">
-            <h1 class="text-h5 font-weight-bold">Entrar!</h1>
+            <h1 class="text-h5 font-weight-bold">Entrar como Candidato!</h1>
           </v-col>
 
           <v-col cols="12">

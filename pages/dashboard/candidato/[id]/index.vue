@@ -1,46 +1,72 @@
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   definePageMeta({
     layout: 'dashboard'
   })
 
   const router = useRouter()
-
-  const candidateName = 'Lucas Almeida' // nome fictício do candidato
-
-  // Dados dos avisos
-  const avisos = [
-    {
-      id: 1,
-      date: '10h00 05/08/2025',
-      title: 'Nova mensagem da empresa XYZ',
-      subtitle: 'Sua candidatura está em análise. Aguarde o retorno.'
-    },
-    {
-      id: 2,
-      date: '14h20 01/08/2025',
-      title: 'Atualização no sistema',
-      subtitle: 'O sistema estará em manutenção no próximo domingo.'
-    }
-  ]
-
-  // Dados das candidaturas recentes
-  const candidaturas = [
-    {
-      id: 1,
-      date: '12h30 12/09/2025',
-      status: 'Em análise',
-      title: 'Desenvolvedor Front-end'
-    },
-    {
-      id: 2,
-      date: '2 dias atrás',
-      status: 'Aprovado',
-      title: 'Designer UI/UX'
-    }
-  ]
+  const info: any = useInfo();
+  const candidaturesList = ref<any[]>([])
+  const noticesList = ref<any[]>([])
+  const counts = ref<any>({
+    total: 0,
+    approved: 0,
+    rejected: 0
+  })
 
   const navigation = (link: any) => {
     router.push(link)
+  }
+
+  const getCounts = async () => {
+    const { data, error } = await useFetch('/api/candidatures/counts', {
+      method: 'GET',
+      params: { candidate_id: info.user.id }
+    })
+    if (error.value) {
+      console.error('Erro ao buscar counts:', error.value)
+    } else {
+      counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
+      getNotices()
+    }
+  }
+
+  const getNotices = async () => {
+    const params: Record<string, any> = {
+      page: 1,
+      pageSize: 3
+    }
+
+    // Filtro por empresa (se houver)
+    if (info.profile.id) {
+      params.profile_id = info.profile.id
+    }
+
+    const { data, error } = await useFetch('/api/notices', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+      console.error('Erro ao carregar candidaturas:', error.value)
+    } else {
+      noticesList.value = data.value?.data || []
+    }
+  }
+
+  const { data: candidatures, error, refresh, pending } = await useFetch('/api/candidatures', {
+    method: 'GET',
+    params: {
+      candidate_id: info.user.id,
+      page: 1,
+      pageSize: 3
+    }
+  })
+
+  if (error.value) {
+  } else {
+    candidaturesList.value = candidatures.value?.data || []
+    await getCounts()
   }
 </script>
 
@@ -48,8 +74,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, {{ candidateName }}!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Olá, {{ info.user.name }}!</span>
+        <span class="text-caption">Seja bem vindo ao seu dashboard</span>
       </div>
     </v-col>
   </v-row>
@@ -65,7 +91,7 @@
           style="min-height: 120px"
         >
           <div class="text-h6" style="line-height: 1.2;">Candidaturas</div>
-          <div class="text-h3 font-weight-bold">9</div>
+          <div class="text-h3 font-weight-bold">{{ counts.total }}</div>
         </v-card>
         <v-card
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 border border-secondary"
@@ -73,8 +99,8 @@
           width="220"
           style="min-height: 120px"
         >
-          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas selecionadas</div>
-          <div class="text-gradient-primary text-h3 font-weight-bold">3</div>
+          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
+          <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.approved }}</div>
         </v-card>
         <v-card
           class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
@@ -82,8 +108,8 @@
           width="220"
           style="min-height: 120px"
         >
-          <div class="text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
-          <div class="text-h3 font-weight-bold">1</div>
+          <div class="text-h6" style="line-height: 1.2;">Candidaturas rejeitadas</div>
+          <div class="text-h3 font-weight-bold">{{ counts.rejected }}</div>
         </v-card>
       </div>
     </v-col>
@@ -95,21 +121,21 @@
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Últimos avisos</v-list-subheader>
 
             <v-list-item
-              v-for="aviso in avisos"
-              :key="aviso.id"
+              v-for="notice in noticesList"
+              :key="notice.id"
               class="py-3"
             >
               <v-list-item-title class="text-caption font-weight-bold">
-                {{ aviso.title }}
+                {{ notice.title }}
               </v-list-item-title>
 
               <v-list-item-subtitle class="text-body-2">
-                {{ aviso.subtitle }}
+                {{ notice.description }}
               </v-list-item-subtitle>
 
               <template v-slot:append="{ isSelected }">
                 <v-list-item-action class="flex-column align-end">
-                  <small class="mb-4 opacity-60">{{ aviso.date }}</small>
+                  <small class="mb-4 opacity-60">{{ notice.created_at }}</small>
                 </v-list-item-action>
               </template>
             </v-list-item>
@@ -128,8 +154,8 @@
             </v-list-subheader>
 
             <v-list-item
-              v-for="candidatura in candidaturas"
-              :key="candidatura.id"
+              v-for="candidature in candidaturesList"
+              :key="candidature.id"
               class="py-2"
             >
               <v-card
@@ -137,14 +163,14 @@
                 elevation="2"
                 ripple
                 hover
-                @click="navigation(`/dashboard/candidato/123/minhas-candidaturas/${candidatura.id}`)"
+                @click="navigation(`/dashboard/candidato/123/minhas-candidaturas/${candidature.id}`)"
               >
                 <div class="d-flex justify-space-between">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ candidatura.title }}</div>
-                    <div class="text-caption">Status: {{ candidatura.status }}</div>
+                    <div class="text-subtitle-1 font-weight-medium">{{ candidature.title }}</div>
+                    <div class="text-caption">Status: {{ candidature.status }}</div>
                   </div>
-                  <div class="text-caption text-grey-darken-1">{{ candidatura.date }}</div>
+                  <div class="text-caption text-grey-darken-1">{{ candidature.created_at_formatted }}</div>
                 </div>
               </v-card>
             </v-list-item>

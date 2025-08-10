@@ -1,10 +1,18 @@
 <script setup lang="ts">
   //import { vMask } from 'vue-the-mask';
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
 
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
-
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const route = useRoute();
+  const router = useRouter();
   const states = ref<any[]>([])
   const stateSelected = ref<any>('')
   const citySelected = ref<any>('')
@@ -17,10 +25,10 @@
     state: null,
     city: null,
     foundation: '',
-    legalName: '',
-    representativeName: '',
-    representativeCpf: '',
-    representativeEmail: ''
+    legal_name: '',
+    representative_name: '',
+    representative_cpf: '',
+    representative_email: ''
   })
 
   const clear = () => {
@@ -31,25 +39,48 @@
       state: null,
       city: null,
       foundation: '',
-      legalName: '',
-      representativeName: '',
-      representativeCpf: '',
-      representativeEmail: ''
+      legal_name: '',
+      representative_name: '',
+      representative_cpf: '',
+      representative_email: ''
     }
   }
 
-  const submit = () => {}
+  const updateCompany = async () => {
+    show.setOverlayDashboard(true)
+    try {
+      const { data, error } = await useFetch(`/api/companies/${info.user.id}`, {
+        method: 'PATCH',
+        body: formdata.value
+      })
 
-  watch(stateSelected, async (newState) => {
+      if (error.value) {
+        console.error('Erro ao atualizar empresa:', error.value)
+        return
+      }
+      show.setOverlayDashboard(false)
+      notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
+      router.push(`/dashboard/empresa/${info.user.id}/meu-perfil`)
+    } catch (err) {
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar', type: 'error' })
+    }
+  }
+
+  watch(stateSelected, async (newState, oldState) => {
     if (newState) {
-      formdata.value.state = newState;
-      await getCities(newState) // ou newState.id, dependendo da estrutura
-      citySelected.value = null
+      formdata.value.state = newState
+      await getCities(newState)
+      
+      if (newState !== oldState && (oldState !== null && oldState !== '')) {
+        citySelected.value = null
+      }
     } else {
       cities.value = []
       citySelected.value = null
     }
   })
+
   watch(citySelected, async (newCity) => {
     if (newCity) {
       formdata.value.city = newCity;
@@ -74,7 +105,6 @@
       }
   };
   const getCities = async (state: any) => {
-      formdata.value.city = '';
       // Buscar o estado selecionado
       const selectedState = states.value.find((s: any) => s.nome === state);
       if (!selectedState) {
@@ -89,10 +119,9 @@
           }
 
           const data = await res.json();
-
           cities.value = data.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
       } catch (err) {
-          console.error('Erro inesperado ao buscar cidades:', err);
+        console.error('Erro inesperado ao buscar cidades:', err);
       }
   };
 
@@ -112,16 +141,41 @@
   }
 
   onMounted(() => {
-    getStates()
   })
+
+  const { data, error, pending } = await useFetch(`/api/companies/${info.user.id}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    formdata.value = {
+      name: data.value.name,
+      legal_name: data.value.legal_name,
+      phone: data.value.phone,
+      foundation: data.value.foundation,
+      cnpj: data.value.cnpj,
+      state: data.value.state,
+      city: data.value.city,
+      representative_name: data.value.representative_name,
+      representative_email: data.value.representative_email,
+      representative_cpf: data.value.representative_cpf,
+    }
+    await getStates()
+    if(data.value.state) {
+      stateSelected.value = data.value.state
+      await getCities(data.value.state)
+      citySelected.value = data.value.city
+    }
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Editar perfil</span>
+        <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
     </v-col>
   </v-row>
@@ -138,7 +192,7 @@
           <v-card-text>
             <v-row no-gutters>
               <v-col cols="12">
-                <form @submit.prevent="submit">
+                <form @submit.prevent="updateCompany">
                   <v-text-field
                     v-model="formdata.name"
                     :counter="10"
@@ -159,7 +213,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.legalName"
+                    v-model="formdata.legal_name"
                     :counter="10"
                     label="Razão Social"
                     density="compact"
@@ -168,7 +222,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.representativeEmail"
+                    v-model="formdata.representative_email"
                     label="E-mail do representante"
                     density="compact"
                     hide-details
@@ -176,7 +230,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.representativeName"
+                    v-model="formdata.representative_name"
                     :counter="10"
                     label="Nome do representante"
                     density="compact"
@@ -185,7 +239,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.representativeCpf"
+                    v-model="formdata.representative_cpf"
                     label="CPF do representante"
                     density="compact"
                     hide-details

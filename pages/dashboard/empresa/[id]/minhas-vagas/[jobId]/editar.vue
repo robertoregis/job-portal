@@ -1,46 +1,71 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
+  definePageMeta({
+    layout: 'dashboard'
+  })
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const route = useRoute();
+  const router = useRouter();
+  const job = ref<any>({})
 
-const vacancy = ref({
-  cargo: '',
-  type_contract: null,
-  work_format: null,
-  salary: '',
-  workload: '',
-  days: [],
-  education_required: null,
-  benefits: '',
-  description: '',
-})
+  const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
+  const work_formats = ['Presencial', 'Remoto', 'Híbrido']
+  const educations = [
+    'Ensino Fundamental',
+    'Ensino Médio',
+    'Ensino Técnico',
+    'Tecnólogo',
+    'Ensino Superior',
+    'Pós-graduação',
+    'Mestrado',
+    'Doutorado',
+  ]
+  const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
 
-const tiposContrato = ['CLT', 'PJ', 'Freelancer', 'Estágio']
-const work_formats = ['Presencial', 'Remoto', 'Híbrido']
-const educations = [
-  'Fundamental',
-  'Médio',
-  'Técnico',
-  'Tecnólogo',
-  'Superior',
-  'Pós-graduação',
-  'Mestrado',
-  'Doutorado',
-]
-const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const updateJob = async () => {
+    show.setOverlayDashboard(true)
+    let benefitsArray: any = job.value.benefits_simple
+    if (job.value.benefits) {
+      benefitsArray = benefitsArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+    }
+    job.value.benefits = benefitsArray
+    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+      method: 'PUT',
+      body: job.value
+    })
 
-const submit = () => {
-  console.log('Vaga cadastrada:', vacancy.value)
-  alert('Vaga salva com sucesso! 🎉')
-}
+    if (error.value) {
+      console.error('Erro ao atualizar vaga:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
+      return
+    }
+    show.setOverlayDashboard(false)
+    notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
+    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
+  }
+
+  const { data, error, pending } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    job.value = data.value
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">Editar vaga</span>
+        <span class="text-caption">Esqueceu algo, edite a sua vaga</span>
       </div>
     </v-col>
   </v-row>
@@ -52,9 +77,9 @@ const submit = () => {
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-form @submit.prevent="submit">
+          <v-form @submit.prevent="updateJob">
             <v-text-field
-              v-model="vacancy.cargo"
+              v-model="job.position"
               label="Cargo"
               density="compact"
               hide-details
@@ -63,8 +88,8 @@ const submit = () => {
             />
 
             <v-select
-              v-model="vacancy.type_contract"
-              :items="tiposContrato"
+              v-model="job.contract_type"
+              :items="contractTypes"
               label="Tipo de contrato"
               density="compact"
               hide-details
@@ -73,7 +98,7 @@ const submit = () => {
             />
 
             <v-select
-              v-model="vacancy.work_format"
+              v-model="job.work_format"
               :items="work_formats"
               label="Formato"
               density="compact"
@@ -83,7 +108,7 @@ const submit = () => {
             />
 
             <v-text-field
-              v-model="vacancy.salary"
+              v-model="job.salary"
               label="Faixa salarial"
               placeholder="Ex: R$ 3.000 - R$ 5.000"
               density="compact"
@@ -92,7 +117,7 @@ const submit = () => {
             />
 
             <v-text-field
-              v-model="vacancy.workload"
+              v-model="job.workload"
               label="Carga horária semanal"
               placeholder="Ex: 40h"
               density="compact"
@@ -101,7 +126,7 @@ const submit = () => {
             />
 
             <v-select
-              v-model="vacancy.days"
+              v-model="job.weekdays"
               :items="days_of_week"
               label="Dias da semana"
               multiple
@@ -112,7 +137,7 @@ const submit = () => {
             />
 
             <v-select
-              v-model="vacancy.education_required"
+              v-model="job.education_level"
               :items="educations"
               label="Escolaridade mínima"
               density="compact"
@@ -121,7 +146,19 @@ const submit = () => {
             />
 
             <v-textarea
-              v-model="vacancy.benefits"
+              v-model="job.description"
+              label="Descrição da vaga"
+              placeholder="Conte mais sobre a oportunidade"
+              auto-grow
+              density="compact"
+              hide-details
+              class="mb-3"
+            />
+
+            <span class="text-caption mb-2">Os campos abaixo pode ser separados por vírgula (,)</span>
+
+            <v-textarea
+              v-model="job.benefits_simple"
               label="Benefícios"
               placeholder="Ex: Vale transporte, alimentação, plano de saúde..."
               auto-grow
@@ -131,9 +168,19 @@ const submit = () => {
             />
 
             <v-textarea
-              v-model="vacancy.description"
-              label="Descrição da vaga"
-              placeholder="Conte mais sobre a oportunidade"
+              v-model="job.knowledge_simple"
+              label="Conhecimentos"
+              placeholder="Ex: Planilhas, Informática, Design..."
+              auto-grow
+              density="compact"
+              hide-details
+              class="mb-3"
+            />
+
+            <v-textarea
+              v-model="job.undergraduate_areas_simple"
+              label="Áreas de graduação"
+              placeholder="Ex: Engenharia, Robôtica..."
               auto-grow
               density="compact"
               hide-details
@@ -141,9 +188,8 @@ const submit = () => {
             />
 
             <v-btn
-              color="primary"
               type="submit"
-              class="mt-2"
+              class="mt-2 bg-gradient-primary"
             >
               Salvar
             </v-btn>

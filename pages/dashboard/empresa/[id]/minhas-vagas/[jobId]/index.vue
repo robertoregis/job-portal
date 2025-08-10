@@ -1,22 +1,19 @@
 <script setup lang="ts">
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
   definePageMeta({
     layout: 'dashboard'
   })
   const router = useRouter();
-
-  const vaga = ref({
-    cargo: 'Desenvolvedor Full Stack',
-    tipo_contrato: 'CLT',
-    formato: 'Remoto',
-    faixa_salarial: 'R$ 5.000 - R$ 7.000',
-    carga_horaria: '40h semanais',
-    dias_da_semana: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'],
-    escolaridade_minima: 'Superior completo',
-    beneficios: 'Plano de saúde, VR, VT, Gympass',
-    descricao: 'Buscamos alguém com experiência em Vue, Node.js, e bancos de dados relacionais.',
-    status: 'Aberta para inscrição', // novo campo
-    ativa: true,
-    icon: 'mdi-briefcase-plus'     // novo campo
+  const route = useRoute();
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const job= ref<any>({})
+  const counts = ref<any>({
+    total: 0
   })
 
   const jobStatusOptions = [
@@ -29,30 +26,79 @@
     { name: 'Cancelada', icon: 'mdi-cancel' },
   ]
 
-  const selectedStatus = ref(jobStatusOptions.find(o => o.name === vaga.value.status) || jobStatusOptions[0])
+  const selectedStatus = ref(jobStatusOptions.find(o => o.name === job.value.status) || jobStatusOptions[0])
 
   const onStatusSelect = (selected: any) => {
-    vaga.value.status = selected.name
-    vaga.value.icon = selected.icon
+    job.value.status = selected.name
+    job.value.icon_status = selected.icon
     selectedStatus.value = selected
   }
 
-  const salvarAlteracoes = () => {
-    console.log('Vaga atualizada:', vaga.value)
-    // Aqui você pode usar useFetch, axios ou algo semelhante para enviar ao backend
+  const getCounts = async () => {
+    const { data, error } = await useFetch('/api/candidatures/countsforjob', {
+      method: 'GET',
+      params: { job_id: job.value.id }
+    })
+    if (error.value) {
+      console.error('Erro ao buscar counts:', error.value)
+    } else {
+      counts.value.total = data.value?.total || 0
+    }
+  }
+
+  const updateJobStatus = async () => {
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+      method: 'PATCH',
+      body: {
+        status: job.value.status,
+        icon_status: job.value.icon_status,
+        is_active: job.value.is_active
+      }
+    })
+
+    if (error.value) {
+      console.error('Erro ao atualizar vaga:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
+      return
+    }
+
+    job.value = data.value
+    createNotice({
+      title: 'Vaga atualizada',
+      description: `A vaga ${job.value.position} teve seu status atualizado`,
+      subtitle: 'Vaga',
+      profile_id: info.profile.id,
+      type: 'info'
+    })
+    show.setOverlayDashboard(false)
+    notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
+    //router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
   }
 
   const navigation = (id: number) => {
-    router.push(`/dashboard/empresa/123/minhas-vagas/123/candidaturas`)
+    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/candidaturas`)
   }
+
+  const { data, error, pending } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    job.value = data.value
+    await getCounts()
+  }
+
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Detalhes da vaga</span>
-        <span class="text-caption font-weight-bold">
+        <span class="text-gradient-primary font-weight-bold">Vagas</span>
+        <span class="text-caption">
           Confira todas as informações e gerencie esta vaga
         </span>
       </div>
@@ -64,7 +110,7 @@
       <div class="d-flex">
         <v-card hover ripple @click="navigation" class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="180" style="min-height: 100px">
             <div class="text-h6" style="line-height: 1.2;">Candidaturas</div>
-            <div class="text-h3 font-weight-bold">9</div>
+            <div class="text-h3 font-weight-bold">{{ counts.total }}</div>
           </v-card>
       </div>
     </v-col>
@@ -74,16 +120,16 @@
           class="ma-2 bg-gradient-status"
           variant="flat"
         >
-          <v-icon :icon="vaga.icon" start></v-icon>
-          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ vaga.status }}</span>
+          <v-icon :icon="job.icon_status" start></v-icon>
+          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ job.status }}</span>
         </v-chip>
         <v-chip
             class="ma-2"
-            :color="`${vaga.ativa ? 'success' : 'error'}`"
+            :color="`${job.is_active ? 'success' : 'error'}`"
             variant="flat"
           >
-          <v-icon :icon="`${vaga.ativa ? 'mdi-power' : 'mdi-power-off'}`" start></v-icon>
-          {{ vaga.ativa ? 'Ativada' : 'Desativada' }}
+          <v-icon :icon="`${job.is_active ? 'mdi-power' : 'mdi-power-off'}`" start></v-icon>
+          {{ job.is_active ? 'Ativada' : 'Desativada' }}
         </v-chip>
       </div>
     </v-col>
@@ -100,31 +146,37 @@
         <v-col cols="12" class="px-4 pa-2">
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
-            <span class="text-body-2 ml-2">{{ vaga.cargo }}</span>
+            <span class="text-body-2 ml-2">{{ job.position }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Tipo de contrato:</span>
-            <span class="text-body-2 ml-2">{{ vaga.tipo_contrato }}</span>
+            <span class="text-body-2 ml-2">{{ job.contract_type }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Formato:</span>
-            <span class="text-body-2 ml-2">{{ vaga.formato }}</span>
+            <span class="text-body-2 ml-2">{{ job.work_format }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Faixa salarial:</span>
-            <span class="text-body-2 ml-2">{{ vaga.faixa_salarial }}</span>
+            <span class="text-body-2 ml-2">{{ job.salary }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Carga horária:</span>
-            <span class="text-body-2 ml-2">{{ vaga.carga_horaria }}</span>
+            <span class="text-body-2 ml-2">{{ job.workload }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
-            <span class="text-body-2 ml-2">{{ vaga.dias_da_semana.join(', ') }}</span>
+            <div class="d-flex flex-wrap ml-2">
+              <template v-for="(day, index) in job.weekdays" :key="index">
+                <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
+                  {{day}}
+                </v-chip>
+              </template>
+            </div>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Escolaridade mínima:</span>
-            <span class="text-body-2 ml-2">{{ vaga.escolaridade_minima }}</span>
+            <span class="text-body-2 ml-2">{{ job.education_level }}</span>
           </div>
         </v-col>
       </v-row>
@@ -134,18 +186,40 @@
       <v-list>
         <v-list-item class="mt-2" style="min-height: unset">
           <v-list-item-content>
-            <v-list-item-title class="text-subtitle-1 font-weight-bold">Benefícios</v-list-item-title>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Descrição da vaga</v-list-item-title>
             <span class="text-body-2">
-              {{ vaga.beneficios }}
+              {{ job.description }}
             </span>
           </v-list-item-content>
         </v-list-item>
         <v-list-item class="mt-2" style="min-height: unset">
           <v-list-item-content>
-            <v-list-item-title class="text-subtitle-1 font-weight-bold">Descrição da vaga</v-list-item-title>
-            <span class="text-body-2">
-              {{ vaga.descricao }}
-            </span>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Benefícios</v-list-item-title>
+            <ul>
+              <template v-for="(benefit, index) in job.benefits" :key="index">
+                <li class="text-body-2">- {{ benefit }};</li>
+              </template>
+            </ul>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="mt-2" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Conhecimentos</v-list-item-title>
+            <ul>
+              <template v-for="(knowledge, index) in job.knowledge" :key="index">
+                <li class="text-body-2">- {{ knowledge }};</li>
+              </template>
+            </ul>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="mt-2" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de graduação</v-list-item-title>
+            <ul>
+              <template v-for="(area, index) in job.undergraduate_areas" :key="index">
+                <li class="text-body-2">- {{ area }};</li>
+              </template>
+            </ul>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -176,8 +250,8 @@
 
           <v-col cols="12" md="6" class="d-flex align-center">
             <v-switch
-              v-model="vaga.ativa"
-              :label="`${vaga.ativa ? 'Ativada' : 'Desativada'}`"
+              v-model="job.is_active"
+              :label="`${job.is_active ? 'Ativada' : 'Desativada'}`"
               color="success"
               inset
               hide-details
@@ -185,7 +259,7 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn color="primary" class="mt-2" @click="salvarAlteracoes">
+            <v-btn class="mt-2 bg-gradient-primary" @click="updateJobStatus">
               Salvar alterações
             </v-btn>
           </v-col>
@@ -196,10 +270,10 @@
     <v-col cols="12" class="mt-4">
       <div class="d-flex">
         <v-btn
-          color="deep-purple-accent-4"
           text="Editar vaga"
           variant="flat"
-          @click="$router.push('/dashboard/empresa/123/minhas-vagas/123/editar')"
+          class="bg-gradient-primary"
+          @click="$router.push(`/dashboard/empresa/123/minhas-vagas/${route.params.jobId}/editar`)"
         />
       </div>
     </v-col>

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   definePageMeta({
     layout: 'dashboard'
   })
-
+  const info: any = useInfo();
   const router = useRouter()
-
+  const page = ref(1)
+  const pageSize = ref(10)
+  const totalPages = ref(1)
+  const candidaturesList = ref<any[]>([])
   const candidaturaStatusOptions = [
     { name: 'Enviada', icon: 'mdi-send' },
     { name: 'Em análise', icon: 'mdi-magnify' },
@@ -28,34 +32,56 @@
     selectedIconStatus.value = result ? result.icon : ''
   }
 
-  const allItems = ref([
-    { id: 1, date: '12:30 12/09/2025', title: 'Desenvolvedor Front-end', status: 'Em análise' },
-    { id: 2, date: '14:10 15/10/2025', title: 'Designer UI/UX', status: 'Aprovado' },
-    { id: 3, date: '09:20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
-    { id: 4, date: '11:00 22/09/2025', title: 'Analista de Dados', status: 'Em entrevista' },
-    { id: 5, date: '16:45 30/07/2025', title: 'Gerente de Projetos', status: 'Arquivada' },
-  ])
+  const getCandidatures = async () => {
+    const params: Record<string, any> = {
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString()
+    }
 
-  const itemsPerPage = 3
-  const currentPage = ref(1)
+    if (selectedStatus.value) params.status = selectedStatus.value
 
-  const filteredItems = computed(() => {
-    if (!selectedStatus.value) return allItems.value
-    return allItems.value.filter(item => item.status === selectedStatus.value)
-  })
+    // Filtro por empresa (se houver)
+    if (info.user.id) {
+      params.candidate_id = info.user.id
+    }
 
-  const paginatedItems = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage
-    const end = start + itemsPerPage
-    return filteredItems.value.slice(start, end)
-  })
+    const { data, error } = await useFetch('/api/candidatures', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+    } else {
+      candidaturesList.value = data.value?.data || []
+      totalPages.value = data.value?.totalPages || 1
+    }
+  }
 
   watch(selectedStatus, () => {
-    currentPage.value = 1
+    getCandidatures()
+  })
+
+  watch(page, () => {
+    getCandidatures()
   })
 
   const navigation = (id: number) => {
-    router.push(`/dashboard/candidato/123/minhas-candidaturas/${id}`)
+    router.push(`/dashboard/candidato/${info.user.inválido}/minhas-candidaturas/${id}`)
+  }
+
+  const { data: candidatures, error, refresh, pending } = await useFetch('/api/candidatures', {
+    method: 'GET',
+    params: {
+      candidate_id: info.user.id,
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString()
+    }
+  })
+
+  if (error.value) {
+  } else {
+    candidaturesList.value = candidatures.value?.data || []
+    totalPages.value = candidatures.value?.totalPages || 1
   }
 </script>
 
@@ -63,8 +89,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Olá, Nome do candidato!</span>
-        <span class="text-caption font-weight-bold">Seja bem-vindo ao seu dashboard</span>
+        <span class="text-gradient-primary font-weight-bold">As suas candidaturas!</span>
+        <span class="text-caption">Confira todas em um mesmo lugar</span>
       </div>
     </v-col>
   </v-row>
@@ -109,7 +135,7 @@
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas</v-list-subheader>
 
             <v-list-item
-              v-for="item in paginatedItems"
+              v-for="item in candidaturesList"
               :key="item.id"
               style="min-height: unset"
             >
@@ -120,12 +146,12 @@
                     <div class="text-caption">{{ item.status }}</div>
                   </div>
 
-                  <div class="text-caption text-grey-darken-1">{{ item.date }}</div>
+                  <div class="text-caption text-grey-darken-1">{{ item.created_at_formatted }}</div>
                 </div>
               </v-card>
             </v-list-item>
 
-            <v-list-item v-if="paginatedItems.length === 0">
+            <v-list-item v-if="candidaturesList.length === 0">
               <v-list-item-title class="text-body-2">Nenhuma candidatura encontrada.</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -133,10 +159,11 @@
       </v-card>
     </v-col>
 
-    <v-col v-if="currentPage < Math.ceil(filteredItems.length / itemsPerPage)">
+    <v-col>
       <v-pagination
-        v-model="currentPage"
-        :length="Math.ceil(filteredItems.length / itemsPerPage)"
+        v-if="totalPages > 1"
+        v-model="page"
+        :length="totalPages"
         :total-visible="5"
         color="primary"
         class="my-4"

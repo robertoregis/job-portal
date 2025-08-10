@@ -1,19 +1,55 @@
-// server/api/candidates/[id].ts
 import supabase from '@/server/utils/supabase'
+
+function emptyStringToNull(value: any) {
+  return value === '' ? null : value
+}
 
 export default defineEventHandler(async (event) => {
   const method = event.req.method
   const id = getRouterParam(event, 'id')
 
-  if (method === 'PATCH') {
-    const { email, profile_id, ...updateData } = await readBody(event)
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'ID is required'
+    })
+  }
 
-    // Garante que email e profile_id não sejam alterados
-    if (email || profile_id) {
+  if (method === 'GET') {
+    const { data, error } = await supabase
+      .from('candidates')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) {
       throw createError({
-        statusCode: 400,
-        statusMessage: 'Email and profile_id cannot be updated'
+        statusCode: 404,
+        statusMessage: 'Candidate not found'
       })
+    }
+
+    if (data.birth_date) {
+      // Garantir que está no formato certo
+      const parts = data.birth_date.split(/[-/]/) // quebra por - ou /
+      if (parts.length === 3) {
+        data.birth_date = `${parts[2]}/${parts[1]}/${parts[0]}`
+      }
+    }
+
+    return data
+  }
+
+
+  if (method === 'PATCH') {
+    const body = await readBody(event)
+    const updateData: any = {}
+
+    const fields = ['name', 'email', 'cpf', 'states', 'city', 'marital_status', 'phone', 'about'] // campos que podem ser atualizados
+    for (const field of fields) {
+      if (field in body) {
+        updateData[field] = emptyStringToNull(body[field])
+      }
     }
 
     const { data, error } = await supabase

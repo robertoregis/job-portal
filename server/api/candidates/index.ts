@@ -1,11 +1,51 @@
-// server/api/candidates/index.ts
 import supabase from '@/server/utils/supabase'
+import { formatDateTimestamp } from '@/composables/formatDate'
+
+function emptyStringToNull(value: any) {
+  return value === '' ? null : value
+}
 
 export default defineEventHandler(async (event) => {
   const method = event.req.method
 
+  if (method === 'GET') {
+    const { profile_id } = getQuery(event)
+    if (!profile_id) {
+      throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
+    }
+
+    const { data, error } = await supabase
+      .from('candidates')
+      .select('*')
+      .eq('profile_id', profile_id)
+
+    if (error) {
+      throw createError({ statusCode: 500, statusMessage: error.message })
+    }
+
+    const formattedData = data.map((candidate: any) => ({
+      ...candidate,
+      created_at_formatted: candidate.created_at ? formatDateTimestamp(candidate.created_at, 3) : null,
+      updated_at_formatted: candidate.updated_at ? formatDateTimestamp(candidate.updated_at, 3) : null,
+      address: `${candidate.city || ''} - ${candidate.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
+    }))
+
+    return formattedData
+  }
+
   if (method === 'POST') {
-    const { name, email, profile_id } = await readBody(event)
+    const body = await readBody(event)
+    const {
+      name,
+      email,
+      profile_id,
+      phone,
+      birth_date,
+      cpf,
+      state,
+      city,
+      about,
+    } = body
 
     if (!name || !email || !profile_id) {
       throw createError({
@@ -14,9 +54,25 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Faz a conversão de strings vazias para null nos campos opcionais
+    const dataToInsert = {
+      name,
+      email,
+      profile_id,
+      phone: emptyStringToNull(phone),
+      birth_date: emptyStringToNull(birth_date),
+      cpf: emptyStringToNull(cpf),
+      state: emptyStringToNull(state),
+      city: emptyStringToNull(city),
+      about: emptyStringToNull(about),
+      image_url: null,
+      image_id: null
+      // outros campos que desejar aqui
+    }
+
     const { data, error } = await supabase
       .from('candidates')
-      .insert([{ name, email, profile_id }])
+      .insert([dataToInsert])
       .select()
       .single()
 
@@ -35,4 +91,3 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Method not allowed'
   })
 })
-

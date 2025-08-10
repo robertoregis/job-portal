@@ -1,68 +1,121 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'dashboard'
-})
+  import { useNotice } from '@/composables/useNotice';
+  import { useInfo } from '@/stores/info';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
 
-const router = useRouter()
+  definePageMeta({
+    layout: 'dashboard'
+  })
+  const info: any = useInfo();
+  const show = useShow();
+  const { createNotice } = useNotice();
+  const route = useRoute();
+  const router = useRouter()
 
-const candidaturaStatusOptions = [
-  { name: 'Enviada', icon: 'mdi-send' },
-  { name: 'Em análise', icon: 'mdi-magnify' },
-  { name: 'Em entrevista', icon: 'mdi-account-question' },
-  { name: 'Avaliação final', icon: 'mdi-progress-clock' },
-  { name: 'Aprovado', icon: 'mdi-check-circle' },
-  { name: 'Rejeitado', icon: 'mdi-close-circle' },
-  { name: 'Arquivada', icon: 'mdi-archive' },
-  { name: 'Desistiu', icon: 'mdi-close-box-outline' },
-]
+  const candidaturaStatusOptions = [
+    { name: 'Enviada', icon: 'mdi-send' },
+    { name: 'Em análise', icon: 'mdi-magnify' },
+    { name: 'Em entrevista', icon: 'mdi-account-question' },
+    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
+    { name: 'Aprovado', icon: 'mdi-check-circle' },
+    { name: 'Rejeitado', icon: 'mdi-close-circle' },
+    { name: 'Arquivada', icon: 'mdi-archive' },
+    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+  ]
+  const page = ref(1)
+  const pageSize = ref(10)
+  const totalPages = ref(1)
+  const selectedStatus = ref<string | null>(null)
+  const selectedIconStatus = ref<string>('')
+  const candidaturesList = ref<any[]>([])
+  const counts = ref<any>({
+    total: 0,
+    approved: 0,
+    rejected: 0
+  })
 
-const selectedStatus = ref<string | null>(null)
-const selectedIconStatus = ref<string>('')
-
-const onStatusSelect = (selected: string | null) => {
-  if (!selected) {
-    selectedIconStatus.value = ''
-    return
+  const onStatusSelect = (selected: string | null) => {
+    if (!selected) {
+      selectedIconStatus.value = ''
+      return
+    }
+    const result = candidaturaStatusOptions.find(option => option.name === selected)
+    selectedIconStatus.value = result ? result.icon : ''
   }
-  const result = candidaturaStatusOptions.find(option => option.name === selected)
-  selectedIconStatus.value = result ? result.icon : ''
-}
 
-const allItems = ref([
-  { id: 1, date: '12h30 12/09/2025', title: 'Desenvolvedor Front-end', status: 'Em análise' },
-  { id: 2, date: '14h10 15/10/2025', title: 'Designer UI/UX', status: 'Aprovado' },
-  { id: 3, date: '09h20 01/08/2025', title: 'QA Tester', status: 'Rejeitado' },
-])
+  const getCandidatures = async () => {
+    const params: Record<string, any> = {
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString()
+    }
 
-const itemsPerPage = 2
-const currentPage = ref(1)
+    if (selectedStatus.value) params.status = selectedStatus.value
 
-const filteredItems = computed(() => {
-  if (!selectedStatus.value) return allItems.value
-  return allItems.value.filter(item => item.status === selectedStatus.value)
-})
+    // Filtro por empresa (se houver)
+    if (info.user.id) {
+      params.job_id = route.params.jobId
+    }
 
-const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredItems.value.slice(start, end)
-})
+    const { data, error } = await useFetch('/api/candidatures', {
+      method: 'GET',
+      params
+    })
 
-watch([selectedStatus], () => {
-  currentPage.value = 1 // reset page ao mudar filtro
-})
+    if (error.value) {
+    } else {
+      candidaturesList.value = data.value?.data || []
+      totalPages.value = data.value?.totalPages || 1
+    }
+  }
 
-const navigation = (id: number) => {
-  router.push(`/dashboard/empresa/123/minhas-vagas/123/candidaturas/${id}`)
-}
+  watch(selectedStatus, () => {
+    getCandidatures()
+  })
+
+  watch(page, () => {
+    getCandidatures()
+  })
+
+  const getCounts = async () => {
+    const { data, error } = await useFetch('/api/candidatures/countsforjob', {
+      method: 'GET',
+      params: { job_id: route.params.jobId }
+    })
+    if (error.value) {
+      console.error('Erro ao buscar counts:', error.value)
+    } else {
+      counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
+    }
+  }
+
+  const navigation = (id: number) => {
+    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/candidaturas/${id}`)
+  }
+
+  const { data: candidatures, error, refresh, pending } = await useFetch('/api/candidatures', {
+    method: 'GET',
+    params: {
+      job_id: route.params.jobId,
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString()
+    }
+  })
+          
+  if (error.value) {
+  } else {
+    candidaturesList.value = candidatures.value?.data || []
+    totalPages.value = candidatures.value?.totalPages || 1
+    await getCounts()
+  }
 </script>
 
 <template>
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span>Candidaturas da vaga</span>
-        <span class="text-caption font-weight-bold">Confira os candidatos inscritos nesta vaga</span>
+        <span class="text-gradient-primary font-weight-bold">Candidaturas da vaga</span>
+        <span class="text-caption">Confira os candidatos inscritos nesta vaga</span>
       </div>
     </v-col>
   </v-row>
@@ -73,15 +126,15 @@ const navigation = (id: number) => {
       <div class="d-flex flex-wrap">
         <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
           <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas</div>
-          <div class="text-h4 font-weight-bold">9</div>
+          <div class="text-h4 font-weight-bold">{{ counts.total }}</div>
         </v-card>
         <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
-          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas enviadas</div>
-          <div class="text-h4 font-weight-bold">3</div>
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas aprovadas</div>
+          <div class="text-h4 font-weight-bold">{{ counts.approved }}</div>
         </v-card>
         <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
-          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas em análise</div>
-          <div class="text-h4 font-weight-bold">1</div>
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas rejeitadas</div>
+          <div class="text-h4 font-weight-bold">{{ counts.rejected }}</div>
         </v-card>
       </div>
     </v-col>
@@ -123,7 +176,7 @@ const navigation = (id: number) => {
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas</v-list-subheader>
 
             <v-list-item
-              v-for="item in paginatedItems"
+              v-for="item in candidaturesList"
               :key="item.id"
               style="min-height: unset"
             >
@@ -134,22 +187,23 @@ const navigation = (id: number) => {
                     <div class="text-caption">{{ item.status }}</div>
                   </div>
 
-                  <div class="text-caption text-grey-darken-1">{{ item.date }}</div>
+                  <div class="text-caption text-grey-darken-1">{{ item.created_at_formatted }}</div>
                 </div>
               </v-card>
             </v-list-item>
 
-            <v-list-item v-if="paginatedItems.length === 0">
+            <v-list-item v-if="candidaturesList.length === 0">
               <v-list-item-title class="text-body-2">Nenhuma candidatura encontrada.</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col v-if="currentPage < Math.ceil(filteredItems.length / itemsPerPage)" cols="12">
+    <v-col>
       <v-pagination
-        v-model="currentPage"
-        :length="Math.ceil(filteredItems.length / itemsPerPage)"
+        v-if="totalPages > 1"
+        v-model="page"
+        :length="totalPages"
         :total-visible="5"
         color="primary"
         class="my-4"
