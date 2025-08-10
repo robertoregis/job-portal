@@ -22,7 +22,7 @@
         return value?.length >= 2 || 'O nome precisa ter no mínimo 2 caracteres.'
       },
       email(value: string) {
-        return /^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(value) || 'O e-mail precisa ser válido.'
+        return /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(value) || 'O e-mail precisa ser válido.'
       },
       password(value: string) {
         return value?.length >= 6 || 'A senha precisa ter no mínimo 6 caracteres.'

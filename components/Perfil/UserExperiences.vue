@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
-  const info: any = useInfo();
+    import { useShow } from '@/stores/show';
+    const { notify } = useNotification();
+    const info: any = useInfo();
+    const show = useShow();
   const pickerVisible = ref(false)
   const typeDate = ref<string>('')
   const editingExperienceIndex = ref<any>(null)
@@ -66,7 +69,7 @@
 
   const changeExperience = () => {
       if (!experience.value.period || !experience.value.company_name) {
-        alert('Selecione o nome da empresa e o período')
+        notify({ title: 'Erro', text: 'Selecione o nome da empresa e o período', type: 'error' })
         return
       }
       // Opção 1: verificar se não é null nem undefined
@@ -78,6 +81,7 @@
   }
 
   const createExperience = async () => {
+    show.setOverlayDashboard(true)
       const { data, error } = await useFetch('/api/experiences', {
           method: 'POST',
           body: {
@@ -90,12 +94,13 @@
           }
       })
 
+      show.setOverlayDashboard(false)
       if (error.value) {
-          console.error('Erro ao criar experience:', error.value)
-          return null
+        notify({ title: 'Erro', text: 'Erro ao criar a exeriência', type: 'error' })
+        return
       }
 
-      console.log('Experience criada:', data.value)
+      notify({ title: 'Parabéns!', text: 'A exeriência foi criada com sucesso', type: 'success' })
       getExperiences()
       clearExperience()
 
@@ -118,32 +123,35 @@
   }
 
   const updateExperience = async (id: string) => {
+    show.setOverlayDashboard(true)
       const { data, error } = await useFetch(`/api/experiences/${id}`, {
           method: 'PATCH',
           body: experience.value
       })
 
+      show.setOverlayDashboard(false)
       if (error.value) {
-          console.error('Erro ao editar experience:', error.value)
-          return null
+        notify({ title: 'Erro', text: 'Erro ao editar a exeriência', type: 'error' })
+        return
       }
 
-      console.log('Experience editada:', data.value)
+      notify({ title: 'Parabéns!', text: 'A exeriência foi editada com sucesso', type: 'success' })
       getExperiences()
       clearExperience()
   }
 
   const removeExperience = async (id: string) => {
+    show.setOverlayDashboard(true)
       const { data, error } = await useFetch(`/api/experiences/${id}`, {
           method: 'DELETE'
       })
-
+      show.setOverlayDashboard(false)
       if (error.value) {
-          console.error('Erro ao remover experience:', error.value)
-          return false
+        notify({ title: 'Erro', text: 'Erro ao remover a exeriência', type: 'error' })
+        return
       }
 
-      console.log('Experience removida:', data.value)
+      notify({ title: 'Parabéns!', text: 'A exeriência foi removida com sucesso', type: 'success' })
       getExperiences()
   }
 
@@ -155,10 +163,8 @@
   })
 
   if (error.value) {
-      console.error('Erro ao carregar experiences:', error.value)
   } else {
       experiencesList.value = experiences.value
-      console.log('Experiences:', experiences.value)
   }
 </script>
 

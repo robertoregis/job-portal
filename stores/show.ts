@@ -3,12 +3,14 @@ import { defineStore } from "pinia";
 export interface InterfaceShow {
 	overlayDashboard: boolean
 	overlaySite: boolean
+	navigation: boolean
 }
 
 export const useShow = defineStore("show", {
 	state: (): InterfaceShow => ({
 		overlayDashboard: false,
-		overlaySite: false
+		overlaySite: false,
+		navigation: false,
 	}),
 	actions: {
 		setOverlayDashboard(data: boolean) {
@@ -17,6 +19,9 @@ export const useShow = defineStore("show", {
 		setOverlaySite(data: boolean) {
 			this.overlaySite = data;
 		},
+		setNavigation(data: boolean) {
+			this.navigation = data;
+		}
 	},
 	getters: {
 	},

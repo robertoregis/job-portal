@@ -1,5 +1,7 @@
 <!-- layouts/default.vue -->
 <script setup lang="ts">
+  import { useShow } from '@/stores/show';
+  const show = useShow();
 </script>
 <template>
   <v-app>
@@ -17,6 +19,17 @@
                   <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
                 </div>
               </v-col>-->
+              <v-col cols="12" v-if="$vuetify.display.smAndDown">
+                <v-app-bar flat absolute>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    icon="mdi-menu"
+                    variant="text"
+                    @click="show.setNavigation(!show.navigation)"
+                  ></v-btn>
+                </v-app-bar>
+              </v-col>
+
               <v-col cols="12">
                 <slot/>
               </v-col>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
+    import { useShow } from '@/stores/show';
+    const { notify } = useNotification();
     const info: any = useInfo();
+    const show = useShow();
     //// Soft Skill
     const dialogSoftSkill = ref(false)
     const softsList = ref<any>([])
@@ -38,7 +41,7 @@
 
     const changeSoftSkill = () => {
         if (!softSkill.value.name) {
-            alert('Selecione o nome do soft skill')
+            notify({ title: 'Erro', text: 'Selecione o nome da soft skill', type: 'error' })
             return
         }
         // Opção 1: verificar se não é null nem undefined
@@ -50,6 +53,7 @@
     }
 
     const createSoftSkill = async () => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch('/api/soft_skills', {
             method: 'POST',
             body: {
@@ -60,12 +64,13 @@
             }
         })
 
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao criar softSkill:', error.value)
-            return null
+            notify({ title: 'Erro', text: 'Erro ao criar a soft skill', type: 'error' })
+            return
         }
 
-        console.log('Soft Skill criada:', data.value)
+        notify({ title: 'Parabéns!', text: 'A soft skill foi criada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
         
@@ -88,32 +93,36 @@
     }
 
     const updateSoftSkill = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/soft_skills/${id}`, {
             method: 'PATCH',
             body: softSkill.value
         })
 
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao editar softSkill:', error.value)
-            return null
+            notify({ title: 'Erro', text: 'Erro ao editar a soft skill', type: 'error' })
+            return
         }
 
-        console.log('Soft Skill editada:', data.value)
+        notify({ title: 'Parabéns!', text: 'A soft skill foi editada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
     }
 
     const removeSoftSkill = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/soft_skills/${id}`, {
             method: 'DELETE'
         })
 
+        show.setOverlayDashboard(false)
         if (error.value) {
-            console.error('Erro ao remover softSkill:', error.value)
-            return false
+            notify({ title: 'Erro', text: 'Erro ao remover a soft skill', type: 'error' })
+            return
         }
 
-        console.log('Soft Skill removida:', data.value)
+        notify({ title: 'Parabéns!', text: 'A soft skill foi removida com sucesso', type: 'success' })
         getSoftSkills()
     }
 
@@ -125,10 +134,8 @@
     })
 
     if (error.value) {
-        console.error('Erro ao carregar softSkills:', error.value)
     } else {
         softsList.value = softSkills.value
-        console.log('Soft Skills:', softSkills.value)
     }
 </script>
 
