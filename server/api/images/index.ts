@@ -28,11 +28,11 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
     }
 
-    if (type !== 'company' && type !== 'candidate') {
-      throw createError({ statusCode: 400, statusMessage: 'Invalid type. Must be "company" or "candidate"' })
+    if (type !== 'company' && type !== 'candidate' && type !== 'admin') {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid type. Must be "company", "candidate" or "admin"' })
     }
 
-    const folder = type === 'company' ? 'company' : 'candidate'
+    const folder = type === 'company' ? 'company' : type === 'candidate' ? 'candidate' : 'admin'
 
     // Comprimir a imagem com sharp
     let compressedBuffer
@@ -68,8 +68,10 @@ export default defineEventHandler(async (event) => {
       .from(bucketName)
       .getPublicUrl(fileName)
 
+    // Define tabela conforme tipo
+    const table = type === 'company' ? 'companies' : type === 'candidate' ? 'candidates' : 'admins'
+
     // Atualizar tabela
-    const table = type === 'company' ? 'companies' : 'candidates'
     const { error: updateError } = await supabase
       .from(table)
       .update({
@@ -95,8 +97,8 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'image_id is required' })
     }
 
-    if (type && type !== 'company' && type !== 'candidate') {
-      throw createError({ statusCode: 400, statusMessage: 'Invalid type. Must be "company" or "candidate"' })
+    if (type && type !== 'company' && type !== 'candidate' && type !== 'admin') {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid type. Must be "company", "candidate" or "admin"' })
     }
 
     const bucketName = 'jobportal'
@@ -112,7 +114,7 @@ export default defineEventHandler(async (event) => {
 
     // Limpar campos na tabela se vier profile_id e type
     if (profile_id && type) {
-      const table = type === 'company' ? 'companies' : 'candidates'
+      const table = type === 'company' ? 'companies' : type === 'candidate' ? 'candidates' : 'admins'
       const { error: updateError } = await supabase
         .from(table)
         .update({
@@ -131,5 +133,6 @@ export default defineEventHandler(async (event) => {
 
   throw createError({ statusCode: 405, statusMessage: 'Method not allowed' })
 })
+
 
 

@@ -52,6 +52,15 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 500, statusMessage: candidateError.message })
     }
   }
+  else if (type === 'admin') {
+    const { error: adminError } = await supabase
+      .from('admins')
+      .insert([{ name, email, profile_id: profile.id }])
+
+    if (adminError) {
+      throw createError({ statusCode: 500, statusMessage: adminError.message })
+    }
+  }
 
   return profile
 })

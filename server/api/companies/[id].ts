@@ -5,6 +5,26 @@ function emptyStringToNull(value: any) {
   return value === '' ? null : value
 }
 
+function toISODate(value: any) {
+  if (!value) return null;
+
+  // Trata string no formato DD/MM/YYYY
+  if (typeof value === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [day, month, year] = value.split('/');
+    // Garante que mês e dia tenham 2 dígitos
+    const isoString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().substring(0, 10);
+  }
+
+  // Caso já seja uma data em formato ISO ou outro formato reconhecido
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().substring(0, 10);
+}
+
+
 export default defineEventHandler(async (event) => {
   const method = event.req.method
   const id = getRouterParam(event, 'id')
@@ -41,6 +61,9 @@ export default defineEventHandler(async (event) => {
   if (method === 'PATCH') {
     const body = await readBody(event)
     const updateData: any = {}
+    console.log('-----')
+    console.log(body)
+    console.log('-----')
 
     const fields = [
       'name',
@@ -53,13 +76,18 @@ export default defineEventHandler(async (event) => {
       'city',
       'email',
       'phone',
-      'about'
+      'about',
+      'foundation_at'
     ]
 
     for (const field of fields) {
       if (field in body) {
         updateData[field] = emptyStringToNull(body[field])
       }
+    }
+
+    if ('foundation_at' in updateData) {
+      updateData.foundation_at = toISODate(updateData.foundation_at)
     }
 
     const { data, error } = await supabase

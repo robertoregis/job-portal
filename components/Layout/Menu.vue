@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import { useInfo } from '#imports';
-  import { useShow } from '@/stores/show';
+  import { useInfo } from '@/stores/info'
+  import { useShow } from '@/stores/show'
   import { useField, useForm } from 'vee-validate';
   interface FormSchema {
     email: string
     password: string
   }
-  const info: any = useInfo();
+  const info: any = useInfo()
+  const router = useRouter()
   const show = useShow()
-  const router = useRouter();
   const dialog = ref<boolean>(false)
   const dialogLoginAdmin = ref<boolean>(false)
   const { notify } = useNotification();
@@ -32,6 +32,7 @@
 
   const navigation = (type: string) => {
     dialog.value = false;
+    show.setMenu(false)
     router.push(`/cadastrar/${type}`)
   }
 
@@ -51,7 +52,7 @@
       default:
         dashboardType = '' // ou alguma rota padrão, se quiser
     }
-
+    show.setMenu(false)
     if (dashboardType && info.user.id) {
       if(dashboardType === 'admin') {
         router.push(`/dashboard/${dashboardType}`)
@@ -90,6 +91,7 @@
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
       dialog.value = false;
       dialogLoginAdmin.value = false;
+      show.setMenu(false)
   }
 
   const submit = handleSubmit(async (values) => {
@@ -117,52 +119,55 @@
     info.setUser({})
     localStorage.removeItem('user')
     show.setOverlayDashboard(false)
+    show.setMenu(false)
     router.push('/')
   }
-  
 </script>
+
 <template>
-  <v-sheet width="100%" class="border-b-sm border-secondary">
-    <v-container class="py-3">
-      <div class="d-flex justify-space-between align-center">
-        <v-toolbar-title class="text-title text-h5 font-weight-bold">Conect One RH</v-toolbar-title>
+  <v-navigation-drawer
+    v-model="show.menu"
+    class="bg-gradient-primary"
+    :temporary="$vuetify.display.smAndDown"
+    :permanent="$vuetify.display.mdAndUp"
+    style="height: 100vh; overflow: hidden;"
+  >
+    <v-row class="pa-3" no-gutters>
+      <v-col cols="12">
+        <v-list nav>
+          <v-list-item class="d-flex justify-center" style="min-height: unset">
+            <NuxtLink @click="show.setMenu(false)" :to="`/`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <span>Home</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex justify-center" style="min-height: unset">
+            <NuxtLink @click="show.setMenu(false)" :to="`/sobre`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <span>Sobre nós</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex justify-center" style="min-height: unset">
+            <NuxtLink @click="show.setMenu(false)" :to="`/vagas`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <span>Vagas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex justify-center" style="min-height: unset">
+            <NuxtLink @click="show.setMenu(false)" :to="`/empresa`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <span>Empresa</span>
+            </NuxtLink>
+          </v-list-item>
+        </v-list>
+      </v-col>
 
-        <v-spacer></v-spacer>
-
-        <div class="d-flex">
-          <div class="d-none d-md-flex align-center">
-            <ul class="pl-0 d-flex list-style-none">
-              <li class="mx-2">
-                <NuxtLink to="/" class="no-underline text-title text-subtitle-1">Home</NuxtLink>
-              </li>
-              <li class="mx-2">
-                <NuxtLink to="/sobre" class="no-underline text-title text-subtitle-1">Sobre nós</NuxtLink>
-              </li>
-              <li class="mx-2">
-                <NuxtLink to="/vagas" class="no-underline text-title text-subtitle-1">Vagas</NuxtLink>
-              </li>
-              <li class="mx-2">
-                <NuxtLink to="/empresa" class="no-underline text-title text-subtitle-1">Empresa</NuxtLink>
-              </li>
-              
-            </ul>
-          </div>
-          <v-btn
-            icon="mdi-menu"
-            variant="text"
-            class="d-md-none"
-            @click="show.setMenu(!show.menu)"
-          ></v-btn>
-          <div class="d-none d-md-flex">
-            <v-btn v-if="info.user && info.user.id" @click="navigationDashboard" rounded="xl" class="ml-5 bg-gradient-status">Dashboard</v-btn>
-            <v-btn v-if="info.user && info.user.id" @click="logout" rounded="xl" class="ml-2" color="error">Sair</v-btn>
-            <v-btn v-else @click="dialog = true" rounded="xl" :class="`${info.user && info.user.id ? 'ml-2' : 'ml-5'}`" class="bg-gradient-primary">Login</v-btn>
-          </div>
+      <v-col cols="12">
+        <div class="d-flex flex-column align-center">
+          <v-btn v-if="info.user && info.user.id" @click="navigationDashboard" rounded="xl" class="mt-5">Dashboard</v-btn>
+          <v-btn v-if="info.user && info.user.id" @click="logout" rounded="xl" class="mt-2" color="error">Sair</v-btn>
+          <v-btn v-else @click="dialog = true" rounded="xl" :class="`${info.user && info.user.id ? 'mt-2' : 'mt-3'}`" class="">Login</v-btn>
         </div>
+      </v-col>
+    </v-row>
+  </v-navigation-drawer>
 
-      </div>
-    </v-container>
-  </v-sheet>
   <v-dialog
     v-model="dialog"
     max-width="400"
@@ -209,6 +214,7 @@
       >
         Administrador
       </v-btn>
+
     </v-card-actions>
   </v-card>
   </v-dialog>
@@ -230,31 +236,31 @@
     <v-card-text class="d-flex flex-column px-4 pb-4 pt-2">
       <form @submit.prevent="submit">
 
-              <v-text-field
-                v-model="email.value.value"
-                :error-messages="email.errorMessage.value"
-                label="E-mail"
-                density="comfortable"
-              />
+        <v-text-field
+          v-model="email.value.value"
+          :error-messages="email.errorMessage.value"
+          label="E-mail"
+          density="comfortable"
+        />
 
-              <v-text-field
-                v-model="password.value.value"
-                :error-messages="password.errorMessage.value"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showPassword = !showPassword"
-                :type="showPassword ? 'text' : 'password'"
-                label="Senha"
-                density="comfortable"
-              />
+        <v-text-field
+          v-model="password.value.value"
+          :error-messages="password.errorMessage.value"
+          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append="showPassword = !showPassword"
+          :type="showPassword ? 'text' : 'password'"
+          label="Senha"
+          density="comfortable"
+        />
 
-              <v-btn class="me-4" type="submit">
-                Entrar
-              </v-btn>
+        <v-btn class="me-4" type="submit">
+          Entrar
+        </v-btn>
 
-              <v-btn @click="handleReset">
-                Limpar
-              </v-btn>
-            </form>
+        <v-btn @click="handleReset">
+          Limpar
+        </v-btn>
+      </form>
     </v-card-text>
   </v-card>
   </v-dialog>

@@ -1,28 +1,28 @@
-<!-- layouts/default.vue -->
+<!-- layouts/dashboard.vue -->
 <script setup lang="ts">
   import { useShow } from '@/stores/show';
   const show = useShow();
 
   let wasLargeScreen = window.innerWidth >= 960
 
-const evaluateWidth = () => {
-  const isLargeScreen = window.innerWidth >= 960
+  const evaluateWidth = () => {
+    const isLargeScreen = window.innerWidth >= 960
 
-  if (isLargeScreen !== wasLargeScreen) {
-    wasLargeScreen = isLargeScreen
-    show.setNavigation(isLargeScreen)
+    if (isLargeScreen !== wasLargeScreen) {
+      wasLargeScreen = isLargeScreen
+      show.setNavigation(isLargeScreen)
+    }
   }
-}
 
-onMounted(() => {
-  if(window.innerWidth >= 960) {
-    show.setNavigation(true)
-  }
-  nextTick(() => {
-    evaluateWidth()
+  onMounted(() => {
+    if(window.innerWidth >= 960) {
+      show.setNavigation(true)
+    }
+    nextTick(() => {
+      evaluateWidth()
+    })
+    window.addEventListener('resize', evaluateWidth)
   })
-  window.addEventListener('resize', evaluateWidth)
-})
 </script>
 <template>
   <v-app>
@@ -31,7 +31,7 @@ onMounted(() => {
       <LayoutNavigation />
 
       <v-main class="overflow-y-auto" style="height: 100vh;">
-        <div class="pa-4">
+        <div class="">
           <v-container>
             <v-row no-gutters>
               <!--<v-col cols="12">

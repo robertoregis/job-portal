@@ -1,11 +1,14 @@
 <script setup lang="ts">
+  definePageMeta({
+    middleware: ['authenticated'] as unknown as any
+  })
   import { useField, useForm } from 'vee-validate';
   import { useInfo } from '#imports';
   import { useShow } from '@/stores/show'
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
-
+  const loading = ref<boolean>(true)
   interface FormSchema {
     name: string
     email: string
@@ -57,8 +60,8 @@
       }
 
       setTimeout(() => {
-        const company = dataCompany.value
-        info.setUser({ ...dataCompany.value[0], type: 'company' })
+        const company = dataCompany.value.data
+        info.setUser({ ...dataCompany.value.data[0], type: 'company' })
         notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
         show.setOverlayDashboard(false)
         router.push(`/dashboard/empresa/${company.id}/meu-perfil/editar`)
@@ -67,6 +70,7 @@
 
   const submit = handleSubmit(async (values) => {
     //alert(JSON.stringify(values, null, 2))
+    show.setOverlayDashboard(true)
     const { data, pending, error } = await useFetch('/api/auth/register', {
       method: 'POST',
       body: {
@@ -79,7 +83,7 @@
 
     // Tratamento de erros
     if (error.value) {
-      console.error('Erro ao criar perfil:', error.value)
+      notify({ title: '', text: 'Erro ao criar cadastro', type: 'error' })
       show.setOverlayDashboard(false)
     } else {
       getProfile(data.value.id)
@@ -90,6 +94,14 @@
   const navigation = (id: number) => {
     router.push(`/entrar/empresa`)
   }
+
+  onBeforeMount(() => {
+    if(info.user && info.user.id) {
+      router.push('/')
+    } else {
+      loading.value = false;
+    }
+  })
 
 </script>
 
@@ -102,7 +114,7 @@
     </v-sheet>-->
 
     <v-sheet width="100%" class="mt-4">
-      <v-container>
+      <v-container v-if="!loading">
         <v-row>
           <v-col cols="12">
             <h1 class="text-h5 font-weight-bold">Cadastrar Empresa!</h1>

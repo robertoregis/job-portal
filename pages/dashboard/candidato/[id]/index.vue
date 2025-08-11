@@ -82,39 +82,43 @@
 
   <v-row no-gutters class="mt-5">
     <v-col cols="12">
-      <div
-        class="d-flex flex-wrap align-center"
-        style="gap: 16px; justify-content: flex-start;"
-      >
-        <v-card
-          hover ripple
-          @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
-          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-h6" style="line-height: 1.2;">Candidaturas</div>
-          <div class="text-h3 font-weight-bold">{{ counts.total }}</div>
-        </v-card>
+      <v-row>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            hover
+            ripple
+            @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
+            class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-h6" style="line-height: 1.2;">Candidaturas</div>
+            <div class="text-h3 font-weight-bold">{{ counts.total }}</div>
+          </v-card>
+        </v-col>
 
-        <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
-          <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.approved }}</div>
-        </v-card>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
+            <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.approved }}</div>
+          </v-card>
+        </v-col>
 
-        <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-h6" style="line-height: 1.2;">Candidaturas rejeitadas</div>
-          <div class="text-h3 font-weight-bold">{{ counts.rejected }}</div>
-        </v-card>
-      </div>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-h6" style="line-height: 1.2;">Candidaturas rejeitadas</div>
+            <div class="text-h3 font-weight-bold">{{ counts.rejected }}</div>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-col>
 
     <v-col cols="12" class="mt-4 border">
@@ -138,7 +142,7 @@
 
               <template v-slot:append="{ isSelected }">
                 <v-list-item-action class="flex-column align-end">
-                  <small class="mb-4 opacity-60">{{ notice.created_at }}</small>
+                  <small class="mb-4 opacity-60">{{ notice.created_at_formatted }}</small>
                 </v-list-item-action>
               </template>
             </v-list-item>

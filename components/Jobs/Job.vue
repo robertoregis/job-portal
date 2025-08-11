@@ -16,7 +16,7 @@
       const router = useRouter();
 
       const apply = () => {
-        if (info.user && info.user.id) {
+        if (info.user && info.user.id && info.user.type === 'candidate') {
           dialogCreateCandidature.value = true
         } else {
           dialog.value = true
@@ -33,7 +33,8 @@
         job,
         dialogCreateCandidature,
         navigation,
-        apply
+        apply,
+        info
       }
     }
   }
@@ -65,6 +66,7 @@
 
         <v-card-actions>
           <v-btn
+            v-if="info.user && info.user.id && info.user.type === 'candidate'"
             @click.prevent="apply"
             class="bg-gradient-primary"
             text="Candidatar-me"

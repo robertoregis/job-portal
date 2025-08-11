@@ -1,5 +1,7 @@
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
 
+  const info: any = useInfo();
 </script>
 <template>
   <v-sheet width="100%" class="bg-gradient-primary mt-4 text-white">
@@ -16,10 +18,10 @@
             >
               <!-- container dos links -->
               <v-row class="max-w-400" no-gutters>
-                <v-col cols="6" class="d-flex">
+                <v-col v-if="!info.user.id" cols="6" class="d-flex">
                   <NuxtLink to="/cadastrar/candidato" class="text-white no-underline text-subtitle-1 pa-1">Cadastrar candidato</NuxtLink>
                 </v-col>
-                <v-col cols="6" class="d-flex">
+                <v-col v-if="!info.user.id" cols="6" class="d-flex">
                   <NuxtLink to="/cadastrar/empresa" class="text-white no-underline text-subtitle-1 pa-1">Cadastrar empresa</NuxtLink>
                 </v-col>
               </v-row>

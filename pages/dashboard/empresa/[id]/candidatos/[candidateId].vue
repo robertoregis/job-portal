@@ -44,7 +44,7 @@
     }
   }
   
-  const { data, error, pending } = await useFetch(`/api/candidates/${route.params.id}`, {
+  const { data, error, pending } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
     method: 'GET'
   })
 

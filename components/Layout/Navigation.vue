@@ -256,6 +256,74 @@ onMounted(() => {
         </div>
       </v-col>
     </v-row>
+    <v-row v-if="authentication.user.type === 'admin'" class="pa-3" no-gutters>
+      <v-col cols="12" class="mt-2">
+        <div class="d-flex flex-column align-center">
+          <v-avatar color="white" size="50"></v-avatar>
+          <div class="d-flex flex-column align-center mt-6">
+            <v-avatar v-if="authentication.user.image_url" size="70">
+              <v-img
+                alt="John"
+                :src="authentication.user.image_url"
+              ></v-img>
+            </v-avatar>
+            <v-avatar v-else color="white" size="70">
+            </v-avatar>
+            <span>{{ authentication.user.name }}</span>
+            <span class="text-caption">{{ authentication.user.email }}</span>
+          </div>
+        </div>
+      </v-col>
+      <v-col cols="12" class="mt-3">
+        <v-list nav>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-view-dashboard</v-icon>
+              <span>Dashboard</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/meu-perfil`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-account</v-icon>
+              <span>Meu perfil</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/empresas`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-clipboard-list</v-icon>
+              <span>Empresas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/ajustes`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-cog</v-icon>
+              <span>Ajustes</span>
+            </NuxtLink>
+          </v-list-item>
+        </v-list>
+      </v-col>
+
+      <v-col cols="12">
+        <div class="d-flex flex-column align-center">
+          <v-btn
+            @click="logout"
+            color="white"
+            text="Sair"
+            variant="flat"
+            class="mt-4"
+            size="small"
+          ></v-btn>
+          <v-btn
+            @click="router.push('/')"
+            color="white"
+            text="Ir para o site"
+            variant="flat"
+            class="mt-2"
+            size="small"
+          ></v-btn>
+        </div>
+      </v-col>
+    </v-row>
   </v-navigation-drawer>
 </template>
 

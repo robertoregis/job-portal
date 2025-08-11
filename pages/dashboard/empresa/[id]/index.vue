@@ -83,44 +83,50 @@
 
   <v-row no-gutters class="mt-5">
     <v-col cols="12">
-      <div
-        style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: flex-start;"
-      >
-        <v-card
-          hover ripple
-          @click="navigation('/dashboard/empresa/123/minhas-vagas')"
-          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-h6" style="line-height: 1.2;">Vagas abertas para inscrição</div>
-          <div class="text-h3 font-weight-bold">{{ counts.open }}</div>
-        </v-card>
+      <v-row dense>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            hover
+            ripple
+            @click="navigation('/dashboard/empresa/123/minhas-vagas')"
+            class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-h6" style="line-height: 1.2;">Vagas abertas para inscrição</div>
+            <div class="text-h3 font-weight-bold">{{ counts.open }}</div>
+          </v-card>
+        </v-col>
 
-        <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas incrições encerradas</div>
-          <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.closedSignup }}</div>
-        </v-card>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas inscrições encerradas</div>
+            <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.closedSignup }}</div>
+          </v-card>
+        </v-col>
 
-        <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
-          elevation="2"
-          style="min-height: 120px; width: 220px;"
-        >
-          <div class="text-h6" style="line-height: 1.2;">Vagas encerrada</div>
-          <div class="text-h3 font-weight-bold">{{ counts.ended }}</div>
-        </v-card>
-      </div>
+        <v-col cols="12" sm="6" md="4">
+          <v-card
+            class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
+            elevation="2"
+            style="min-height: 120px;"
+          >
+            <div class="text-h6" style="line-height: 1.2;">Vagas encerradas</div>
+            <div class="text-h3 font-weight-bold">{{ counts.ended }}</div>
+          </v-card>
+        </v-col>
+      </v-row>
+
     </v-col>
 
     <v-col cols="12 mt-4">
       <div class="d-flex">
         <v-btn
-          color="deep-purple-accent-4"
+          color="primary"
           text="Criar vaga"
           variant="flat"
           @click="$router.push(`/dashboard/empresa/${info.user.name}/vagas/criar`)"

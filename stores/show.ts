@@ -3,7 +3,8 @@ import { defineStore } from "pinia";
 export interface InterfaceShow {
 	overlayDashboard: boolean
 	overlaySite: boolean
-	navigation: boolean
+	navigation: boolean,
+	menu: boolean
 }
 
 export const useShow = defineStore("show", {
@@ -11,6 +12,7 @@ export const useShow = defineStore("show", {
 		overlayDashboard: false,
 		overlaySite: false,
 		navigation: false,
+		menu: false
 	}),
 	actions: {
 		setOverlayDashboard(data: boolean) {
@@ -21,6 +23,9 @@ export const useShow = defineStore("show", {
 		},
 		setNavigation(data: boolean) {
 			this.navigation = data;
+		},
+		setMenu(data: boolean) {
+			this.menu = data;
 		}
 	},
 	getters: {
