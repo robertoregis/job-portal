@@ -95,20 +95,25 @@ const checkRedirect = () => {
   // Se não caiu em nenhuma regra, não faz nada (deixa passar)
 }
 
-onMounted(async () => {
-  const supabase = useNuxtApp().$supabase
-  const { data: { session } } = await supabase.auth.getSession()
+  onMounted(async () => {
+    const supabase = useNuxtApp().$supabase
+    const { data: { session } } = await supabase.auth.getSession()
 
-  if (session) {
-    await getProfile(session.user.id)
-  } else {
-    // Se não estiver logado, mas está em rota dashboard, redireciona para /
-    if (route.path.startsWith('/dashboard')) {
-      router.push('/')
+    if (session) {
+      await getProfile(session.user.id)
+    } else {
+      // Se não houver sessão, faz logout "limpo"
+      await supabase.auth.signOut()
+      info.setUser({})
+      info.setProfile({})
+      localStorage.removeItem('user')
+      if (route.path.startsWith('/dashboard')) {
+        router.push('/')
+      }
+      loading.value = false
     }
-    loading.value = false
-  }
-})
+  })
+
 </script>
 
 <template>

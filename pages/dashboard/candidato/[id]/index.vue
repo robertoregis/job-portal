@@ -82,31 +82,34 @@
 
   <v-row no-gutters class="mt-5">
     <v-col cols="12">
-      <div class="d-flex align-center">
+      <div
+        class="d-flex flex-wrap align-center"
+        style="gap: 16px; justify-content: flex-start;"
+      >
         <v-card
-          hover ripple @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
+          hover ripple
+          @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
+          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-h6" style="line-height: 1.2;">Candidaturas</div>
           <div class="text-h3 font-weight-bold">{{ counts.total }}</div>
         </v-card>
+
         <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 border border-secondary"
+          class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
           <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.approved }}</div>
         </v-card>
+
         <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
+          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-h6" style="line-height: 1.2;">Candidaturas rejeitadas</div>
           <div class="text-h3 font-weight-bold">{{ counts.rejected }}</div>
