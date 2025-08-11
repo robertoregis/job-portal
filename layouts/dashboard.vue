@@ -15,7 +15,9 @@ const evaluateWidth = () => {
 }
 
 onMounted(() => {
-  evaluateWidth()
+  if(window.innerWidth >= 960) {
+    show.setNavigation(true)
+  }
   nextTick(() => {
     evaluateWidth()
   })
