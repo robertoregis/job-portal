@@ -2,6 +2,24 @@
 <script setup lang="ts">
   import { useShow } from '@/stores/show';
   const show = useShow();
+
+  let wasLargeScreen = window.innerWidth >= 960
+
+const evaluateWidth = () => {
+  const isLargeScreen = window.innerWidth >= 960
+
+  if (isLargeScreen !== wasLargeScreen) {
+    wasLargeScreen = isLargeScreen
+    show.setNavigation(isLargeScreen)
+  }
+}
+
+onMounted(() => {
+  nextTick(() => {
+    evaluateWidth()
+  })
+  window.addEventListener('resize', evaluateWidth)
+})
 </script>
 <template>
   <v-app>

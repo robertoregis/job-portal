@@ -85,8 +85,6 @@ onMounted(() => {
   <v-navigation-drawer
     v-model="show.navigation"
     class="bg-gradient-primary"
-    :temporary="$vuetify.display.smAndDown"
-    :permanent="$vuetify.display.mdAndUp"
     style="height: 100vh; overflow: hidden;"
   >
 
