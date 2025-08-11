@@ -83,31 +83,33 @@
 
   <v-row no-gutters class="mt-5">
     <v-col cols="12">
-      <div class="d-flex align-center">
+      <div
+        style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: flex-start;"
+      >
         <v-card
-          hover ripple @click="navigation('/dashboard/empresa/123/minhas-vagas')"
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
+          hover ripple
+          @click="navigation('/dashboard/empresa/123/minhas-vagas')"
+          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-h6" style="line-height: 1.2;">Vagas abertas para inscrição</div>
           <div class="text-h3 font-weight-bold">{{ counts.open }}</div>
         </v-card>
+
         <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 border border-secondary"
+          class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas incrições encerradas</div>
           <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.closedSignup }}</div>
         </v-card>
+
         <v-card
-          class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary"
+          class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
           elevation="2"
-          width="220"
-          style="min-height: 120px"
+          style="min-height: 120px; width: 220px;"
         >
           <div class="text-h6" style="line-height: 1.2;">Vagas encerrada</div>
           <div class="text-h3 font-weight-bold">{{ counts.ended }}</div>
