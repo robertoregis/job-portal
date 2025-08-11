@@ -168,6 +168,100 @@
       citySelected.value = data.value.city
     }
   }
+
+  const imagePreview = ref<any>(null)
+  const file = ref<File | null>(null)
+  const fileInput: any = ref(null)
+  const triggerFileInput = () => {
+    fileInput.value?.click()
+  }
+
+  const previewImage = () => {
+    if (!file.value) {
+      imagePreview.value = null
+      return
+    }
+    const selectedFile = file.value
+
+    if (selectedFile instanceof File) {
+      imagePreview.value = URL.createObjectURL(selectedFile)
+    } else if (Array.isArray(selectedFile)) {
+      imagePreview.value = selectedFile.length > 0 ? URL.createObjectURL(selectedFile[0]) : null
+    }
+  }
+
+  const uploadImage = async () => {
+    show.setOverlayDashboard(true)
+    if (!file.value) {
+      notify({ title: 'Erro', text: 'Selecione uma imagem', type: 'error' })
+      show.setOverlayDashboard(false)
+      return
+    }
+
+    const formDataTy = new FormData()
+    formDataTy.append('file', file.value)
+    const url = `/api/images?profile_id=${info.profile.id}&type=company`
+
+    const { data: imageData, error: imageError }: any = await useFetch(url, {
+      method: 'POST',
+      body: formDataTy
+    })
+
+    if (imageError.value) {
+      notify({ title: 'Erro', text: 'Erro ao enviar imagem', type: 'error' })
+    } else {
+      if(info.user.image_id) {
+        await deleteImage(false)
+      }
+      const company = info.user
+      setTimeout(() => {
+        info.setUser({
+          ...company,
+          image_url: imageData.value.image_url,
+          image_id: imageData.value.image_id
+        })
+        imagePreview.value = imageData.value.image_url
+        notify({ title: 'Parabéns!', text: 'A imagem foi enviada', type: 'success' })
+      }, 1500)
+    }
+    setTimeout(() => {
+      show.setOverlayDashboard(false)
+    }, 1000)
+  }
+
+  const deleteImage = async (isLoading: boolean) => {
+    if(isLoading) {
+      show.setOverlayDashboard(true)
+    }
+    const url = `/api/images?image_id=${encodeURIComponent(info.user.image_id)}&type=${info.user.type}&profile_id=${info.profile.id}`
+    const { data, error } = await useFetch(url, {
+      method: 'DELETE'
+    })
+
+    setTimeout(() => {
+      if(isLoading) {
+        if(error.value) {
+          notify({ title: 'Erro', text: 'Erro ao remover imagem', type: 'error' })
+        } else {
+          notify({ title: 'Parabéns!', text: 'A imagem foi removida', type: 'success' })
+        }
+        const company = info.user
+        info.setUser({
+          ...company,
+          image_url: null,
+          image_id: null
+        })
+        imagePreview.value = null
+        file.value = null
+        show.setOverlayDashboard(false)
+      }
+    }, 1000)
+  }
+
+  const cancelChange = () => {
+    imagePreview.value = info.user.image_url
+    file.value = null
+  }
 </script>
 
 <template>
@@ -180,7 +274,86 @@
     </v-col>
   </v-row>
   <v-row class="mt-5">
-      <v-col cols="12" class="border">
+    <v-col cols="12" class="border pa-2">
+      <div class="d-flex flex-column">
+        <span class="text-caption mb-2">Clique na foto para trocar:</span>
+        <div class="d-flex align-center">
+          <v-avatar v-if="imagePreview" size="70" @click="triggerFileInput" class="cursor-pointer">
+            <v-img alt="Foto" :src="imagePreview"></v-img>
+          </v-avatar>
+          <v-avatar v-else size="70" @click="triggerFileInput" class="cursor-pointer">
+            <v-img alt="Foto" src="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/blank-profile-picture-973460_640.png"></v-img>
+          </v-avatar>
+
+          <!-- Input de arquivo escondido -->
+          <v-file-input
+            ref="fileInput"
+            accept="image/*"
+            v-model="file"
+            style="display: none"
+            @change="previewImage"
+          ></v-file-input>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview !== info.user.image_url && imagePreview"
+                @click="uploadImage"
+                size="small"
+                :disabled="!file"
+                color="primary"
+                class="ml-2"
+                icon
+                aria-label="Upload"
+              >
+                <v-icon>mdi-upload</v-icon>
+              </v-btn>
+            </template>
+            <span>Trocar</span>
+          </v-tooltip>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview !== info.user.image_url && imagePreview"
+                @click="cancelChange"
+                size="small"
+                :disabled="!file"
+                color="grey"
+                class="ml-2"
+                icon
+                aria-label="Cancelar"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </template>
+            <span>Cancelar</span>
+          </v-tooltip>
+
+          <v-tooltip open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                v-if="imagePreview && info.user.image_id"
+                @click="deleteImage(true)"
+                size="small"
+                color="error"
+                class="ml-2"
+                icon
+                aria-label="Remover"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
+            <span>Remover</span>
+          </v-tooltip>
+
+        </div>
+      </div>
+    </v-col>
+      <v-col cols="12" class="border mt-4">
         <v-card>
           <v-card-title>
             <div class="d-flex align-center">
