@@ -15,6 +15,7 @@ const evaluateWidth = () => {
 }
 
 onMounted(() => {
+  evaluateWidth()
   nextTick(() => {
     evaluateWidth()
   })
