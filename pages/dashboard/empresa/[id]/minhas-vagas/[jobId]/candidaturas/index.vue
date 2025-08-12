@@ -183,7 +183,7 @@
               <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation(item.id)">
                 <div class="d-flex justify-space-between align-start">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ item.title }}</div>
+                    <div class="text-subtitle-1 font-weight-medium">{{ item.candidate_name }}</div>
                     <div class="text-caption">{{ item.status }}</div>
                   </div>
 

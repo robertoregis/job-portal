@@ -61,9 +61,6 @@ export default defineEventHandler(async (event) => {
   if (method === 'PATCH') {
     const body = await readBody(event)
     const updateData: any = {}
-    console.log('-----')
-    console.log(body)
-    console.log('-----')
 
     const fields = [
       'name',
@@ -77,7 +74,10 @@ export default defineEventHandler(async (event) => {
       'email',
       'phone',
       'about',
-      'foundation_at'
+      'foundation_at',
+      'instagram',
+      'site',
+      'linkedin'
     ]
 
     for (const field of fields) {

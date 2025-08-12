@@ -14,12 +14,51 @@
       const dialogCreateCandidature = ref<boolean>(false)
       const info: any = useInfo()
       const router = useRouter();
+      const { notify } = useNotification();
 
       const apply = () => {
         if (info.user && info.user.id && info.user.type === 'candidate') {
           dialogCreateCandidature.value = true
         } else {
           dialog.value = true
+        }
+      }
+
+      const candidature = ref<any>({
+        candidate_name: 'Nome',
+        state: null,
+        city: null,
+        status: 'Enviada',
+        icon_status: 'mdi-send',
+        title: null
+      })
+
+      const resetCandidature = () => {
+        candidature.value = {
+          candidate_name: 'Nome',
+          state: null,
+          city: null,
+          status: 'Enviada',
+          icon_status: 'mdi-send',
+          title: null
+        }
+      }
+
+      const createCandidature = async () => {
+        const { data, error } = await useFetch('/api/candidatures', {
+          method: 'POST',
+          body: {
+            ...candidature.value,
+            candidate_id: info.user.id,
+            job_id: job.value.id,
+            title: job.value.position
+          }
+        })
+        if (error.value) {
+          notify({ title: '', text: 'Erro ao criar candidatura', type: 'error' })
+        } else {
+          router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${data.value.id}`)
+          resetCandidature()
         }
       }
 
@@ -34,7 +73,8 @@
         dialogCreateCandidature,
         navigation,
         apply,
-        info
+        info,
+        createCandidature
       }
     }
   }
@@ -61,12 +101,70 @@
         </v-card-subtitle>
 
         <v-card-text>
-          {{ job.description }}
+          <div class="d-flex flex-column">
+            <span>{{ job.description }}</span>
+            <div class="d-flex flex-wrap gap-3 mt-1">
+              <v-chip
+                small
+                color="primary"
+                text-color="white"
+                variant="tonal"
+                class="mb-1 mr-1"
+              >
+                <v-icon left size="16">mdi-clock-outline</v-icon>
+                {{ job.workload || 'Carga horária não informada' }}
+              </v-chip>
+
+              <v-chip
+                small
+                color="green"
+                text-color="white"
+                variant="tonal"
+                class="mb-1 mr-1"
+              >
+                <v-icon left size="16">mdi-cash-multiple</v-icon>
+                {{ job.salary || 'Faixa salarial não informada' }}
+              </v-chip>
+
+              <v-chip
+                small
+                color="indigo"
+                text-color="white"
+                variant="tonal"
+                class="mb-1 mr-1"
+              >
+                <v-icon left size="16">mdi-school-outline</v-icon>
+                {{ job.education_level || 'Escolaridade não informada' }}
+              </v-chip>
+
+              <v-chip
+                small
+                color="deep-purple"
+                text-color="white"
+                variant="tonal"
+                class="mb-1 mr-1"
+              >
+                <v-icon left size="16">mdi-laptop</v-icon>
+                {{ job.work_format || 'Formato de trabalho não informado' }}
+              </v-chip>
+
+              <v-chip
+                small
+                color="orange"
+                text-color="white"
+                variant="tonal"
+                class="mb-1 mr-1"
+              >
+                <v-icon left size="16">mdi-file-document-outline</v-icon>
+                {{ job.contract_type || 'Tipo de contrato não informado' }}
+              </v-chip>
+            </div>
+          </div>
         </v-card-text>
 
         <v-card-actions>
           <v-btn
-            v-if="info.user && info.user.id && info.user.type === 'candidate'"
+            v-if="info.user && (!info.user.id || info.user.id && info.user.type === 'candidate')"
             @click.prevent="apply"
             class="bg-gradient-primary"
             text="Candidatar-me"
@@ -93,7 +191,7 @@
           Não
         </v-btn>
 
-        <v-btn color="success" variant="flat" @click="dialogCreateCandidature = false">
+        <v-btn color="success" variant="flat" @click="createCandidature">
           Sim
         </v-btn>
       </template>

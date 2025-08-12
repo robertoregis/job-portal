@@ -1,7 +1,27 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
+  import { name_formated } from '@/composables/textFunctions';
 
   const info: any = useInfo();
+  const page = ref(1)
+  const pageSize = ref(30)
+  const totalPages = ref(1)
+  const pagesList = ref<any[]>([])
+
+  const { data: pages, error, refresh, pending } = await useFetch('/api/pages', {
+    method: 'GET',
+    params: {
+      page: page.value.toString(),
+      pageSize: pageSize.value.toString(),
+      is_active: true
+    }
+  })
+
+  if (error.value) {
+  } else {
+    pagesList.value = pages.value?.data || []
+    totalPages.value = pages.value?.totalPages || 1
+  }
 </script>
 <template>
   <v-sheet width="100%" class="bg-gradient-primary mt-4 text-white">
@@ -24,6 +44,11 @@
                 <v-col v-if="!info.user.id" cols="6" class="d-flex">
                   <NuxtLink to="/cadastrar/empresa" class="text-white no-underline text-subtitle-1 pa-1">Cadastrar empresa</NuxtLink>
                 </v-col>
+                <template v-for="page in pagesList" :key="page.id">
+                  <v-col cols="6" class="d-flex">
+                    <NuxtLink :to="`/paginas/${page.id}/${name_formated(page.title)}`" class="text-white no-underline text-subtitle-1 pa-1">{{ page.title }}</NuxtLink>
+                  </v-col>
+                </template>
               </v-row>
             </v-col>
 

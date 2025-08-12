@@ -168,7 +168,7 @@
             <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
             <div class="d-flex flex-wrap mt-1 mt-md-0 ml-md-2">
               <template v-for="(day, index) in job.weekdays" :key="index">
-                <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
+                <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mb-1 mb-md-0 mr-1">
                   {{day}}
                 </v-chip>
               </template>

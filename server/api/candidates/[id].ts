@@ -56,7 +56,11 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const updateData: any = {}
 
-    const fields = ['name', 'email', 'cpf', 'states', 'city', 'marital_status', 'phone', 'about', 'birth_date'] // campos que podem ser atualizados
+    const fields = ['name', 'email', 'cpf', 
+      'states', 'city', 'marital_status', 'phone', 
+      'about', 'birth_date', 'is_employed', 'job_types', 
+      'areas_of_interest', 'instagram', 'site', 'linkedin'
+    ] // campos que podem ser atualizados
     for (const field of fields) {
       if (field in body) {
         updateData[field] = emptyStringToNull(body[field])

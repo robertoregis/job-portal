@@ -95,6 +95,7 @@
 
   if (error.value) {
   } else {
+    console.log(jobs.value)
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1
   }
@@ -149,13 +150,26 @@
             </div>
           </v-col>
 
-          <v-col cols="12">
+          <v-col v-if="jobsList.length > 0" cols="12">
             <v-row>
               <template v-for="(job, indice) in jobsList" :key="indice">
                 <JobsJob :job="job" />
               </template>
             </v-row>
           </v-col>
+          <v-col v-else cols="12" class="text-center">
+            <v-sheet
+              class="d-flex flex-column align-center justify-center pa-8"
+              rounded
+              style="min-height: 250px;"
+            >
+              <v-icon size="64" color="grey darken-1" class="mb-4">mdi-briefcase-off</v-icon>
+              <h3 class="text-subtitle-1 mb-2" style="color: #555;">
+                Nenhuma vaga encontrada
+              </h3>
+            </v-sheet>
+          </v-col>
+
           <!-- Paginação -->
           <v-col
             v-if="totalPages > 1"

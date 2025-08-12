@@ -137,6 +137,7 @@
             >
               <v-card
                 class="pa-2 border mb-2"
+                :class="`${!company.is_approved ? 'opacity-50' : ''}`"
                 elevation="2"
                 ripple
                 hover

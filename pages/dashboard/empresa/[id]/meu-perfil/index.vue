@@ -98,6 +98,19 @@
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>
                 <span class="text-body-2 ml-2">{{ company.address }}</span>
               </div>
+              <div v-if="company.site || company.instagram || company.linkedin" class="d-flex align-center my-1" style="gap: 12px;">
+                <v-btn v-if="company.site" icon :href="company.site" target="_blank" aria-label="Site" density="comfortable">
+                  <v-icon>mdi-web</v-icon>
+                </v-btn>
+
+                <v-btn v-if="company.instagram" icon :href="company.instagram" target="_blank" aria-label="Instagram" density="comfortable">
+                  <v-icon color="#E1306C">mdi-instagram</v-icon>
+                </v-btn>
+
+                <v-btn v-if="company.linkedin" icon :href="company.linkedin" target="_blank" aria-label="LinkedIn" density="comfortable">
+                  <v-icon color="#0A66C2">mdi-linkedin</v-icon>
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
