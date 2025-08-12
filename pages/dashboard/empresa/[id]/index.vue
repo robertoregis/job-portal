@@ -183,19 +183,77 @@
                 hover
                 @click="navigation(`/dashboard/empresa/${info.user.id}/minhas-vagas/${job.id}`)"
               >
-                <div class="d-flex justify-space-between align-start">
+                <div class="d-flex justify-space-between align-start mb-1">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">
-                      {{ job.position }}
-                    </div>
-                    <div class="text-caption text-grey">
-                      Status: {{ job.status }} | Ativa: {{ job.is_active ? 'Sim' : 'Não' }}
+                    <div class="text-subtitle-1 font-weight-medium">{{ job.position }}</div>
+                    <div class="text-caption text-grey-darken-1">
+                      {{ job.company_name || 'Empresa não informada' }}
                     </div>
                   </div>
-
                   <div class="text-caption text-grey-darken-1">
-                    {{ job.created_at_formatted }}
+                    {{ formatDate(new Date(job.created_at), 3) }}
                   </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 mb-2">
+                  <v-chip
+                    small
+                    color="primary"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-clock-outline</v-icon>
+                    {{ job.workload || 'Carga horária não informada' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="green"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-cash-multiple</v-icon>
+                    {{ job.salary || 'Faixa salarial não informada' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="indigo"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-school-outline</v-icon>
+                    {{ job.education_level || 'Escolaridade não informada' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="deep-purple"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-laptop</v-icon>
+                    {{ job.work_format || 'Formato de trabalho não informado' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="orange"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-file-document-outline</v-icon>
+                    {{ job.contract_type || 'Tipo de contrato não informado' }}
+                  </v-chip>
+                </div>
+
+                <div class="text-caption text-grey">
+                  Status: {{ job.status }} | Ativa: {{ job.is_active ? 'Sim' : 'Não' }}
                 </div>
               </v-card>
             </v-list-item>
