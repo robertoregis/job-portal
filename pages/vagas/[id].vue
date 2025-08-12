@@ -243,7 +243,7 @@
                   </v-list>
                 </v-col>
 
-                <v-col v-if="info.user && info.user.id && info.user.type === 'candidate'" cols="12">
+                <v-col v-if="info.user && (!info.user.id || info.user.id && info.user.type === 'candidate')" cols="12">
                   <div class="d-flex justify-end px-4 py-2">
                     <v-btn
                       @click.prevent="apply"
