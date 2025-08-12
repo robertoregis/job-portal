@@ -32,13 +32,13 @@ onMounted(async () => {
           [{ header: [1, 2, false] }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image'],
+          ['link'],
           ['clean']
         ],
-        imageResize: {
+        /*imageResize: {
           // opções do módulo
           modules: ['Resize', 'DisplaySize', 'Toolbar']
-        }
+        }*/
       }
     })
 
@@ -55,7 +55,7 @@ onMounted(async () => {
 
 <template>
   <v-card>
-    <div ref="editorContainer" style="min-height: 200px;"></div>
+    <div ref="editorContainer" style="min-height: 200px; background: #f6f6f6;"></div>
   </v-card>
 </template>
 

@@ -17,7 +17,7 @@
   const citySelected = ref<any>('')
   const cities = ref<any[]>([])
   const loading = ref<boolean>(true)
-
+  const items = ref<any>([])
   const phoneInputRef: any = ref(null)
   const cpfInputRef: any = ref(null)
   let phoneMaskInstance: any = null
@@ -32,6 +32,8 @@
     city: null,
     about: null,
     marital_status: null,
+    areas_of_interest: [],
+    job_types: [],
   })
   const imagePreview = ref<any>(null)
 
@@ -161,6 +163,8 @@
       city: data.value.city,
       about: data.value.about,
       marital_status: data.value.marital_status,
+      areas_of_interest: data.value.areas_of_interest,
+      job_types: data.value.job_types,
     }
     if(info.user.image_url) {
       imagePreview.value = info.user.image_url
@@ -490,6 +494,14 @@
             <v-row no-gutters>
               <v-col cols="12">
                 <form @submit.prevent="updateCandidate">
+                  <v-switch
+                    v-model="formdata.is_employed"
+                    :label="`${formdata.is_employed ? 'Empregado' : 'Desempregado'}`"
+                    color="success"
+                    inset
+                    hide-details
+                    class="mb-2"
+                  />
                   <v-text-field
                     v-model="formdata.name"
                     :counter="10"
@@ -593,6 +605,57 @@
                     density="compact"
                     class="mb-2"
                   ></v-textarea>
+
+                  <v-combobox
+                    v-model="formdata.areas_of_interest"
+                    label="Áreas de interesse"
+                    multiple
+                    chips
+                    clearable
+                    hide-details
+                    chip-color="primary"
+                    placeholder="Digite e pressione Enter"
+                    class="mb-2"
+                  />
+
+                  <v-combobox
+                    v-model="formdata.job_types"
+                    label="Tipos de vagas que procura"
+                    multiple
+                    chips
+                    clearable
+                    hide-details
+                    chip-color="primary"
+                    placeholder="Digite e pressione Enter"
+                    class="mb-2"
+                  />
+
+                  <v-text-field
+                    v-model="formdata.site"
+                    :counter="10"
+                    label="Site"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
+                  <v-text-field
+                    v-model="formdata.linkedin"
+                    :counter="10"
+                    label="Linkedin"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
+                  <v-text-field
+                    v-model="formdata.instagram"
+                    :counter="10"
+                    label="Instagram"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
 
                   <v-btn class="me-4 bg-gradient-primary" type="submit">
                     Salvar

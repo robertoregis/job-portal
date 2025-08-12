@@ -125,7 +125,8 @@
   <v-sheet width="100%" class="border-b-sm border-secondary">
     <v-container class="py-3">
       <div class="d-flex justify-space-between align-center">
-        <v-toolbar-title class="text-title text-h5 font-weight-bold">Conect One RH</v-toolbar-title>
+        <h1 class="text-h6 font-weight-bold">Conect One RH</h1>
+
 
         <v-spacer></v-spacer>
 

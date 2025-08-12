@@ -36,7 +36,10 @@
     legal_name: '',
     representative_name: '',
     representative_cpf: '',
-    representative_email: ''
+    representative_email: '',
+    site: null,
+    instagram: null,
+    linkedin: null
   })
 
   const formattedFoundationDate = computed(() => {
@@ -61,7 +64,10 @@
       legal_name: '',
       representative_name: '',
       representative_cpf: '',
-      representative_email: ''
+      representative_email: '',
+      site: null,
+      linkedin: null,
+      instagram: null
     }
   }
 
@@ -535,6 +541,33 @@
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+
+                  <v-text-field
+                    v-model="formdata.site"
+                    :counter="10"
+                    label="Site"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
+                  <v-text-field
+                    v-model="formdata.linkedin"
+                    :counter="10"
+                    label="Linkedin"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
+                  <v-text-field
+                    v-model="formdata.instagram"
+                    :counter="10"
+                    label="Instagram"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
 
                   <v-btn class="me-4 bg-gradient-primary" type="submit">
                     Salvar

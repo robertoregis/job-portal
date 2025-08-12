@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
-  const candidateId = 'e00eef55-050b-4a3f-8732-973bb27a2dc8';
   const router = useRouter();
   const route = useRoute();
   const loading = ref<boolean>(true)
@@ -47,7 +46,7 @@
       method: 'POST',
       body: {
         ...candidature.value,
-        candidate_id: candidateId,
+        candidate_id: info.user.id,
         job_id: job.value.id,
         title: job.value.position
       }
@@ -87,7 +86,7 @@
                 <p class="text-h4 font-weight-black">{{ job.position }}</p>
                 <p>{{ job.company_name }}</p>
                 <div class="d-flex align-center">
-                  <span>Salário:</span>
+                  <span>Faixa salarial:</span>
                   <span class="text-subtitle-1 ml-2 font-weight-bold">{{ job.salary }}</span>
                 </div>
               </v-card-text>
@@ -186,7 +185,7 @@
                     <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
                     <div class="d-flex flex-wrap mt-1 mt-md-0 ml-md-2">
                       <template v-for="(day, index) in job.weekdays" :key="index">
-                        <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
+                        <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mb-1 mb-md-0 mr-1">
                           {{day}}
                         </v-chip>
                       </template>

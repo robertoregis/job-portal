@@ -151,7 +151,7 @@
     <v-card>
         <v-card-title>
             <div class="d-flex align-center">
-            <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
+            <v-icon class="mr-2 text-gradient-primary">mdi-school</v-icon>
             <h2 class="text-h6 font-weight-bold text-gradient-primary">Escolaridade</h2>
             </div>
         </v-card-title>
@@ -200,7 +200,7 @@
         max-width="400"
     >
         <v-card
-            prepend-icon="mdi-star-circle"
+            prepend-icon="mdi-school"
             :title="`${editingEducationIndex !== null ? 'Editar' : 'Adicionar'} Escolaridade`"
         >
         <v-card-text>

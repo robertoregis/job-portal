@@ -183,7 +183,7 @@
   <v-card>
     <v-card-title>
       <div class="d-flex align-center">
-        <v-icon class="mr-2 text-gradient-primary">mdi-account-circle</v-icon>
+        <v-icon class="mr-2 text-gradient-primary">mdi-account-tie</v-icon>
         <h2 class="text-h6 font-weight-bold text-gradient-primary">Experiência profissional</h2>
       </div>
     </v-card-title>
@@ -229,7 +229,7 @@
     max-width="400"
   >
     <v-card
-        prepend-icon="mdi-account"
+        prepend-icon="mdi-account-tie"
         title="Criar experiência profissional"
       >
         <v-card-text>

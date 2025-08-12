@@ -75,9 +75,9 @@
       <div class="d-flex">
         <v-btn
           @click="navigation('editar')"
-          color="primary"
           text="Editar perfil"
           variant="flat"
+          class="bg-gradient-primary"
         />
       </div>
     </v-col>
@@ -93,6 +93,17 @@
         <v-divider></v-divider>
         <v-card-text>
           <v-row no-gutters>
+            <v-col cols="12">
+              <div class="d-flex">
+                <v-chip
+                  color="primary"
+                  variant="outlined"
+                >
+                  <v-icon icon="mdi-account-circle-outline" start></v-icon>
+                  {{ candidate.is_employed ? 'Está empregado' : 'Está desempregado' }}
+                </v-chip>
+              </div>
+            </v-col>
             <v-col cols="12">
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
@@ -122,6 +133,19 @@
                 <span class="text-subtitle-2 font-weight-bold">Telefone:</span>
                 <span class="text-body-2 ml-2">{{ candidate.phone }}</span>
               </div>
+              <div v-if="candidate.site || candidate.instagram || candidate.linkedin" class="d-flex align-center my-1" style="gap: 12px;">
+                <v-btn v-if="candidate.site" icon :href="candidate.site" target="_blank" aria-label="Site" density="comfortable">
+                  <v-icon>mdi-web</v-icon>
+                </v-btn>
+
+                <v-btn v-if="candidate.instagram" icon :href="candidate.instagram" target="_blank" aria-label="Instagram" density="comfortable">
+                  <v-icon color="#E1306C">mdi-instagram</v-icon>
+                </v-btn>
+
+                <v-btn v-if="candidate.linkedin" icon :href="candidate.linkedin" target="_blank" aria-label="LinkedIn" density="comfortable">
+                  <v-icon color="#0A66C2">mdi-linkedin</v-icon>
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -137,6 +161,42 @@
                 <span class="text-body-2">
                   {{ candidate.about }}
                 </span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de interesse</v-list-item-title>
+                <div v-if="candidate.areas_of_interest.length > 0" class="d-flex flex-wrap">
+                  <v-chip
+                    v-for="(area, idx) in candidate.areas_of_interest"
+                    :key="idx"
+                    class="mr-2 my-1 d-flex align-center"
+                    label
+                    color="language"
+                    variant="flat"
+                  >
+                    <span>{{ area }}</span>
+                  </v-chip>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Tipos de vagas que procuro</v-list-item-title>
+                <div v-if="candidate.job_types.length > 0" class="d-flex flex-wrap">
+                  <v-chip
+                    v-for="(area, idx) in candidate.job_types"
+                    :key="idx"
+                    class="mr-2 my-1 d-flex align-center"
+                    label
+                    color="language"
+                    variant="flat"
+                  >
+                    <span>{{ area }}</span>
+                  </v-chip>
+                </div>
               </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>

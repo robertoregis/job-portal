@@ -15,11 +15,10 @@
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">
-      <v-card>
-        <v-card-text>
-          <span class="text-caption">Página em construção...</span>
-        </v-card-text>
-      </v-card>
+      <AdminBenefits />
+    </v-col>
+    <v-col cols="12" class="border mt-4">
+      <AdminServices />
     </v-col>
   </v-row>
 </template>
