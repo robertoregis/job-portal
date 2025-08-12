@@ -5,7 +5,7 @@
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
-
+  const loading = ref<boolean>(true)
   interface FormSchema {
     email: string
     password: string
@@ -48,7 +48,7 @@
 
       const candidate = dataCandidate.value
       info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
-
+      show.setOverlayDashboard(false)
       //localStorage.setItem('user', JSON.stringify(candidate))
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
       router.push(`/`)
@@ -56,6 +56,7 @@
 
   const submit = handleSubmit(async (values) => {
     //alert(JSON.stringify(values, null, 2))
+    show.setOverlayDashboard(true)
     const supabase = useNuxtApp().$supabase
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -64,7 +65,8 @@
     })
 
     if (error) {
-      console.error('Erro ao logar:', error)
+      notify({ title: '', text: 'Seu email ou a sua senha estão errados', type: 'error' })
+      show.setOverlayDashboard(false)
     } else {
       getProfile(data.session.user.id)
     }
@@ -73,13 +75,22 @@
   const navigation = (id: number) => {
     router.push(`/cadastrar/candidato`)
   }
+
+  onBeforeMount(() => {
+    if(info.user && info.user.id) {
+      router.push('/')
+    } else {
+      loading.value = false;
+    }
+  })
+
 </script>
 
 <template>
   <div>
 
     <v-sheet width="100%" class="mt-4">
-      <v-container>
+      <v-container v-if="!loading">
         <v-row>
           <v-col cols="12">
             <h1 class="text-h5 font-weight-bold">Entrar como Candidato!</h1>

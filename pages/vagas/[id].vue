@@ -8,13 +8,14 @@
   const info: any = useInfo()
   const dialog = ref<boolean>(false)
   const dialogCreateCandidature = ref<boolean>(false)
+  const { notify } = useNotification();
 
   definePageMeta({
     layout: 'default'
   })
 
   const apply = () => {
-    if (info.user && info.user.id) {
+    if (info.user && info.user.id && info.user.type === 'candidate') {
       dialogCreateCandidature.value = true
     } else {
       dialog.value = true
@@ -52,10 +53,9 @@
       }
     })
     if (error.value) {
-      console.error('Erro ao criar candidatura:', error.value)
+      notify({ title: '', text: 'Erro ao criar candidatura', type: 'error' })
     } else {
-      router.push(`/dashboard/candidato/123/minhas-candidaturas/${data.value.id}`)
-      console.log('Candidatura criada:', data.value)
+      router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${data.value.id}`)
       resetCandidature()
     }
   }
@@ -70,9 +70,7 @@
   }
 
   if (error.value) {
-    console.error('Erro ao carregar vaga:', error.value)
   } else {
-    console.log('Vaga única:', data.value)
     job.value = data.value
     loading.value = false;
   }
@@ -184,9 +182,9 @@
                     <span class="text-subtitle-2 font-weight-bold">Carga horária:</span>
                     <span class="text-body-2 ml-2">{{ job.workload }}</span>
                   </div>
-                  <div class="d-flex align-center mb-2">
+                  <div class="d-flex flex-column flex-md-row align-start align-md-center mb-2">
                     <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
-                    <div class="d-flex flex-wrap ml-2">
+                    <div class="d-flex flex-wrap mt-1 mt-md-0 ml-md-2">
                       <template v-for="(day, index) in job.weekdays" :key="index">
                         <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
                           {{day}}
@@ -246,13 +244,13 @@
                   </v-list>
                 </v-col>
 
-                <v-col cols="12">
+                <v-col v-if="info.user && info.user.id && info.user.type === 'candidate'" cols="12">
                   <div class="d-flex justify-end px-4 py-2">
                     <v-btn
                       @click.prevent="apply"
-                      color="deep-purple-accent-4"
                       text="Candidatar-me"
                       variant="flat"
+                      class="bg-gradient-primary"
                     ></v-btn>
                   </div>
                 </v-col>

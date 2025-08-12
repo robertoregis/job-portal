@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const { data, error } = await supabase
-      .from('candidates')
+      .from('admins')
       .select('*')
       .eq('id', id)
       .single()
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (error || !data) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Candidate not found'
+        statusMessage: 'Admin not found'
       })
     }
 
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const updateData: any = {}
 
-    const fields = ['name', 'email', 'cpf', 'states', 'city', 'marital_status', 'phone', 'about', 'birth_date'] // campos que podem ser atualizados
+    const fields = ['name', 'email', 'states', 'city', 'phone', 'birth_date'] // campos que podem ser atualizados
     for (const field of fields) {
       if (field in body) {
         updateData[field] = emptyStringToNull(body[field])
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
       updateData.birth_date = toISODate(updateData.birth_date)
     }
     const { data, error } = await supabase
-      .from('candidates')
+      .from('admins')
       .update(updateData)
       .eq('id', id)
       .select()

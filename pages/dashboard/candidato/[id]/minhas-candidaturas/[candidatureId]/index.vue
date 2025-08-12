@@ -249,9 +249,9 @@
                 <span class="text-subtitle-2 font-weight-bold">Carga horária:</span>
                 <span class="text-body-2 ml-2">{{ job.workload }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div class="d-flex flex-column flex-md-row align-start align-md-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Dias da semana:</span>
-                <div class="d-flex flex-wrap ml-2">
+                <div class="d-flex flex-wrap mt-1 mt-md-0 ml-md-2">
                   <template v-for="(day, index) in job.weekdays" :key="index">
                     <v-chip color="primary" variant="flat" :ripple="false" class="text-body-2 mr-1">
                       {{day}}

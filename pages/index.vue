@@ -1,8 +1,9 @@
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   definePageMeta({
     layout: 'default'
   })
-
+  const info: any = useInfo();
   // Dados fictícios para os serviços
   const services = ref([
     {
@@ -43,13 +44,13 @@
         <v-row no-gutters>
           <v-col cols="12">
             <div class="d-flex flex-column align-center pa-3 rounded">
-              <h1 class="text-h5 font-weight-bold">Connect One RH</h1>
+              <h1 class="text-h5 font-weight-bold">Conect One RH</h1>
               <v-avatar color="info" size="x-large" class="mt-4">
                 <!-- Pode colocar logo ou ícone aqui -->
               </v-avatar>
               <div class="d-flex max-w-500 mt-4">
                 <p class="text-subtitle-1 mb-0">
-                  A Connect One RH oferece soluções inovadoras para conectar talentos e empresas, facilitando processos seletivos e o desenvolvimento profissional.
+                  A Conect One RH oferece soluções inovadoras para conectar talentos e empresas, facilitando processos seletivos e o desenvolvimento profissional.
                 </p>
               </div>
             </div>

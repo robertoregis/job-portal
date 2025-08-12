@@ -13,6 +13,15 @@
     router.push(`/dashboard/empresa/${info.user.id}/meu-perfil/editar`)
   }
 
+  const getFormatDate = (date: string) => {
+    if (!date) return ''
+    const parts = date.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return date
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+
   const { data, error, pending } = await useFetch(`/api/companies/${info.user.id}`, {
     method: 'GET'
   })
@@ -27,8 +36,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="">Perfil da empresa</span>
-        <span class="text-caption font-weight-bold">Gerencie os dados da sua empresa</span>
+        <span class="text-gradient-primary font-weight-bold">Perfil da empresa</span>
+        <span class="text-caption">Gerencie os dados da sua empresa</span>
       </div>
     </v-col>
   </v-row>
@@ -38,7 +47,7 @@
       <div class="d-flex">
         <v-btn
           @click="navigation"
-          color="deep-purple-accent-4"
+          color="primary"
           text="Editar perfil"
           variant="flat"
         ></v-btn>
@@ -80,6 +89,10 @@
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">CPF do representante:</span>
                 <span class="text-body-2 ml-2">{{ company.representative_cpf }}</span>
+              </div>
+              <div class="d-flex align-center mb-2">
+                <span class="text-subtitle-2 font-weight-bold">Data da fundação:</span>
+                <span class="text-body-2 ml-2">{{ getFormatDate(company.foundation_at) }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>

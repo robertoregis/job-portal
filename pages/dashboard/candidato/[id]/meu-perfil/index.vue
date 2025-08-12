@@ -16,6 +16,15 @@
   const softSkillsList = ref<any[]>([])
   const loading = ref<boolean>(true)
 
+  const getFormatDate = (date: string) => {
+    if (!date) return ''
+    const parts = date.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return date
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+
   const getDataCandidate = async (candidateId: string) => {
     try {
       // Busca educations
@@ -62,11 +71,11 @@
   </v-row>
   
   <v-row no-gutters class="mt-5">
-    <v-col cols="12" class="mt-4">
+    <v-col cols="12">
       <div class="d-flex">
         <v-btn
           @click="navigation('editar')"
-          color="deep-purple-accent-4"
+          color="primary"
           text="Editar perfil"
           variant="flat"
         />
@@ -91,7 +100,11 @@
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Data de nascimento:</span>
-                <span class="text-body-2 ml-2">{{ candidate.birth_date }}</span>
+                <span class="text-body-2 ml-2">{{ getFormatDate(candidate.birth_date) }}</span>
+              </div>
+              <div class="d-flex align-center my-1">
+                <span class="text-subtitle-2 font-weight-bold">CPF:</span>
+                <span class="text-body-2 ml-2">{{ candidate.cpf }}</span>
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Estado civil:</span>

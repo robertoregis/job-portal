@@ -3,7 +3,15 @@
   import { useNotice } from '@/composables/useNotice';
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
+  import IMask from 'imask'
   const { notify } = useNotification();
+
+  const phoneInputRef: any = ref(null)
+  const cpfInputRef: any = ref(null)
+  const cnpjInputRef: any = ref(null)
+  let phoneMaskInstance: any = null
+  let cpfMaskInstance: any = null
+  let cnpjMaskInstance: any = null
 
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
@@ -24,12 +32,23 @@
     cnpj: '',
     state: null,
     city: null,
-    foundation: '',
+    foundation_at: '',
     legal_name: '',
     representative_name: '',
     representative_cpf: '',
     representative_email: ''
   })
+
+  const formattedFoundationDate = computed(() => {
+    if (!formdata.value.foundation_at) return ''
+
+    const parts = formdata.value.foundation_at.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return formdata.value.foundation_at
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  })
+
 
   const clear = () => {
     formdata.value = {
@@ -38,7 +57,7 @@
       cnpj: '',
       state: null,
       city: null,
-      foundation: '',
+      foundation_at: '',
       legal_name: '',
       representative_name: '',
       representative_cpf: '',
@@ -128,7 +147,7 @@
   const pickerVisible = ref(false)
 
   const onDateSelected = (val: any) => {
-    formdata.value.foundation = new Date(val).toLocaleDateString('pt-BR')
+    formdata.value.foundation_at = new Date(val).toLocaleDateString('pt-BR')
     pickerVisible.value = false
   }
   const openDate = () => {
@@ -140,9 +159,6 @@
     return phoneRegex.test(value) || 'Telefone inválido'
   }
 
-  onMounted(() => {
-  })
-
   const { data, error, pending } = await useFetch(`/api/companies/${info.user.id}`, {
     method: 'GET'
   })
@@ -153,7 +169,7 @@
       name: data.value.name,
       legal_name: data.value.legal_name,
       phone: data.value.phone,
-      foundation: data.value.foundation,
+      foundation_at: data.value.foundation_at,
       cnpj: data.value.cnpj,
       state: data.value.state,
       city: data.value.city,
@@ -262,6 +278,50 @@
     imagePreview.value = info.user.image_url
     file.value = null
   }
+
+  onMounted(() => {
+    if (phoneInputRef.value) {
+      const nativePhoneInput = phoneInputRef.value.$el.querySelector('input')
+      if (nativePhoneInput) {
+        phoneMaskInstance = IMask(nativePhoneInput, {
+          mask: '(00) 00000-0000'
+        })
+        phoneMaskInstance.on('accept', () => {
+          formdata.value.phone = phoneMaskInstance.value || ''
+        })
+      }
+    }
+
+    if (cpfInputRef.value) {
+      const nativeCpfInput = cpfInputRef.value.$el.querySelector('input')
+      if (nativeCpfInput) {
+        cpfMaskInstance = IMask(nativeCpfInput, {
+          mask: '000.000.000-00'
+        })
+        cpfMaskInstance.on('accept', () => {
+          formdata.value.cpf = cpfMaskInstance.value || ''
+        })
+      }
+    }
+
+    if (cnpjInputRef.value) {
+      const nativeCnpjInput = cnpjInputRef.value.$el.querySelector('input')
+      if (nativeCnpjInput) {
+        cnpjMaskInstance = IMask(nativeCnpjInput, {
+          mask: '00.000.000/0000-00'
+        })
+        cnpjMaskInstance.on('accept', () => {
+          formdata.value.cnpj = cnpjMaskInstance.value || ''
+        })
+      }
+    }
+  })
+
+  onBeforeUnmount(() => {
+    phoneMaskInstance?.destroy()
+    cpfMaskInstance?.destroy()
+    cnpjMaskInstance?.destroy()
+  })
 </script>
 
 <template>
@@ -273,7 +333,7 @@
       </div>
     </v-col>
   </v-row>
-  <v-row class="mt-5">
+  <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border pa-2">
       <div class="d-flex flex-column">
         <span class="text-caption mb-2">Clique na foto para trocar:</span>
@@ -376,13 +436,13 @@
                   />
 
                   <v-text-field
+                    ref="cnpjInputRef"
                     v-model="formdata.cnpj"
                     label="CNPJ"
                     density="compact"
                     hide-details
                     class="mb-2"
                     :counter="15"
-                    v-mask="'##.###.###/####-##'"
                   />
 
                   <v-text-field
@@ -412,23 +472,23 @@
                   />
 
                   <v-text-field
+                    ref="cpfInputRef"
                     v-model="formdata.representative_cpf"
                     label="CPF do representante"
                     density="compact"
                     hide-details
                     class="mb-2"
                     :counter="15"
-                    v-mask="'###.###.###-##'"
                   />
 
                   <v-text-field
+                    ref="phoneInputRef"
                     v-model="formdata.phone"
                     label="Telefone"
                     density="compact"
                     hide-details
                     class="mb-2"
                     :counter="15"
-                    v-mask="'(##) #####-####'"
                   />
 
                   <v-select
@@ -455,7 +515,7 @@
                   />
 
                   <v-text-field
-                    v-model="formdata.foundation"
+                    :model-value="formattedFoundationDate"
                     label="Data de fundação"
                     readonly
                     @click="openDate()"

@@ -5,15 +5,40 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id } = getQuery(event)
-    if (!profile_id) {
-      throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
+    const query = getQuery(event)
+    
+    const profile_id = query.profile_id as string | undefined
+    const is_approved = query.is_approved as string | undefined
+    const status = query.status as string | undefined
+    const page = query.page as string | undefined
+    const pageSize = query.pageSize as string | undefined
+
+    const pageNumber = page ? parseInt(page, 10) : 1
+    const size = pageSize ? parseInt(pageSize, 10) : 10
+    const from = (pageNumber - 1) * size
+    const to = from + size - 1
+
+    let queryBuilder = supabase
+      .from('companies')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    // filtro profile_id opcional
+    if (profile_id) {
+      queryBuilder = queryBuilder.eq('profile_id', profile_id)
     }
 
-    const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('profile_id', profile_id)
+    if (is_approved !== undefined) {
+      const approvedBool = is_approved === 'true'
+      queryBuilder = queryBuilder.eq('is_approved', approvedBool)
+    }
+
+    if (status) {
+      queryBuilder = queryBuilder.eq('status', status)
+    }
+
+    const { data, error, count } = await queryBuilder
 
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
@@ -23,10 +48,17 @@ export default defineEventHandler(async (event) => {
       ...company,
       created_at_formatted: company.created_at ? formatDateTimestamp(company.created_at, 3) : null,
       updated_at_formatted: company.updated_at ? formatDateTimestamp(company.updated_at, 3) : null,
+      approved_at_formatted: company.approved_at ? formatDateTimestamp(company.approved_at, 3) : null,
       address: `${company.city || ''} - ${company.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }))
 
-    return formattedData
+    return {
+      data: formattedData,
+      count,
+      page: pageNumber,
+      pageSize: size,
+      totalPages: Math.ceil((count ?? 0) / size)
+    }
   }
 
 
@@ -61,7 +93,10 @@ export default defineEventHandler(async (event) => {
         city,
         profile_id,
         image_url: null,
-        image_id: null
+        image_id: null,
+        status: 'Esperando',
+        approved_at: null,
+        is_approved: false
       }])
       .select()
       .single()

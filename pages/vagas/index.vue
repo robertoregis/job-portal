@@ -78,7 +78,6 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar jobs:', error.value)
     } else {
       jobsList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1
@@ -95,11 +94,9 @@
   })
 
   if (error.value) {
-    console.error('Erro ao carregar jobs:', error.value)
   } else {
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1
-    console.log('Jobs:', jobs.value)
   }
 </script>
 

@@ -5,7 +5,7 @@
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
-
+  const loading = ref<boolean>(true)
   interface FormSchema {
     name: string
     email: string
@@ -81,7 +81,7 @@
 
       // Tratamento de erros
       if (error.value) {
-        console.error('Erro ao criar perfil:', error.value)
+        notify({ title: '', text: 'Erro ao criar cadastro', type: 'error' })
         show.setOverlayDashboard(false)
       } else {
         getProfile(data.value.id)
@@ -92,13 +92,22 @@
   const navigation = (id: number) => {
     router.push(`/entrar/candidato`)
   }
+
+  onBeforeMount(() => {
+    if(info.user && info.user.id) {
+      router.push('/')
+    } else {
+      loading.value = false;
+    }
+  })
+
 </script>
 
 <template>
   <div>
 
     <v-sheet width="100%" class="mt-4">
-      <v-container>
+      <v-container v-if="!loading">
         <v-row>
           <v-col cols="12">
             <h1 class="text-h5 font-weight-bold">Cadastrar Candidato!</h1>

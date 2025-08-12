@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  //import { vMask } from 'vue-the-mask';
   import { useNotice } from '@/composables/useNotice';
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
@@ -8,6 +9,8 @@
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
+  const phoneInputRef: any = ref(null)
+  let phoneMaskInstance: any = null
   const info: any = useInfo();
   const show = useShow();
   const { createNotice } = useNotice();
@@ -17,21 +20,12 @@
   const citySelected = ref<any>('')
   const cities = ref<any[]>([])
   const loading = ref<boolean>(true)
-
-  const phoneInputRef: any = ref(null)
-  const cpfInputRef: any = ref(null)
-  let phoneMaskInstance: any = null
-  let cpfMaskInstance: any = null
-
   const formdata = ref<any>({
     name: null,
     phone: null,
     birth_date: null,
-    cpf: null,
     state: null,
     city: null,
-    about: null,
-    marital_status: null,
   })
   const imagePreview = ref<any>(null)
 
@@ -119,10 +113,10 @@
     return phoneRegex.test(value) || 'Telefone inválido'
   }
 
-  const updateCandidate = async () => {
+  const updateAdmin = async () => {
     show.setOverlayDashboard(true)
     try {
-      const { data, error } = await useFetch(`/api/candidates/${info.user.id}`, {
+      const { data, error } = await useFetch(`/api/admins/${info.user.id}`, {
         method: 'PATCH',
         body: formdata.value
       })
@@ -146,7 +140,7 @@
     }
   }
 
-  const { data, error, pending } = await useFetch(`/api/candidates/${info.user.id}`, {
+  const { data, error, pending } = await useFetch(`/api/admins/${info.user.id}`, {
     method: 'GET'
   })
 
@@ -156,11 +150,8 @@
       name: data.value.name,
       phone: data.value.phone,
       birth_date: data.value.birth_date,
-      cpf: data.value.cpf,
       state: data.value.state,
       city: data.value.city,
-      about: data.value.about,
-      marital_status: data.value.marital_status,
     }
     if(info.user.image_url) {
       imagePreview.value = info.user.image_url
@@ -203,7 +194,7 @@
 
     const formDataTy = new FormData()
     formDataTy.append('file', file.value)
-    const url = `/api/images?profile_id=${info.profile.id}&type=candidate`
+    const url = `/api/images?profile_id=${info.profile.id}&type=admin`
 
     const { data: imageData, error: imageError }: any = await useFetch(url, {
       method: 'POST',
@@ -216,10 +207,10 @@
       if(info.user.image_id) {
         await deleteImage(false)
       }
-      const candidate = info.user
+      const admin = info.user
       setTimeout(() => {
         info.setUser({
-          ...candidate,
+          ...admin,
           image_url: imageData.value.image_url,
           image_id: imageData.value.image_id
         })
@@ -248,9 +239,9 @@
         } else {
           notify({ title: 'Parabéns!', text: 'A imagem foi removida', type: 'success' })
         }
-        const candidate = info.user
+        const admin = info.user
         info.setUser({
-          ...candidate,
+          ...admin,
           image_url: null,
           image_id: null
         })
@@ -266,94 +257,6 @@
     file.value = null
   }
 
-  const filePDF = ref<File | null>(null)
-  const fileInputPDF = ref<HTMLInputElement | null>(null)
-
-  const uploadPDF = async () => {
-    if (!filePDF.value) {
-      notify({ title: 'Erro', text: 'Selecione um arquivo PDF', type: 'error' })
-      return
-    }
-
-    // opcional: validar extensão e tipo mime no frontend
-    if (filePDF.value.type !== 'application/pdf') {
-      notify({ title: 'Erro', text: 'Apenas arquivos PDF são permitidos', type: 'error' })
-      return
-    }
-
-    show.setOverlayDashboard(true)
-
-    const formData = new FormData()
-    formData.append('file', filePDF.value)
-
-    // Aqui você manda o candidate_id e o type correto (candidate ou candidature)
-    // Exemplo usando candidate_id para candidato
-    const url = `/api/archives?candidate_id=${info.user.id}&type=candidate`
-
-    const { data: pdfData, error: pdfError }: any = await useFetch(url, {
-      method: 'POST',
-      body: formData
-    })
-
-    if (pdfError.value) {
-      notify({ title: 'Erro', text: 'Erro ao enviar arquivo', type: 'error' })
-    } else {
-      if(info.user.curriculum_id) {
-        await deletePDF(false, info.user.curriculum_id)
-      }
-      notify({ title: 'Sucesso', text: 'Currículo enviado com sucesso!', type: 'success' })
-      // Atualize seu store com o curriculum_url e curriculum_id retornados
-      // Exemplo:
-      setTimeout(() => {
-        info.setUser({
-          ...info.user,
-          curriculum_url: pdfData.value.curriculum_url,
-          curriculum_id: pdfData.value.curriculum_id
-        })
-        filePDF.value = null
-      }, 1000)
-    }
-
-    setTimeout(() => {
-      show.setOverlayDashboard(false)
-    })
-  }
-
-  const deletePDF = async (isLoading: boolean, curriculumId: string) => {
-    if (!info.user.curriculum_id) {
-      notify({ title: 'Erro', text: 'Nenhum currículo para remover', type: 'error' })
-      return
-    }
-    if(isLoading) {
-      show.setOverlayDashboard(true)
-    }
-
-    const url = `/api/archives?curriculum_id=${encodeURIComponent(curriculumId)}&type=candidate&candidate_id=${info.user.id}`
-    const { error }: any = await useFetch(url, {
-      method: 'DELETE'
-    })
-    
-    setTimeout(() => {
-      if(isLoading) {
-        if(error.value) {
-          notify({ title: 'Erro', text: 'Erro ao remover currículo', type: 'error' })
-        } else {
-          console.log(3)
-          notify({ title: 'Sucesso', text: 'Currículo removido', type: 'success' })
-          const candidate = info.user
-          info.setUser({
-            ...candidate,
-            curriculum_url: null,
-            curriculum_id: null
-          })
-          filePDF.value = null
-        }
-        show.setOverlayDashboard(false)
-      }
-    }, 1000)
-
-  }
-
   onMounted(() => {
     if (phoneInputRef.value) {
       const nativePhoneInput = phoneInputRef.value.$el.querySelector('input')
@@ -366,24 +269,12 @@
         })
       }
     }
-
-    if (cpfInputRef.value) {
-      const nativeCpfInput = cpfInputRef.value.$el.querySelector('input')
-      if (nativeCpfInput) {
-        cpfMaskInstance = IMask(nativeCpfInput, {
-          mask: '000.000.000-00'
-        })
-        cpfMaskInstance.on('accept', () => {
-          formdata.value.cpf = cpfMaskInstance.value || ''
-        })
-      }
-    }
   })
 
   onBeforeUnmount(() => {
     phoneMaskInstance?.destroy()
-    cpfMaskInstance?.destroy()
   })
+
 </script>
 
 <template>
@@ -489,7 +380,7 @@
           <v-card-text>
             <v-row no-gutters>
               <v-col cols="12">
-                <form @submit.prevent="updateCandidate">
+                <form @submit.prevent="updateAdmin">
                   <v-text-field
                     v-model="formdata.name"
                     :counter="10"
@@ -517,26 +408,6 @@
                     type="tel"
                     :counter="15"
                   />
-
-                  <v-text-field
-                    ref="cpfInputRef"
-                    v-model="formdata.cpf"
-                    label="CPF"
-                    density="compact"
-                    hide-details
-                    class="mb-2"
-                    type="tel"
-                    :counter="15"
-                  />
-
-                  <v-select
-                    v-model="formdata.marital_status"
-                    label="Estado Cívil"
-                    :items="['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)']"
-                    density="compact"
-                    hide-details
-                    class="mb-2"
-                  ></v-select>
 
                   <v-select
                     v-model="stateSelected"
@@ -583,17 +454,6 @@
                     </v-card>
                   </v-dialog>
 
-                  <v-textarea
-                    label="Sobre mim"
-                    v-model="formdata.about"
-                    name="input-7-1"
-                    variant="filled"
-                    auto-grow
-                    hide-details
-                    density="compact"
-                    class="mb-2"
-                  ></v-textarea>
-
                   <v-btn class="me-4 bg-gradient-primary" type="submit">
                     Salvar
                   </v-btn>
@@ -603,75 +463,6 @@
             </v-row>
           </v-card-text>
         </v-card>
-      </v-col>
-
-      <v-col cols="12" class="border mt-4">
-        <v-card>
-          <v-card-title>Currículo</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <div class="d-flex flex-column">
-              <div v-if="info.user.curriculum_url" class="mb-4">
-                <a
-                  :href="info.user.curriculum_url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-decoration-none text-subtitle-1"
-                >
-                  Ver currículo atual
-                </a>
-                <v-btn
-                  color="error"
-                  class="ml-4"
-                  @click="deletePDF(true, info.user.curriculum_id)"
-                  size="small"
-                >
-                  <v-icon left>mdi-delete</v-icon>
-                  Remover currículo
-                </v-btn>
-              </div>
-              <span class="text-caption mb-2">Envie seu currículo (PDF):</span>
-
-              <v-file-input
-                ref="fileInputPDF"
-                accept="application/pdf"
-                v-model="filePDF"
-                :label="filePDF ? filePDF.name : (info.user.curriculum_url ? 'Arquivo selecionado' : 'Escolher arquivo PDF')"
-                show-size
-                prepend-icon="mdi-file-pdf-box"
-                clearable
-              />
-
-              <div class="d-flex align-start">
-                <v-btn
-                  class="mt-2 bg-gradient-primary"
-                  :disabled="!filePDF"
-                  @click="uploadPDF"
-                >
-                  <v-icon left>mdi-upload</v-icon>
-                  Enviar currículo
-                </v-btn>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-
-      <v-col cols="12" class="border mt-4">
-        <PerfilUserExperiences />
-      </v-col>
-
-      <v-col cols="12" class="border mt-4">
-        <PerfilUserLanguages />
-      </v-col>
-      
-      <v-col cols="12" class="border mt-4">
-        <PerfilUserEducations />
-      </v-col>
-
-      <v-col cols="12" class="border mt-4">
-        <PerfilUserSoftsSkills />
       </v-col>
 
   </v-row>

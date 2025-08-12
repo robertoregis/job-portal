@@ -9,6 +9,7 @@ const loading = ref(true)
 const profile = ref<any>({})
 const candidate = ref<any>({})
 const company = ref<any>({})
+const admin = ref<any>({})
 
 const getProfile = async (id: string) => {
   loading.value = true
@@ -24,7 +25,7 @@ const getProfile = async (id: string) => {
 
   profile.value = data.value
   info.setProfile(data.value)
-
+  
   if (data.value.type === 'candidate') {
     const { data: dataCandidate, error: errorCandidate } = await useFetch(`/api/candidates`, {
       method: 'GET',
@@ -39,6 +40,7 @@ const getProfile = async (id: string) => {
 
     candidate.value = dataCandidate.value
     info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+
   } else if (data.value.type === 'company') {
     const { data: dataCompany, error: errorCompany } = await useFetch(`/api/companies`, {
       method: 'GET',
@@ -51,8 +53,24 @@ const getProfile = async (id: string) => {
       return
     }
 
-    company.value = dataCompany.value
-    info.setUser({ ...dataCompany.value[0], type: 'company' })
+    company.value = dataCompany.value.data
+    info.setUser({ ...dataCompany.value.data[0], type: 'company' })
+
+  } else if (data.value.type === 'admin') {
+    // Caso admin, carregar dados do admin se necessário
+    const { data: dataAdmin, error: errorAdmin } = await useFetch(`/api/admins`, {
+      method: 'GET',
+      params: { profile_id: profile.value.id }
+    })
+
+    if (errorAdmin.value) {
+      loading.value = false
+      console.error('Erro ao carregar admin:', errorAdmin.value)
+      return
+    }
+
+    admin.value = dataAdmin.value
+    info.setUser({ ...dataAdmin.value[0], type: 'admin' })
   }
 
   // Após carregar o usuário, checa o redirecionamento
@@ -65,55 +83,56 @@ const checkRedirect = () => {
   const user = info.user
   const currentPath = route.path
 
+  // Paths dos dashboards existentes
   const dashboardPaths = ['/dashboard/candidato', '/dashboard/empresa', '/dashboard/admin']
 
-  // 1. Se não estiver logado e estiver no dashboard, redireciona para /
+  // 1. Se não estiver logado e estiver em rota dashboard, redireciona para /
   if (!user && currentPath.startsWith('/dashboard')) {
     router.push('/')
     return
   }
 
-  // 2. Se estiver logado, mas estiver num dashboard que não é o seu tipo, redireciona para o correto
+  // 2. Se estiver logado, mas estiver em dashboard errado, redireciona para o correto
   if (user && currentPath.startsWith('/dashboard')) {
-    // Obtém o segmento após /dashboard/
     const [, dashboardType] = currentPath.split('/').filter(Boolean)
 
-    // Map tipo do usuário para o segmento da url
-    const userTypeToDashboard: any = {
+    const userTypeToDashboard: Record<string, string> = {
       candidate: 'candidato',
       company: 'empresa',
       admin: 'admin'
     }
-    const userDashboardSegment = userTypeToDashboard[user.type]
 
+    const userDashboardSegment = userTypeToDashboard[user.type]
     if (dashboardType && userDashboardSegment && dashboardType !== userDashboardSegment) {
-      router.push(`/dashboard/${userDashboardSegment}/${user.id}`)
+      if(dashboardType === 'admin') {
+        router.push(`/dashboard/${userDashboardSegment}`)
+      } else {
+        router.push(`/dashboard/${userDashboardSegment}/${user.id}`)
+      }
       return
     }
   }
-
-  // Se não caiu em nenhuma regra, não faz nada (deixa passar)
+  // Se não houver motivo para redirecionar, deixa passar
 }
 
-  onMounted(async () => {
-    const supabase = useNuxtApp().$supabase
-    const { data: { session } } = await supabase.auth.getSession()
+onMounted(async () => {
+  const supabase = useNuxtApp().$supabase
+  const { data: { session } } = await supabase.auth.getSession()
 
-    if (session) {
-      await getProfile(session.user.id)
-    } else {
-      // Se não houver sessão, faz logout "limpo"
-      await supabase.auth.signOut()
-      info.setUser({})
-      info.setProfile({})
-      localStorage.removeItem('user')
-      if (route.path.startsWith('/dashboard')) {
-        router.push('/')
-      }
-      loading.value = false
+  if (session) {
+    await getProfile(session.user.id)
+  } else {
+    // Logout limpo se não houver sessão
+    await supabase.auth.signOut()
+    info.setUser({})
+    info.setProfile({})
+    localStorage.removeItem('user')
+    if (route.path.startsWith('/dashboard')) {
+      router.push('/')
     }
-  })
-
+    loading.value = false
+  }
+})
 </script>
 
 <template>
