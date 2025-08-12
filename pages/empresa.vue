@@ -1,29 +1,19 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
+  definePageMeta({
+    layout: 'default'
+  })
 
-const services = ref<any[]>([1, 2, 3, 4])
+  const benefitsList = ref<any[]>([])
+  // Dados fictícios para os serviços
+  const { data: benefits, error, refresh, pending } = await useFetch('/api/benefits', {
+      method: 'GET',
+      params: {}
+  })
 
-const getBenefitTitle = (index: number): string => {
-  const titles = [
-    'Cadastros únicos',
-    'Busca inteligente',
-    'Suporte dedicado',
-    'Atualizações constantes'
-  ]
-  return titles[index] ?? 'Benefício'
-}
-
-const getBenefitDescription = (index: number): string => {
-  const descriptions = [
-    'Permitimos apenas um cadastro por e-mail para evitar duplicidade e garantir segurança.',
-    'Encontre candidatos ideais com filtros avançados e recomendações personalizadas.',
-    'Nossa equipe de suporte está sempre pronta para ajudar você em qualquer etapa.',
-    'A plataforma é atualizada regularmente para oferecer as melhores ferramentas do mercado.'
-  ]
-  return descriptions[index] ?? ''
-}
+  if (error.value) {
+  } else {
+      benefitsList.value = benefits.value
+  }
 </script>
 
 <template>
@@ -70,15 +60,16 @@ const getBenefitDescription = (index: number): string => {
 
           <v-col cols="12" class="mt-4">
             <v-row no-gutters>
-              <template v-for="(service, indice) in services" :key="indice">
+              <template v-for="(benefit, indice) in benefitsList" :key="indice">
                 <v-col cols="12" sm="6" lg="3" class="px-2 mb-4">
                   <v-card class="mx-auto" elevation="2" hover>
-                    <v-card-title>
-                      <v-icon left color="primary">mdi-briefcase</v-icon>
-                      <span class="font-weight-black">{{ getBenefitTitle(indice) }}</span>
+                    <v-card-title class="d-flex align-center">
+                      <v-icon class="mr-2" size="28">{{ benefit.icon }}</v-icon>
+                      <span class="text-h6 font-weight-bold">{{ benefit.title }}</span>
                     </v-card-title>
-                    <v-card-text class="bg-surface-light pt-4">
-                      {{ getBenefitDescription(indice) }}
+                    <v-card-subtitle class="mb-2 text--secondary">{{ benefit.subtitle }}</v-card-subtitle>
+                    <v-card-text class="bg-surface-light pt-0">
+                      {{ benefit.description }}
                     </v-card-text>
                   </v-card>
                 </v-col>

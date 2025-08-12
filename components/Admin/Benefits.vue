@@ -9,6 +9,7 @@
     const benefitsList = ref<any>([])
     const benefit = ref<any>({
         title: null,
+        subtitle: null,
         icon: null,
         description: null
     })
@@ -115,9 +116,7 @@
 
     const { data: benefits, error, refresh, pending } = await useFetch('/api/benefits', {
         method: 'GET',
-        params: {
-            candidate_id: info.user.id
-        }
+        params: {}
     })
 
     if (error.value) {
@@ -314,7 +313,17 @@
                         class="mb-1"
                     />
                 </v-col>
-
+                <v-col cols="12 mt-1">
+                    <v-text-field
+                        v-model="benefit.subtitle"
+                        label="Subtítulo"
+                        required
+                        :counter="30"
+                        density="compact"
+                        hide-details
+                        class="mb-1"
+                    />
+                </v-col>
                 <v-col cols="12">
                     <v-textarea
                     v-model="benefit.description"

@@ -4,33 +4,17 @@
     layout: 'default'
   })
   const info: any = useInfo();
+  const servicesList = ref<any[]>([])
   // Dados fictícios para os serviços
-  const services = ref([
-    {
-      icon: 'mdi-briefcase-account',
-      title: 'Recrutamento Personalizado',
-      subtitle: 'Soluções sob medida',
-      description: 'Encontramos candidatos qualificados que atendem exatamente às necessidades da sua empresa, garantindo o match perfeito.'
-    },
-    {
-      icon: 'mdi-account-group',
-      title: 'Gestão de Talentos',
-      subtitle: 'Desenvolvimento contínuo',
-      description: 'Apoiamos no crescimento e retenção dos seus colaboradores com ferramentas modernas de avaliação e treinamento.'
-    },
-    {
-      icon: 'mdi-laptop',
-      title: 'Plataforma Integrada',
-      subtitle: 'Tudo em um só lugar',
-      description: 'Candidatos e empresas interagem na mesma plataforma intuitiva, facilitando processos seletivos e comunicação.'
-    },
-    {
-      icon: 'mdi-chart-line',
-      title: 'Análise de Dados',
-      subtitle: 'Decisões baseadas em insights',
-      description: 'Fornecemos relatórios detalhados para você tomar decisões estratégicas e otimizar sua gestão de pessoas.'
-    },
-  ])
+  const { data: services, error, refresh, pending } = await useFetch('/api/services', {
+      method: 'GET',
+      params: {}
+  })
+
+  if (error.value) {
+  } else {
+      servicesList.value = services.value
+  }
 </script>
 
 <template>
@@ -83,7 +67,7 @@
 
           <v-col cols="12" class="mt-4">
             <v-row no-gutters>
-              <template v-for="(service, index) in services" :key="index">
+              <template v-for="(service, index) in servicesList" :key="index">
                 <v-col cols="12" sm="6" lg="3" class="px-2 mb-4">
                   <v-card class="mx-auto" elevation="2" hover>
                     <v-card-title class="d-flex align-center">
