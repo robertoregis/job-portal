@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const bodyRequest = await readBody(event)
-    let { title, body } = bodyRequest
+    let { title, body, description } = bodyRequest
 
     if (!title) {
       throw createError({ statusCode: 400, statusMessage: 'title is required' })
@@ -59,10 +59,11 @@ export default defineEventHandler(async (event) => {
 
     title = emptyStringToNull(title)
     body = emptyStringToNull(body)
+    description = emptyStringToNull(description)
 
     const { data, error } = await supabase
       .from('pages')
-      .insert([{ title, body }])
+      .insert([{ title, body, description }])
       .select()
       .single()
 

@@ -27,15 +27,17 @@
         <v-row>
           <v-col cols="12" md="6">
             <p class="text-subtitle-1 mb-0">
-              Somos uma empresa dedicada a conectar talentos às melhores oportunidades do mercado.
+              Na Conect RH One, acreditamos que equipes de sucesso começam com as pessoas certas. 
+              Por isso, oferecemos uma plataforma completa para conectar talentos às oportunidades ideais.
             </p>
           </v-col>
           <v-col cols="12" md="6">
             <p class="text-subtitle-1 mb-0">
-              Nossa plataforma é simples, segura e eficiente, garantindo uma experiência fluida para candidatos e empresas.
+              Nossa ferramenta é intuitiva, segura e eficiente, tornando o processo de recrutamento mais rápido, transparente e estratégico para empresas e candidatos.
             </p>
           </v-col>
         </v-row>
+
       </v-container>
     </v-sheet>
 
@@ -43,8 +45,11 @@
       <v-container>
         <v-row no-gutters>
           <v-col>
-            <div class="d-flex flex-column align-center rounded">
-              <span class="text-h6 font-weight-bold text-white">Aumente o seu time com as melhores pessoas</span>
+            <div class="d-flex flex-column align-center rounded pa-4">
+              <span class="text-h5 font-weight-bold text-white">Construa equipes fortes com quem realmente faz a diferença</span>
+              <p class="text-body-1 text-white mt-3 text-center max-w-700">
+                Com a Conect RH One, você tem acesso a talentos qualificados, ferramentas inovadoras e insights estratégicos que ajudam a sua empresa a crescer mais rápido e de forma sustentável.
+              </p>
             </div>
           </v-col>
         </v-row>

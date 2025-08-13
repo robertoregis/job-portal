@@ -61,8 +61,9 @@
       </div>
     </v-col>
   </v-row>
+
   <v-row no-gutters class="mt-5">
-    <v-col cols="12" class="border mt-4">
+    <v-col cols="12" class="border">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
@@ -107,15 +108,8 @@
       </v-card>
     </v-col>
 
-    <v-col cols="12" class="border mt-4">
-      <AdminBenefits />
-    </v-col>
-    <v-col cols="12" class="border mt-4">
-      <AdminServices />
-    </v-col>
   </v-row>
 </template>
 
 <style lang="scss" scoped>
-
 </style>

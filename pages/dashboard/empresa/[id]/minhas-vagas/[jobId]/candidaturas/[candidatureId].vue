@@ -8,7 +8,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const router = useRouter();
   const candidature = ref<any>({})
@@ -24,6 +24,21 @@
     { name: 'Arquivada', icon: 'mdi-archive' },
     { name: 'Desistiu', icon: 'mdi-close-box-outline' },
   ]
+
+  const sendMail = async (candidateName: string, status: string, candidateEmail: string) => {
+    const { data, error } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`${candidateName} <${candidateEmail}>`],
+        subject: 'O status da sua candidatura mudou - Conect RH One',
+        template: 'contact_email_candidate_template',
+        variables: {
+          name: candidateName,
+          status: status
+        }
+      }
+    })
+  }
 
   const getCandidate = async (candidateId: string) => {
     const { data, error } = await useFetch(`/api/candidates/${candidateId}`, {
@@ -52,7 +67,12 @@
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a candidatura', type: 'error' })
       return
     }
-
+    sendMail(candidature.value.candidate_name, candidature.value.status, candidature.value.candidate_email)
+    createLog({
+      title: `Atualizou a candidatura`,
+      profile_id: info.profile.id,
+      type: 'update_candidature'
+    })
     createNotice({
       title: 'Candidatura atualizada',
       description: `A candidatura do candidato ${candidature.value.candidate_name} teve seu status atualizado`,

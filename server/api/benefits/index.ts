@@ -24,17 +24,18 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { title, icon, description } = body
+    let { title, icon, description, subtitle } = body
 
 
     // Converte strings vazias para null
     title = emptyStringToNull(title)
     icon = emptyStringToNull(icon)
     description = emptyStringToNull(description)
+    subtitle = emptyStringToNull(subtitle)
 
     const { data, error } = await supabase
       .from('benefits')
-      .insert([{ title, icon, description }])
+      .insert([{ title, icon, description, subtitle }])
       .select()
       .single()
 

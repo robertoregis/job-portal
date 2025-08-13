@@ -2,10 +2,12 @@
   import { useInfo } from '@/stores/info'
   import { useShow } from '@/stores/show'
   import { useField, useForm } from 'vee-validate';
+  import { useNotice } from '@/composables/useNotice';
   interface FormSchema {
     email: string
     password: string
   }
+  const { createLog } = useNotice();
   const info: any = useInfo()
   const router = useRouter()
   const show = useShow()
@@ -88,6 +90,11 @@
       info.setUser({ ...dataAdmin.value[0], type: 'admin' })
       show.setOverlayDashboard(false)
       //localStorage.setItem('user', JSON.stringify(admin))
+      createLog({
+        title: `Logou`,
+        profile_id: info.profile.id,
+        type: 'login'
+      })
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
       dialog.value = false;
       dialogLoginAdmin.value = false;

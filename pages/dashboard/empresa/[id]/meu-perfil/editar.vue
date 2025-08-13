@@ -18,7 +18,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const router = useRouter();
   const states = ref<any[]>([])
@@ -84,6 +84,11 @@
         return
       }
       show.setOverlayDashboard(false)
+      createLog({
+        title: `Atualizou o perfil`,
+        profile_id: info.profile.id,
+        type: 'update_perfil'
+      })
       notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
       router.push(`/dashboard/empresa/${info.user.id}/meu-perfil`)
     } catch (err) {
@@ -243,6 +248,11 @@
           image_id: imageData.value.image_id
         })
         imagePreview.value = imageData.value.image_url
+        createLog({
+          title: `Atualizou a foto de perfil`,
+          profile_id: info.profile.id,
+          type: 'update_photo_perfil'
+        })
         notify({ title: 'Parabéns!', text: 'A imagem foi enviada', type: 'success' })
       }, 1500)
     }
@@ -265,6 +275,11 @@
         if(error.value) {
           notify({ title: 'Erro', text: 'Erro ao remover imagem', type: 'error' })
         } else {
+          createLog({
+            title: `Removeu a foto de perfil`,
+            profile_id: info.profile.id,
+            type: 'delete_photo_perfil'
+          })
           notify({ title: 'Parabéns!', text: 'A imagem foi removida', type: 'success' })
         }
         const company = info.user

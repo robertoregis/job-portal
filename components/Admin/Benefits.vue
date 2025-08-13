@@ -1,9 +1,11 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
     import { useShow } from '@/stores/show';
+    import { useNotice } from '@/composables/useNotice';
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
+    const { createLog } = useNotice();
     //// Escolaridade
     const dialogBenefits = ref(false)
     const benefitsList = ref<any>([])
@@ -61,7 +63,11 @@
             notify({ title: 'Erro', text: 'Erro ao criar o benefício', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Criou o benefício`,
+            profile_id: info.profile.id,
+            type: 'create_benefits'
+        })
         notify({ title: 'Parabéns!', text: 'O benefício foi criada com sucesso', type: 'success' })
         getBenefits()
         clearBenefit()
@@ -85,6 +91,7 @@
     }
 
     const updateBenefit = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/benefits/${id}`, {
             method: 'PATCH',
             body: benefit.value
@@ -94,13 +101,18 @@
             notify({ title: 'Erro', text: 'Erro ao editar o benefício', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Atualizou o benefício`,
+            profile_id: info.profile.id,
+            type: 'update_benefits'
+        })
         notify({ title: 'Parabéns!', text: 'O benefício foi editada com sucesso', type: 'success' })
         getBenefits()
         clearBenefit()
     }
 
     const removeBenefit = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/benefits/${id}`, {
             method: 'DELETE'
         })
@@ -109,7 +121,11 @@
             notify({ title: 'Erro', text: 'Erro ao remover o benefício', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Removeu o benefício`,
+            profile_id: info.profile.id,
+            type: 'delete_benefits'
+        })
         notify({ title: 'Parabéns!', text: 'O benefício foi removido com sucesso', type: 'success' })
         getBenefits()
     }
@@ -221,7 +237,62 @@
         'mdi-check-circle-outline',
         'mdi-check-decagram',
         'mdi-clipboard-text',
-        ]
+        'mdi-train',             // transporte público
+        'mdi-train-variant',     // trem alternativo
+        'mdi-bus-clock',         // horários de ônibus
+        'mdi-van-passenger',     // van ou transporte de passageiros
+        'mdi-car-convertible',   // carro esportivo
+        'mdi-motorbike',         // moto
+        'mdi-scooter-electric',  // patinete elétrico
+        'mdi-roller-skate',      // lazer / esportes
+        'mdi-run',               // atividade física / esporte
+        'mdi-dumbbell',          // academia
+        'mdi-yoga',              // bem-estar
+        'mdi-meditation',        // relaxamento
+        'mdi-food-variant',      // alimentação
+        'mdi-coffee-outline',    // café / cafeteria
+        'mdi-water-percent',     // hidratação / saúde
+        'mdi-hospital',          // saúde / atendimento
+        'mdi-medical-bag',       // kit médico / primeiros socorros
+        'mdi-school-outline',    // educação / cursos
+        'mdi-laptop-chromebook', // tecnologia / TI
+        'mdi-cellphone-link',
+        // Usuários / pessoas
+        'mdi-account',            // usuário
+        'mdi-account-circle',     // usuário em círculo
+        'mdi-account-tie',        // usuário executivo
+        'mdi-account-supervisor', // supervisor / gestor
+        'mdi-account-plus',       // adicionar usuário
+        'mdi-account-remove',     // remover usuário
+        'mdi-account-check',      // usuário verificado
+        'mdi-account-alert',      // usuário com alerta
+        'mdi-account-group-outline', // grupo de usuários
+        'mdi-account-star',       // usuário destaque
+
+        // Computadores / tecnologia
+        'mdi-desktop-classic',    // desktop
+        'mdi-laptop',             // laptop
+        'mdi-laptop-off',         // laptop desligado
+        'mdi-server',             // servidor
+        'mdi-server-network',     // rede de servidores
+        'mdi-desktop-tower',      // torre desktop
+        'mdi-monitor-dashboard',  // monitor dashboard
+        'mdi-mouse',              // mouse
+        'mdi-keyboard',           // teclado
+        'mdi-chip',               // chip de processador
+
+        // Arquivos / documentos
+        'mdi-file',               // arquivo genérico
+        'mdi-file-document',      // documento
+        'mdi-file-pdf',           // PDF
+        'mdi-file-word',          // Word
+        'mdi-file-excel',         // Excel
+        'mdi-file-image',         // imagem
+        'mdi-file-video',         // vídeo
+        'mdi-file-music',         // música
+        'mdi-folder',             // pasta
+        'mdi-folder-outline',     // pasta outline
+    ]
 
     // Função para selecionar o ícone
     const selectIcon = (icon: string) => {

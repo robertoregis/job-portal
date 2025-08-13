@@ -6,7 +6,7 @@
   definePageMeta({
     layout: 'dashboard'
   })
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const show = useShow();
   const info: any = useInfo();
   const router = useRouter();
@@ -36,6 +36,11 @@
       subtitle: 'Empresa',
       profile_id: info.profile.id,
       type: 'info'
+    })
+    createLog({
+      title: `${company.value.is_approved ? 'Aprovou' : 'Reprovou'} a empresa`,
+      profile_id: info.profile.id,
+      type: 'approved_company'
     })
     show.setOverlayDashboard(false)
     notify({ title: 'Parabéns!', text: `A empresa foi ${company.value.is_approved ? 'aprovada' : 'desprovada'} com sucesso`, type: 'success' })

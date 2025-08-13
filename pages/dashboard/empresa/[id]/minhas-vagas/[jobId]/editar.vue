@@ -8,7 +8,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const router = useRouter();
   const job = ref<any>({})
@@ -45,6 +45,11 @@
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
       return
     }
+    createLog({
+      title: `Atualizou o perfil`,
+      profile_id: info.profile.id,
+      type: 'update_perfil'
+    })
     show.setOverlayDashboard(false)
     notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
     router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)

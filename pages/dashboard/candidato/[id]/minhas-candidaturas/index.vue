@@ -140,13 +140,47 @@
               style="min-height: unset"
             >
               <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation(item.id)">
-                <div class="d-flex justify-space-between align-start">
+                <div class="d-flex justify-space-between align-start mb-2">
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">{{ item.title }}</div>
-                    <div class="text-caption">{{ item.status }}</div>
+                    <div class="text-caption  text-grey">Status: {{ item.status }}</div>
                   </div>
 
                   <div class="text-caption text-grey-darken-1">{{ item.created_at_formatted }}</div>
+                </div>
+                <div class="d-flex flex-wrap gap-3 mb-2">
+                  <v-chip
+                    small
+                    color="green"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-cash-multiple</v-icon>
+                    {{ item.salary || 'Faixa salarial não informada' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="deep-purple"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-laptop</v-icon>
+                    {{ item.work_format || 'Formato de trabalho não informado' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="orange"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-file-document-outline</v-icon>
+                    {{ item.contract_type || 'Tipo de contrato não informado' }}
+                  </v-chip>
                 </div>
               </v-card>
             </v-list-item>

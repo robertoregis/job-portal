@@ -77,7 +77,9 @@ export default defineEventHandler(async (event) => {
       'foundation_at',
       'instagram',
       'site',
-      'linkedin'
+      'linkedin',
+      'is_confirmation',
+      'code_confirmation'
     ]
 
     for (const field of fields) {

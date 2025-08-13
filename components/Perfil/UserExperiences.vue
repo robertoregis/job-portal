@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
-    import { useShow } from '@/stores/show';
-    const { notify } = useNotification();
-    const info: any = useInfo();
-    const show = useShow();
+  import { useShow } from '@/stores/show';
+  import { useNotice } from '@/composables/useNotice';
+  const { createLog } = useNotice();
+  const { notify } = useNotification();
+  const info: any = useInfo();
+  const show = useShow();
   const pickerVisible = ref(false)
   const typeDate = ref<string>('')
   const editingExperienceIndex = ref<any>(null)
@@ -99,7 +101,11 @@
         notify({ title: 'Erro', text: 'Erro ao criar a exeriência', type: 'error' })
         return
       }
-
+      createLog({
+        title: `Criou a experiência`,
+        profile_id: info.profile.id,
+        type: 'create_experience'
+      })
       notify({ title: 'Parabéns!', text: 'A exeriência foi criada com sucesso', type: 'success' })
       getExperiences()
       clearExperience()
@@ -134,7 +140,11 @@
         notify({ title: 'Erro', text: 'Erro ao editar a exeriência', type: 'error' })
         return
       }
-
+      createLog({
+        title: `Editou a experiência`,
+        profile_id: info.profile.id,
+        type: 'update_experience'
+      })
       notify({ title: 'Parabéns!', text: 'A exeriência foi editada com sucesso', type: 'success' })
       getExperiences()
       clearExperience()
@@ -150,7 +160,11 @@
         notify({ title: 'Erro', text: 'Erro ao remover a exeriência', type: 'error' })
         return
       }
-
+      createLog({
+        title: `Removeu a experiência`,
+        profile_id: info.profile.id,
+        type: 'delete_experience'
+      })
       notify({ title: 'Parabéns!', text: 'A exeriência foi removida com sucesso', type: 'success' })
       getExperiences()
   }

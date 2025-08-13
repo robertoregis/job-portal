@@ -35,6 +35,15 @@
     rejected: 0
   })
 
+  const getFormatDate = (date: string) => {
+    if (!date) return ''
+    const parts = date.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return date
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+
   const onStatusSelect = (selected: string | null) => {
     if (!selected) {
       selectedIconStatus.value = ''
@@ -181,13 +190,36 @@
               style="min-height: unset"
             >
               <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation(item.id)">
-                <div class="d-flex justify-space-between align-start">
+                <div class="d-flex justify-space-between align-start mb-2">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ item.candidate_name }}</div>
-                    <div class="text-caption">{{ item.status }}</div>
+                    <div class="text-subtitle-1 font-weight-medium">{{ item.title }}</div>
+                    <div class="text-caption  text-grey">Status: {{ item.status }}</div>
                   </div>
 
                   <div class="text-caption text-grey-darken-1">{{ item.created_at_formatted }}</div>
+                </div>
+                <div class="d-flex flex-wrap gap-3 mb-2">
+                  <v-chip
+                    small
+                    color="orange"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-account-heart</v-icon>
+                    {{ item.candidate_marital_status || 'Estado civil não informado' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="teal"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-cake</v-icon>
+                    {{ item.candidate_birth_date ? getFormatDate(item.candidate_birth_date) : 'Data de nascimento não informada' }}
+                  </v-chip>
                 </div>
               </v-card>
             </v-list-item>

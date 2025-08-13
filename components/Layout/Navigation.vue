@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useInfo } from '@/stores/info'
 import { useShow } from '@/stores/show'
-
+import { useNotice } from '@/composables/useNotice';
 const { notify } = useNotification()
 const authentication: any = useInfo()
 const router = useRouter()
 const show = useShow()
+const { createLog } = useNotice();
 
 const profilePoints = {
   name: 15,
@@ -62,6 +63,11 @@ const calculateProfileScore = (profile: any, profilePoints: any) => {
 const logout = async () => {
   show.setOverlayDashboard(true)
   setTimeout(async () => {
+    createLog({
+      title: `Deslogou`,
+      profile_id: authentication.profile.id,
+      type: 'logout'
+    })
     router.push('/')
     show.setOverlayDashboard(false)
     const supabase = useNuxtApp().$supabase
@@ -136,6 +142,12 @@ onMounted(() => {
             <NuxtLink :to="`/dashboard/candidato/${authentication.user.id}/avisos`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-bell</v-icon>
               <span>Avisos</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/candidato/${authentication.user.id}/ajustes`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-cog</v-icon>
+              <span>Ajustes</span>
             </NuxtLink>
           </v-list-item>
         </v-list>

@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const fields = ['name', 'email', 'cpf', 
       'states', 'city', 'marital_status', 'phone', 
       'about', 'birth_date', 'is_employed', 'job_types', 
-      'areas_of_interest', 'instagram', 'site', 'linkedin'
+      'areas_of_interest', 'instagram', 'site', 'linkedin', 'code_confirmation', 'is_confirmation'
     ] // campos que podem ser atualizados
     for (const field of fields) {
       if (field in body) {

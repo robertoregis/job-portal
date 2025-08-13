@@ -10,7 +10,7 @@
   const info: any = useInfo();
   const show = useShow();
   const route = useRoute();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
 
   const router = useRouter();
   const page = ref<any>({})
@@ -28,6 +28,11 @@
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao editar a página', type: 'error' })
     } else {
+      createLog({
+        title: `Criou a página`,
+        profile_id: info.profile.id,
+        type: 'create_page'
+      })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'A página foi editada com sucesso', type: 'success' })
       router.push(`/dashboard/admin/paginas/${data.value.id}`)

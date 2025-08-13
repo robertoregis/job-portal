@@ -6,12 +6,66 @@
     layout: 'dashboard'
   })
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const candidature = ref<any>({})
   const job = ref<any>({})
   const loading = ref<boolean>(true)
   const info: any = useInfo();
+  const config = ref<any>({})
+  const message = ref<string>('')
+
+  const sendMail = async () => {
+    const { data, error } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`${info.user.name} <${config.value.company_email}>`],
+        subject: 'Chegou um email de contato - Conect RH One',
+        template: 'contact_email_candidate_template',
+        variables: {
+          name: info.user.name,
+          job: job.value.position,
+          name_company: config.value.company_name,
+          message: message.value
+        }
+      }
+    })
+
+    if (error.value) {
+      notify({ title: 'Erro', text: 'Falha ao enviar email', type: 'error' })
+      return
+    } else {
+      const { data: dataSend, error: errorSend } = await useFetch('/api/emails/send', {
+        method: 'POST',
+        body: {
+          to: [`${info.user.name} <${config.value.company_email}>`],
+          subject: 'Seu email de contato foi enviado - Conect RH One',
+          template: 'email_contact_confirmation_template',
+          variables: {
+            name: info.user.name,
+            job: job.value.position,
+            name_company: config.value.company_name,
+          }
+        }
+      })
+      notify({ title: 'Sucesso', text: 'Email enviado com sucesso!', type: 'success' })
+      message.value = ''
+    }
+  }
+
+  const getConfiguration = async (id: string) => {
+    const { data, error, pending }: any = await useFetch(`/api/configurations`, {
+      method: 'GET',
+      params: {
+        company_id: id
+      }
+    })
+    if (error.value) {
+    } else {
+      config.value = data.value
+    }
+    loading.value = false
+  }
 
   const getJob = async (jobId: string) => {
     const { data, error } = await useFetch(`/api/jobs/${jobId}`, {
@@ -21,7 +75,7 @@
     if (error.value) {
     } else {
       job.value = data.value
-      loading.value = false
+      getConfiguration(job.value.company_id)
     }
   }
 
@@ -82,6 +136,11 @@
       if(candidature.value.curriculum_id) {
         await deletePDF(false, candidature.value.curriculum_id)
       }
+      createLog({
+        title: `Currículo enviado`,
+        profile_id: info.profile.id,
+        type: 'send_curriculum'
+      })
       notify({ title: 'Sucesso', text: 'Currículo enviado com sucesso!', type: 'success' })
       // Atualize seu store com o curriculum_url e curriculum_id retornados
       // Exemplo:
@@ -115,6 +174,11 @@
         if(error.value) {
           notify({ title: 'Erro', text: 'Erro ao remover currículo', type: 'error' })
         } else {
+          createLog({
+            title: `Currículo removido`,
+            profile_id: info.profile.id,
+            type: 'delete_curriculum'
+          })
           notify({ title: 'Sucesso', text: 'Currículo removido', type: 'success' })
           fetchCandidature(candidature.value.id)
           filePDF.value = null
@@ -310,6 +374,38 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+    </v-col>
+
+    <v-col v-if="config.allow_candidate_email" cols="12" class="border rounded-lg mt-4" style="background:#fafafa;">
+      <v-card flat>
+        <v-card-text class="d-flex flex-column">
+          <div class="mb-1">
+            <span class="font-weight-semibold text-subtitle-2">Envie email para a empresa sobre a vaga</span>
+          </div>
+          <div class="mb-3">
+            <span class="text-caption" style="color: #555;">Somos apenas o canal inicial, a resposta será direta da empresa.</span>
+          </div>
+          <v-textarea
+            label="Mensagem"
+            v-model="message"
+            name="input-7-1"
+            variant="filled"
+            auto-grow
+            hide-details
+            density="compact"
+            class="mb-2"
+          ></v-textarea>
+          <div class="d-flex">
+            <v-btn
+                  class="mt-2 bg-gradient-primary"
+                  @click="sendMail"
+                >
+                  Enviar mensagem
+                </v-btn>
+          </div>
+        </v-card-text>
+        <v-card-actions></v-card-actions>
+      </v-card>
     </v-col>
 
   </v-row>

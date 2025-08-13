@@ -172,12 +172,47 @@
                 hover
                 @click="navigation(`/dashboard/candidato/123/minhas-candidaturas/${candidature.id}`)"
               >
-                <div class="d-flex justify-space-between">
+                <div class="d-flex justify-space-between align-start mb-2">
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">{{ candidature.title }}</div>
-                    <div class="text-caption">Status: {{ candidature.status }}</div>
+                    <div class="text-caption  text-grey">Status: {{ candidature.status }}</div>
                   </div>
+
                   <div class="text-caption text-grey-darken-1">{{ candidature.created_at_formatted }}</div>
+                </div>
+                <div class="d-flex flex-wrap gap-3 mb-2">
+                  <v-chip
+                    small
+                    color="green"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-cash-multiple</v-icon>
+                    {{ candidature.salary || 'Faixa salarial não informada' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="deep-purple"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-laptop</v-icon>
+                    {{ candidature.work_format || 'Formato de trabalho não informado' }}
+                  </v-chip>
+
+                  <v-chip
+                    small
+                    color="orange"
+                    text-color="white"
+                    variant="tonal"
+                    class="mb-1 mr-1"
+                  >
+                    <v-icon left size="16">mdi-file-document-outline</v-icon>
+                    {{ candidature.contract_type || 'Tipo de contrato não informado' }}
+                  </v-chip>
                 </div>
               </v-card>
             </v-list-item>
