@@ -5,6 +5,8 @@
   definePageMeta({
     layout: 'clean'
   })
+  import { useNotice } from '@/composables/useNotice';
+  const { createLog } = useNotice();
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
@@ -51,8 +53,13 @@
     const { error } = await supabase.auth.updateUser({ password: values.password })
     show.setOverlayDashboard(false);
     if (error) {
-      notify({ type: 'error', text: 'Erro ao redefinir a senha: ' + error.message })
+      notify({ type: 'error', text: 'Erro ao redefinir a senha' })
     } else {
+      createLog({
+        title: `Redefiniu a senha`,
+        profile_id: info.profile.id,
+        type: 'reset_password'
+      })
       notify({ type: 'success', text: 'Senha redefinida com sucesso! Você já pode entrar.' })
       window.location.href = `/entrar/${route.params.type}`
       setTimeout(() => {

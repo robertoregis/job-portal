@@ -13,7 +13,7 @@
   let phoneMaskInstance: any = null
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const states = ref<any[]>([])
   const stateSelected = ref<any>('')
@@ -132,6 +132,11 @@
         profile_id: info.profile.id,
         type: 'Info'
       })*/
+      createLog({
+        title: `Atualizou o perfil`,
+        profile_id: info.profile.id,
+        type: 'update_perfil'
+      })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
     } catch (err) {
@@ -215,6 +220,11 @@
           image_id: imageData.value.image_id
         })
         imagePreview.value = imageData.value.image_url
+        createLog({
+          title: `Atualizou a foto de perfil`,
+          profile_id: info.profile.id,
+          type: 'update_photo_perfil'
+        })
         notify({ title: 'Parabéns!', text: 'A imagem foi enviada', type: 'success' })
       }, 1500)
     }
@@ -237,6 +247,11 @@
         if(error.value) {
           notify({ title: 'Erro', text: 'Erro ao remover imagem', type: 'error' })
         } else {
+          createLog({
+            title: `Removeu a foto de perfil`,
+            profile_id: info.profile.id,
+            type: 'delete_photo_perfil'
+          })
           notify({ title: 'Parabéns!', text: 'A imagem foi removida', type: 'success' })
         }
         const admin = info.user

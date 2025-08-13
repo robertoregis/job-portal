@@ -2,6 +2,7 @@
   import { useInfo } from '@/stores/info';
   import { name_formated } from '@/composables/textFunctions';
   import { useShow } from '@/stores/show';
+  import { useNotice } from '@/composables/useNotice';
   const { notify } = useNotification();
 
   const info: any = useInfo();
@@ -9,7 +10,7 @@
   const pageSize = ref(30)
   const totalPages = ref(1)
   const pagesList = ref<any[]>([])
-
+  //const { createLog } = useNotice();
   const { data: pages, error, refresh, pending } = await useFetch('/api/pages', {
     method: 'GET',
     params: {

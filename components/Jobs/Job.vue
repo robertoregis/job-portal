@@ -1,5 +1,6 @@
 <script lang="ts">
   import { useInfo } from '@/stores/info';
+  import { useNotice } from '@/composables/useNotice';
 
   export default {
     props: {
@@ -15,7 +16,7 @@
       const info: any = useInfo()
       const router = useRouter();
       const { notify } = useNotification();
-
+      const { createLog } = useNotice();
       const apply = () => {
         if (info.user && info.user.id && info.user.type === 'candidate') {
           dialogCreateCandidature.value = true
@@ -57,6 +58,11 @@
         if (error.value) {
           notify({ title: '', text: 'Erro ao criar candidatura', type: 'error' })
         } else {
+          createLog({
+            title: `Criou o candidatura`,
+            profile_id: info.profile.id,
+            type: 'create_candidature'
+          })
           router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${data.value.id}`)
           resetCandidature()
         }

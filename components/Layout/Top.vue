@@ -2,6 +2,7 @@
   import { useInfo } from '#imports';
   import { useShow } from '@/stores/show';
   import { useField, useForm } from 'vee-validate';
+  import { useNotice } from '@/composables/useNotice';
   interface FormSchema {
     email: string
     password: string
@@ -12,6 +13,7 @@
   const dialog = ref<boolean>(false)
   const dialogLoginAdmin = ref<boolean>(false)
   const { notify } = useNotification();
+  const { createLog } = useNotice();
 
   const showPassword = ref(false)
   const showPasswordConfirm = ref(false)
@@ -86,6 +88,11 @@
       const admin = dataAdmin.value
       info.setUser({ ...dataAdmin.value[0], type: 'admin' })
       show.setOverlayDashboard(false)
+      createLog({
+        title: `Logou`,
+        profile_id: info.profile.id,
+        type: 'login'
+      })
       //localStorage.setItem('user', JSON.stringify(admin))
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
       dialog.value = false;
@@ -111,6 +118,11 @@
   })
 
   const logout = async () => {
+    createLog({
+      title: `Deslogou`,
+      profile_id: info.profile.id,
+      type: 'logout'
+    })
     show.setOverlayDashboard(true)
     const supabase = useNuxtApp().$supabase
     await supabase.auth.signOut()

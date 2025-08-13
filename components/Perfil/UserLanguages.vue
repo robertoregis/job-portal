@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
     import { useShow } from '@/stores/show';
+    import { useNotice } from '@/composables/useNotice';
+    const { createLog } = useNotice();
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
@@ -67,7 +69,11 @@
             notify({ title: 'Erro', text: 'Erro ao criar o idioma', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Criou o idioma`,
+            profile_id: info.profile.id,
+            type: 'create_language'
+        })
         notify({ title: 'Parabéns!', text: 'O idioma foi criada com sucesso', type: 'success' })
         getLanguages()
         clearLanguage()
@@ -101,7 +107,11 @@
             notify({ title: 'Erro', text: 'Erro ao remover o idioma', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Removeu o idioma`,
+            profile_id: info.profile.id,
+            type: 'delete_language'
+        })
         notify({ title: 'Parabéns!', text: 'O idioma foi removida com sucesso', type: 'success' })
         getLanguages()
     }

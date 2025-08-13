@@ -4,7 +4,9 @@
   })
   import { useField, useForm } from 'vee-validate';
   import { useInfo } from '#imports';
-  import { useShow } from '@/stores/show'
+  import { useShow } from '@/stores/show';
+  import { useNotice } from '@/composables/useNotice';
+  const { createLog } = useNotice();
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
@@ -79,6 +81,11 @@
         const company = dataCompany.value.data
         info.setUser({ ...dataCompany.value.data[0], type: 'company' })
         sendMail(values.name, info.user.email)
+        createLog({
+            title: `Cadastrou a conta`,
+            profile_id: info.profile.id,
+            type: 'register'
+        })
         notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
         show.setOverlayDashboard(false)
         router.push(`/dashboard/empresa/${company.id}/meu-perfil/editar`)

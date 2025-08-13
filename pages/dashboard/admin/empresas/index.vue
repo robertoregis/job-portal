@@ -62,7 +62,7 @@
 
 
 
-  const { data: jobs, error, refresh, pending } = await useFetch('/api/companies', {
+  const { data: companies, error, refresh, pending } = await useFetch('/api/companies', {
     method: 'GET',
     params: {
       page: page.value.toString(),
@@ -71,10 +71,9 @@
   })
 
   if (error.value) {
-    console.error('Erro ao carregar jobs:', error.value)
   } else {
-    companiesList.value = jobs.value?.data || []
-    totalPages.value = jobs.value?.totalPages || 1
+    companiesList.value = companies.value?.data || []
+    totalPages.value = companies.value?.totalPages || 1
   }
 
 </script>

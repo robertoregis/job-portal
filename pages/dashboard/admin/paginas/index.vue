@@ -2,9 +2,11 @@
   import { useInfo } from '@/stores/info';
   import { formatDate } from '@/composables/formatDate';
   import { useShow } from '@/stores/show';
+  import { useNotice } from '@/composables/useNotice';
   definePageMeta({
     layout: 'dashboard',
   })
+  const { createNotice, createLog } = useNotice();
   const { notify } = useNotification();
   const show = useShow();
   const info: any = useInfo();
@@ -56,7 +58,11 @@
           notify({ title: 'Erro', text: 'Erro ao remover a página', type: 'error' })
           return
       }
-
+      createLog({
+        title: `Removeu a página`,
+        profile_id: info.profile.id,
+        type: 'delete_page'
+      })
       notify({ title: 'Parabéns!', text: 'A página foi removida com sucesso', type: 'success' })
       getPages()
   }

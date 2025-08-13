@@ -29,13 +29,15 @@
         <v-row no-gutters>
           <v-col cols="12">
             <div class="d-flex flex-column align-center pa-3 rounded">
-              <h1 class="text-h5 font-weight-bold">Conect One RH</h1>
+              <h1 class="text-h4 font-weight-bold">Conect RH One</h1>
               <v-avatar color="info" size="x-large" class="mt-4">
-                <!-- Pode colocar logo ou ícone aqui -->
+                <!-- Logo ou ícone -->
               </v-avatar>
-              <div class="d-flex max-w-500 mt-4">
+              <div class="d-flex max-w-600 mt-4">
                 <p class="text-subtitle-1 mb-0">
-                  A Conect One RH oferece soluções inovadoras para conectar talentos e empresas, facilitando processos seletivos e o desenvolvimento profissional.
+                  Somos a ponte entre talentos extraordinários e empresas que desejam crescer. 
+                  Na Conect RH One, nossa missão é facilitar conexões humanas inteligentes, simplificar processos seletivos e potencializar carreiras e negócios.
+                  Com tecnologia de ponta e um time apaixonado pelo que faz, transformamos cada oportunidade em sucesso real.
                 </p>
               </div>
             </div>
@@ -49,9 +51,10 @@
         <v-row no-gutters>
           <v-col>
             <div class="d-flex flex-column align-center rounded pa-4">
-              <span class="text-h6 font-weight-bold text-white">Descubra novos talentos</span>
-              <p class="text-body-2 text-white mt-2 text-center max-w-600">
-                Nossa plataforma conecta você a profissionais qualificados que transformarão sua equipe e impulsionarão seus resultados.
+              <h1 class="text-h4 font-weight-bold">O que fazemos de melhor</h1>
+              <p class="text-body-1 mt-2 max-w-700">
+                Na Conect RH One, oferecemos soluções completas que unem empresas e candidatos em um ecossistema moderno, ágil e transparente. 
+                Descubra como podemos transformar a maneira de atrair, selecionar e reter talentos.
               </p>
             </div>
           </v-col>
@@ -76,7 +79,7 @@
                       <span class="text-h6 font-weight-bold">{{ service.title }}</span>
                     </v-card-title>
                     <v-card-subtitle class="mb-2 text--secondary">{{ service.subtitle }}</v-card-subtitle>
-                    <v-card-text class="bg-surface-light pt-0">
+                    <v-card-text class="bg-surface-light pt-2">
                       {{ service.description }}
                     </v-card-text>
                   </v-card>

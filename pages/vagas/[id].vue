@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
+  import { useNotice } from '@/composables/useNotice';
+  const { createLog } = useNotice();
   const router = useRouter();
   const route = useRoute();
   const loading = ref<boolean>(true)
@@ -54,6 +56,11 @@
     if (error.value) {
       notify({ title: '', text: 'Erro ao criar candidatura', type: 'error' })
     } else {
+      createLog({
+        title: `Criou a candidatura`,
+        profile_id: info.profile.id,
+        type: 'create_candidature'
+      })
       router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${data.value.id}`)
       resetCandidature()
     }

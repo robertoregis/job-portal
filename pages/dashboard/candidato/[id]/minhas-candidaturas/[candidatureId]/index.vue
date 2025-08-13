@@ -6,7 +6,7 @@
     layout: 'dashboard'
   })
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const candidature = ref<any>({})
   const job = ref<any>({})
@@ -136,6 +136,11 @@
       if(candidature.value.curriculum_id) {
         await deletePDF(false, candidature.value.curriculum_id)
       }
+      createLog({
+        title: `Currículo enviado`,
+        profile_id: info.profile.id,
+        type: 'send_curriculum'
+      })
       notify({ title: 'Sucesso', text: 'Currículo enviado com sucesso!', type: 'success' })
       // Atualize seu store com o curriculum_url e curriculum_id retornados
       // Exemplo:
@@ -169,6 +174,11 @@
         if(error.value) {
           notify({ title: 'Erro', text: 'Erro ao remover currículo', type: 'error' })
         } else {
+          createLog({
+            title: `Currículo removido`,
+            profile_id: info.profile.id,
+            type: 'delete_curriculum'
+          })
           notify({ title: 'Sucesso', text: 'Currículo removido', type: 'success' })
           fetchCandidature(candidature.value.id)
           filePDF.value = null

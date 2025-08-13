@@ -9,7 +9,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
 
   const router = useRouter();
   const page = ref({
@@ -36,6 +36,11 @@
         subtitle: 'Página',
         profile_id: info.profile.id,
         type: 'info'
+      })
+      createLog({
+        title: `Criou a página`,
+        profile_id: info.profile.id,
+        type: 'create_page'
       })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'A página foi criada com sucesso', type: 'success' })

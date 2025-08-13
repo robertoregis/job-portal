@@ -10,7 +10,7 @@
   const route = useRoute();
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const job= ref<any>({})
   const counts = ref<any>({
     total: 0
@@ -63,7 +63,11 @@
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
       return
     }
-
+    createLog({
+      title: `Atualizou a vaga`,
+      profile_id: info.profile.id,
+      type: 'update_job'
+    })
     job.value = data.value
     createNotice({
       title: 'Vaga atualizada',

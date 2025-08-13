@@ -9,7 +9,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
 
   const router = useRouter();
   const job = ref({
@@ -77,6 +77,11 @@
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao criar a vaga', type: 'error' })
     } else {
+      createLog({
+        title: `Criou a vaga`,
+        profile_id: info.profile.id,
+        type: 'create_job'
+      })
       createNotice({
         title: 'Vaga criada',
         description: `Parabéns, você acabou de criar a vaga ${job.value.position}`,

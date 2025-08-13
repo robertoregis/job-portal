@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import { useInfo } from '@/stores/info';
     import { useShow } from '@/stores/show';
+    import { useNotice } from '@/composables/useNotice';
+    const { createLog } = useNotice();
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
@@ -69,7 +71,11 @@
             notify({ title: 'Erro', text: 'Erro ao criar a soft skill', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Criou o soft skill`,
+            profile_id: info.profile.id,
+            type: 'create_soft_skill'
+        })
         notify({ title: 'Parabéns!', text: 'A soft skill foi criada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
@@ -104,7 +110,11 @@
             notify({ title: 'Erro', text: 'Erro ao editar a soft skill', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Editou o soft skill`,
+            profile_id: info.profile.id,
+            type: 'update_soft_skill'
+        })
         notify({ title: 'Parabéns!', text: 'A soft skill foi editada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
@@ -121,7 +131,11 @@
             notify({ title: 'Erro', text: 'Erro ao remover a soft skill', type: 'error' })
             return
         }
-
+        createLog({
+            title: `Removeu o soft skill`,
+            profile_id: info.profile.id,
+            type: 'delete_soft_skill'
+        })
         notify({ title: 'Parabéns!', text: 'A soft skill foi removida com sucesso', type: 'success' })
         getSoftSkills()
     }

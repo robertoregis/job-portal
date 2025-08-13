@@ -10,7 +10,7 @@
   const show = useShow();
   const info: any = useInfo();
   const { notify } = useNotification();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const page = ref<any>({})
   const loading = ref<boolean>(true)
 
@@ -40,6 +40,11 @@
       subtitle: 'Página',
       profile_id: info.profile.id,
       type: 'info'
+    })
+    createLog({
+      title: `Atualizou a página`,
+      profile_id: info.profile.id,
+      type: 'update_page'
     })
     show.setOverlayDashboard(false)
     notify({ title: 'Parabéns!', text: 'A página foi atualizada com sucesso', type: 'success' })

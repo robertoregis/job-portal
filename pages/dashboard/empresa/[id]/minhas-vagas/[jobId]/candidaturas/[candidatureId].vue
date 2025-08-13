@@ -8,7 +8,7 @@
   })
   const info: any = useInfo();
   const show = useShow();
-  const { createNotice } = useNotice();
+  const { createNotice, createLog } = useNotice();
   const route = useRoute();
   const router = useRouter();
   const candidature = ref<any>({})
@@ -68,6 +68,11 @@
       return
     }
     sendMail(candidature.value.candidate_name, candidature.value.status, candidature.value.candidate_email)
+    createLog({
+      title: `Atualizou a candidatura`,
+      profile_id: info.profile.id,
+      type: 'update_candidature'
+    })
     createNotice({
       title: 'Candidatura atualizada',
       description: `A candidatura do candidato ${candidature.value.candidate_name} teve seu status atualizado`,

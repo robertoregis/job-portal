@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { useField, useForm } from 'vee-validate';
   import { useInfo } from '@/stores/info';
-  import { useShow } from '@/stores/show'
+  import { useShow } from '@/stores/show';
+  import { useNotice } from '@/composables/useNotice';
+  const { createLog } = useNotice();
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
@@ -52,6 +54,11 @@
       show.setOverlayDashboard(false)
       const company = dataCompany.value.data
       info.setUser({ ...dataCompany.value.data[0], type: 'company' })
+      createLog({
+        title: `Logou`,
+        profile_id: info.profile.id,
+        type: 'login'
+      })
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
       if(token.value && token.value === info.user.code_confirmation) {
         updateConfirmation(info.user.id)
@@ -97,7 +104,11 @@
           code_confirmation: null
         }
       })
-
+      createLog({
+        title: `Confirmou o cadastro`,
+        profile_id: info.profile.id,
+        type: 'register_confirmation'
+      })
       router.push(`/`)
     } catch (err) {
       console.log(err)
