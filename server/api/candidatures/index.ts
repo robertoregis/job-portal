@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     const candidateIds = [...new Set(data.map((c: any) => c.candidate_id))]
     const { data: candidatesData, error: candidateError } = await supabase
       .from('candidates')
-      .select('id, name, image_url')
+      .select('id, name, image_url, marital_status, birth_date')
       .in('id', candidateIds)
 
     if (candidateError) {
@@ -46,7 +46,29 @@ export default defineEventHandler(async (event) => {
     const candidateMap = candidatesData.reduce((acc: any, candidate: any) => {
       acc[candidate.id] = {
         name: candidate.name,
-        image_url: candidate.image_url
+        image_url: candidate.image_url,
+        marital_status: candidate.marital_status,
+        birth_date: candidate.birth_date
+      }
+      return acc
+    }, {})
+
+    // Buscar dados das vagas
+    const jobIds = [...new Set(data.map((c: any) => c.job_id))]
+    const { data: jobsData, error: jobError } = await supabase
+      .from('jobs')
+      .select('id, contract_type, salary, work_format')
+      .in('id', jobIds)
+
+    if (jobError) {
+      throw createError({ statusCode: 500, statusMessage: jobError.message })
+    }
+
+    const jobMap = jobsData.reduce((acc: any, job: any) => {
+      acc[job.id] = {
+        contract_type: job.contract_type,
+        salary: job.salary,
+        work_format: job.work_format
       }
       return acc
     }, {})
@@ -55,7 +77,12 @@ export default defineEventHandler(async (event) => {
       ...c,
       created_at_formatted: c.created_at ? formatDateTimestamp(c.created_at, 3) : null,
       candidate_name: candidateMap[c.candidate_id]?.name || null,
-      candidate_image_url: candidateMap[c.candidate_id]?.image_url || null
+      candidate_image_url: candidateMap[c.candidate_id]?.image_url || null,
+      candidate_marital_status: candidateMap[c.candidate_id]?.marital_status || null,
+      candidate_birth_date: candidateMap[c.candidate_id]?.birth_date || null,
+      contract_type: jobMap[c.job_id]?.contract_type || null,
+      salary: jobMap[c.job_id]?.salary || null,
+      work_format: jobMap[c.job_id]?.work_format || null
     }))
 
     return {
@@ -66,6 +93,7 @@ export default defineEventHandler(async (event) => {
       totalPages: Math.ceil(count / size)
     }
   }
+
 
   if (method === 'POST') {
     const body = await readBody(event)
