@@ -56,6 +56,15 @@
   if (error.value) {
   } else {
     candidate.value = data.value
+    useHead({
+      title: `${candidate.value.name} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Confira suas informações, experiências e qualificações profissionais.'
+        }
+      ]
+    })
     getDataCandidate(candidate.value.id)
   }
 </script>

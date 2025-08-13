@@ -16,6 +16,15 @@
   if (error.value) {
   } else {
     page.value = data.value
+    useHead({
+    title: `${page.value.title} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: page.value.description
+        }
+      ]
+    })
     loading.value = false;
   }
 </script>

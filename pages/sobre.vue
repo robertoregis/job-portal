@@ -3,6 +3,15 @@
   definePageMeta({
     layout: 'default' // ou outro nome, conforme os arquivos em layouts/
   })
+  useHead({
+    title: `Sobre - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Saiba mais sobre a Conect RH One e como estamos transformando o recrutamento, unindo empresas e candidatos em um só lugar.'
+      }
+    ]
+  })
   //const content = ref('<p>Conteúdo inicial</p>')
   const loading = ref<boolean>(true)
 

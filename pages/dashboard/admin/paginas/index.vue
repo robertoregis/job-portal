@@ -6,6 +6,15 @@
   definePageMeta({
     layout: 'dashboard',
   })
+  useHead({
+    title: `Páginas - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Gerencie todas as páginas do site e controle sua exibição.'
+      }
+    ]
+  })
   const { createNotice, createLog } = useNotice();
   const { notify } = useNotification();
   const show = useShow();

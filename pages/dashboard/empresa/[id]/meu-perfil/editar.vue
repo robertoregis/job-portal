@@ -5,7 +5,15 @@
   import { useShow } from '@/stores/show';
   import IMask from 'imask'
   const { notify } = useNotification();
-
+  useHead({
+    title: `Editar perfil - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Atualize as informações e dados da sua empresa.'
+      }
+    ]
+  })
   const phoneInputRef: any = ref(null)
   const cpfInputRef: any = ref(null)
   const cnpjInputRef: any = ref(null)

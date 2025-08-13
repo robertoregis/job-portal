@@ -4,7 +4,15 @@
   import { useShow } from '@/stores/show';
   import IMask from 'imask'
   const { notify } = useNotification();
-
+  useHead({
+    title: `Editar perfil - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Atualize e personalize seu perfil para destacar suas habilidades.'
+      }
+    ]
+  })
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })

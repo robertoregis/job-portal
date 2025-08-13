@@ -7,6 +7,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
+  useHead({
+    title: `Criar página - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Crie novas páginas para o site da Conect RH One.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const show = useShow();
   const { createNotice, createLog } = useNotice();

@@ -3,7 +3,15 @@
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   const { notify } = useNotification();
-
+  useHead({
+    title: `Editar página - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Edite as páginas criadas ao seu modo.'
+      }
+    ]
+  })
   definePageMeta({
     layout: 'dashboard'
   })

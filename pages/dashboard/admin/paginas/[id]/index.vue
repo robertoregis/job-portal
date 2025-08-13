@@ -58,6 +58,15 @@
   if (error.value) {
   } else {
     page.value = data.value
+    useHead({
+      title: `${page.value.title} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Visualize a página e ative para que fique visível no site.'
+        }
+      ]
+    })
   }
 </script>
 

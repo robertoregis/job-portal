@@ -3,7 +3,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
-
+  useHead({
+    title: `Dashboard - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Veja suas candidaturas e acompanhe seu progresso na Conect RH One.'
+      }
+    ]
+  })
   const router = useRouter()
   const info: any = useInfo();
   const candidaturesList = ref<any[]>([])

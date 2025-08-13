@@ -3,6 +3,15 @@
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
+  useHead({
+    title: `Avisos - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Fique por dentro de comunicados importantes para sua empresa.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const page = ref(1)
   const pageSize = ref(10)

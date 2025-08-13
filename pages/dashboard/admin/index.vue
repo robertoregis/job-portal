@@ -3,7 +3,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
-
+  useHead({
+    title: `Dashboard - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Acompanhe estatísticas e informações gerais sobre vagas, empresas e candidatos.'
+      }
+    ]
+  })
   const router = useRouter()
   const info: any = useInfo();
   const companiesList = ref<any[]>([])

@@ -28,6 +28,15 @@
   if (error.value) {
   } else {
     admin.value = data.value
+    useHead({
+      title: `${admin.value.name} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Confira suas informações de administrador.'
+        }
+      ]
+    })
   }
 </script>
 

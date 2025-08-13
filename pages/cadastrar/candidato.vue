@@ -14,6 +14,15 @@
     password: string
     passwordConfirm: string
   }
+  useHead({
+    title: `Cadastrar - Candidato - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+      }
+    ]
+  })
   const router = useRouter();
   const showPassword = ref(false)
   const showPasswordConfirm = ref(false)
