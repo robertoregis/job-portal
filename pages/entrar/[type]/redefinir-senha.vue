@@ -8,7 +8,16 @@
   import { useNotice } from '@/composables/useNotice';
   const { createLog } = useNotice();
   const info: any = useInfo();
-  const show = useShow()
+  const show = useShow();
+  useHead({
+    title: `Redefinir Senha - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Redefina sua senha e recupere o acesso à sua conta na Conect RH One.'
+      }
+    ]
+  })
   const { notify } = useNotification();
   interface FormSchema {
     passwordConfirm: string

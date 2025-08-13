@@ -3,6 +3,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
+  useHead({
+    title: `Minhas candidaturas - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Gerencie todas as vagas para as quais você se candidatou.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)

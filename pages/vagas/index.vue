@@ -8,7 +8,15 @@
   definePageMeta({
     layout: 'default' // ou outro nome, conforme os arquivos em layouts/
   })
-
+  useHead({
+    title: `Vagas - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Confira todas as oportunidades disponíveis na Conect RH One e encontre a vaga ideal para o seu perfil.'
+      }
+    ]
+  })
   const info: any = useInfo();
 
 
@@ -95,7 +103,6 @@
 
   if (error.value) {
   } else {
-    console.log(jobs.value)
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1
   }

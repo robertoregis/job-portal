@@ -3,6 +3,15 @@
   definePageMeta({
     layout: 'default'
   })
+  useHead({
+    title: `Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'A Conect RH One conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const servicesList = ref<any[]>([])
   // Dados fictícios para os serviços

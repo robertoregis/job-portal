@@ -9,6 +9,15 @@
   definePageMeta({
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
+  useHead({
+    title: `Editar perfil - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Atualize seus dados e informações de contato.'
+      }
+    ]
+  })
   const phoneInputRef: any = ref(null)
   let phoneMaskInstance: any = null
   const info: any = useInfo();

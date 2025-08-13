@@ -92,6 +92,15 @@
   if (error.value) {
   } else {
     job.value = data.value
+    useHead({
+      title: `${job.value.position} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Veja detalhes e gerencie as candidaturas para esta vaga.'
+        }
+      ]
+    })
     await getCounts()
   }
 

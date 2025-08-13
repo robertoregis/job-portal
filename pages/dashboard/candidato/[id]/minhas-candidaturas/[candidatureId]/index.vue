@@ -75,6 +75,15 @@
     if (error.value) {
     } else {
       job.value = data.value
+      useHead({
+        title: `${job.value.position} - Conect RH One`,
+        meta: [
+          {
+              name: 'description',
+              content: 'Veja detalhes da sua candidatura e acompanhe seu status.'
+          }
+        ]
+      })
       getConfiguration(job.value.company_id)
     }
   }

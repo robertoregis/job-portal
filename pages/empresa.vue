@@ -2,7 +2,15 @@
   definePageMeta({
     layout: 'default'
   })
-
+  useHead({
+    title: `Empresa - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Descubra as vantagens para empresas na Conect RH One: divulgue vagas, encontre talentos qualificados e contrate com rapidez.'
+      }
+    ]
+  })
   const benefitsList = ref<any[]>([])
   // Dados fictícios para os serviços
   const { data: benefits, error, refresh, pending } = await useFetch('/api/benefits', {

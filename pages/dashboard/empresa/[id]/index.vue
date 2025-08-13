@@ -3,7 +3,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
-
+  useHead({
+    title: `Dashboard - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Acompanhe suas vagas e estatísticas de contratação na Conect RH One.'
+      }
+    ]
+  })
   const router = useRouter()
   const info: any = useInfo();
   const jobsList = ref<any[]>([])

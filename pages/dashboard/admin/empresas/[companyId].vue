@@ -54,6 +54,15 @@
   if (error.value) {
   } else {
     company.value = data.value
+    useHead({
+      title: `${company.value.name} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Analise e aprove ou recuse o cadastro desta empresa.'
+        }
+      ]
+    })
   }
 </script>
 

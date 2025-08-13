@@ -10,7 +10,6 @@
   const dialog = ref<boolean>(false)
   const dialogCreateCandidature = ref<boolean>(false)
   const { notify } = useNotification();
-
   definePageMeta({
     layout: 'default'
   })
@@ -78,6 +77,15 @@
   if (error.value) {
   } else {
     job.value = data.value
+    useHead({
+      title: `${job.value.job} - Conect RH One`,
+      meta: [
+        {
+            name: 'description',
+            content: 'Veja todos os detalhes desta vaga e candidate-se para dar o próximo passo na sua carreira.'
+        }
+      ]
+    })
     loading.value = false;
   }
 </script>

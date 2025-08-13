@@ -8,7 +8,16 @@
   import { useNotice } from '@/composables/useNotice';
   const { createLog } = useNotice();
   const info: any = useInfo();
-  const show = useShow()
+  const show = useShow();
+  useHead({
+    title: `Cadastrar - Empresa - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+      }
+    ]
+  })
   const { notify } = useNotification();
   const loading = ref<boolean>(true)
   interface FormSchema {

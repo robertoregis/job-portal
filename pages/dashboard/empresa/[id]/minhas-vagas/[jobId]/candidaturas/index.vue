@@ -3,9 +3,17 @@
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   const { notify } = useNotification();
-
   definePageMeta({
     layout: 'dashboard'
+  })
+  useHead({
+    title: `Candidaturas - Conect RH One`,
+    meta: [
+      {
+        name: 'description',
+        content: 'Confira todos os candidatos que se inscreveram nesta vaga.'
+      }
+    ]
   })
   const info: any = useInfo();
   const show = useShow();

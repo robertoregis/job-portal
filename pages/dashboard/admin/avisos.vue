@@ -8,7 +8,7 @@
     meta: [
       {
           name: 'description',
-          content: 'Confira avisos e comunicados importantes para candidatos.'
+          content: 'Publique e gerencie avisos para empresas e candidatos.'
       }
     ]
   })

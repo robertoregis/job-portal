@@ -1,9 +1,13 @@
 <!-- layouts/dashboard.vue -->
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   const show = useShow();
-
+  const info: any = useInfo();
+  const router = useRouter();
   let wasLargeScreen = window.innerWidth >= 960
+  const hasNotices = ref<boolean>(false)
+  const countsNotices = ref<number>(0)
 
   const evaluateWidth = () => {
     const isLargeScreen = window.innerWidth >= 960
@@ -12,6 +16,16 @@
       wasLargeScreen = isLargeScreen
       show.setNavigation(isLargeScreen)
     }
+  }
+
+  const navigation = () => {
+    if(info.user.type === 'admin') {
+      router.push('/dashboard/admin/avisos')
+    } else if(info.user.type === 'candidate') {
+      router.push(`/dashboard/candidato/${info.user.id}/avisos`)
+    } else if(info.user.type === 'admin') {
+      router.push(`/dashboard/empresa/${info.user.id}/avisos`)
+    } 
   }
 
   onMounted(() => {
@@ -23,23 +37,44 @@
     })
     window.addEventListener('resize', evaluateWidth)
   })
+
+  const { data, error }: any = await useFetch('/api/notices/todaycount', {
+      method: 'GET',
+      params: { profile_id: info.user.profile_id }
+    })
+    if (error.value) {
+    } else {
+      countsNotices.value = data.value?.count
+      hasNotices.value = data.value?.hasNotices
+    }
+
 </script>
 <template>
   <v-app>
     <v-layout class="">
       
       <LayoutNavigation />
-
+      
       <v-main class="overflow-y-auto" style="height: 100vh;">
         <div class="">
           <v-container>
-            <v-row no-gutters>
-              <!--<v-col cols="12">
-                <div class="d-flex flex-column">
-                  <span>Olá, Nome do candidato!</span>
-                  <span class="text-caption font-weight-bold">Seja bem vindo ao seu dashboard</span>
-                </div>
-              </v-col>-->
+            <v-row no-gutters class="relative">
+              <v-btn
+                variant="text"
+                size="small"
+                icon
+                class="notification-btn"
+                @click="navigation"
+              >
+                <v-badge
+                  :dot="hasNotices"
+                  :color="hasNotices ? 'orange' : 'transparent'"
+                  offset-x="2"
+                  offset-y="2"
+                >
+                  <v-icon size="24">mdi-bell</v-icon>
+                </v-badge>
+              </v-btn>
               <v-col cols="12" v-if="$vuetify.display.smAndDown">
                 <v-app-bar flat absolute>
                   <v-spacer></v-spacer>
@@ -63,3 +98,11 @@
     <GlobalOverlay />
   </v-app>
 </template>
+<style lang="scss" scoped>
+.notification-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 999;
+}
+</style>

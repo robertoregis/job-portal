@@ -4,6 +4,15 @@
   definePageMeta({
     layout: 'dashboard',
   })
+  useHead({
+    title: `Empresas - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Veja todas as empresas cadastradas e gerencie aprovações.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)

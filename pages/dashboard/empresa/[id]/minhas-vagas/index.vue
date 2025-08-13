@@ -4,6 +4,15 @@
   definePageMeta({
     layout: 'dashboard',
   })
+  useHead({
+    title: `Minhas vagas - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Gerencie todas as vagas da sua empresa publicadas na Conect RH One.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)

@@ -7,6 +7,15 @@
   definePageMeta({
     layout: 'dashboard'
   })
+  useHead({
+    title: `Criar vaga - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Publique uma nova vaga e encontre os candidatos ideais.'
+      }
+    ]
+  })
   const info: any = useInfo();
   const show = useShow();
   const { createNotice, createLog } = useNotice();

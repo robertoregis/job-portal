@@ -8,6 +8,15 @@
     password: string
     passwordConfirm: string
   }
+  useHead({
+    title: `Ajustes - Conect RH One`,
+    meta: [
+      {
+          name: 'description',
+          content: 'Configure preferências e altere sua senha.'
+      }
+    ]
+  })
   const { notify } = useNotification();
   const info: any = useInfo();
   const show = useShow();
@@ -146,6 +155,9 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12" lg="6">
+              <div class="d-flex mb-2">
+                <span class="text-caption text-warning font-weight-bold">O seu email de cadastro precisa ser válido.</span>
+              </div>
               <form @submit.prevent="updatePassword">
                 <v-text-field
                   v-model="password.value.value"
