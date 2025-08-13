@@ -50,7 +50,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    SUPABASE_SERVICE_ROLE_KEY: process.env.NUXT_SUPABASE_ROLE_KEY, // SOMENTE BACKEND
+    SUPABASE_SERVICE_ROLE_KEY: process.env.NUXT_SUPABASE_ROLE_KEY,
+    MAILGUN_API_KEY: process.env.NUXT_MAILGUN_API_KEY,
+    MAILGUN_DOMAIN: process.env.NUXT_MAILGUN_DOMAIN,
 
     public: {
       SUPABASE_URL: process.env.NUXT_PUBLIC_SUPABASE_URL,

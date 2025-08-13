@@ -10,9 +10,13 @@
     email: string
     password: string
   }
+  const route = useRoute();
   const router = useRouter();
   const showPassword = ref(false)
   const showPasswordConfirm = ref(false)
+  const emailResetPassword = ref<any>(null)
+  const dialogResetPassword = ref<boolean>(false)
+  const token = ref<any>(null)
 
   const { handleSubmit, handleReset, values } = useForm<FormSchema>({
     validationSchema: {
@@ -49,7 +53,11 @@
       const company = dataCompany.value.data
       info.setUser({ ...dataCompany.value.data[0], type: 'company' })
       notify({ title: '', text: 'Logado com sucesso', type: 'success' })
-      router.push(`/`)
+      if(token.value && token.value === info.user.code_confirmation) {
+        updateConfirmation(info.user.id)
+      } else {
+        router.push(`/`)
+      }
   }
 
   const submit = handleSubmit(async (values) => {
@@ -80,13 +88,60 @@
     router.push(`/cadastrar/empresa`)
   }
 
+  const updateConfirmation = async (id: string) => {
+    try {
+      const { data, error } = await useFetch(`/api/companies/${id}`, {
+        method: 'PATCH',
+        body: {
+          is_confirmation: true,
+          code_confirmation: null
+        }
+      })
+
+      router.push(`/`)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   onBeforeMount(() => {
+    token.value = route.query.token as string | undefined
+
     if(info.user && info.user.id) {
-      router.push('/')
+      if(token.value && token.value === info.user.code_confirmation) {
+        updateConfirmation(info.user.id)
+      } else {
+        router.push('/')
+      }
     } else {
       loading.value = false;
     }
   })
+
+  const resetPassword = async () => {
+    if (!emailResetPassword.value) {
+      notify({ title: '', text: 'Por favor, informe o email para redefinir a senha.', type: 'warning' });
+      return;
+    }
+    
+    show.setOverlayDashboard(true);
+
+    const supabase = useNuxtApp().$supabase;
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(emailResetPassword.value, {
+      redirectTo: window.location.origin + '/entrar/empresa/redefinir-senha' // pode ajustar para a rota da sua app
+    });
+
+    show.setOverlayDashboard(false);
+    console.log(data)
+    if (error) {
+      notify({ title: '', text: 'Erro ao enviar o email de redefinição.', type: 'error' });
+    } else {
+      emailResetPassword.value = null
+      dialogResetPassword.value = false;
+      notify({ title: '', text: 'Email de redefinição enviado! Verifique sua caixa de entrada.', type: 'success' });
+    }
+  };
 
 </script>
 
@@ -131,13 +186,23 @@
                 density="comfortable"
               />
 
-              <v-btn class="me-4" type="submit">
-                Entrar
-              </v-btn>
-
-              <v-btn @click="handleReset">
-                Limpar
-              </v-btn>
+              <div class="d-flex flex-column flex-sm-row align-start">
+                <div class="d-flex me-sm-4">
+                  <v-btn class="me-4" type="submit">
+                    Entrar
+                  </v-btn>
+                  <v-btn @click="handleReset">
+                    Limpar
+                  </v-btn>
+                </div>
+                <v-btn
+                  text
+                  class="mt-2 mt-sm-0"
+                  @click="dialogResetPassword = true"
+                >
+                  Esqueci a senha
+                </v-btn>
+              </div>
             </form>
           </v-col>
 
@@ -158,6 +223,36 @@
       </v-container>
     </v-sheet>
   </div>
+  <v-dialog
+    v-model="dialogResetPassword"
+    max-width="400"
+  >
+    <v-card class="pa-5">
+    <!-- TÍTULO COM ÍCONE -->
+    <template v-slot:title>
+      <div class="d-flex align-center">
+        <v-icon class="mr-2">mdi-account-key</v-icon>
+        <span class="text-h6 font-weight-bold">Redefinir a senha</span>
+      </div>
+    </template>
+
+    <!-- AÇÕES -->
+    <v-card-text class="d-flex flex-column px-4 pb-4 pt-2">
+      <form @submit.prevent="resetPassword">
+
+              <v-text-field
+                v-model="emailResetPassword"
+                label="E-mail"
+                density="comfortable"
+              />
+
+              <v-btn class="me-4" type="submit">
+                Redefinir
+              </v-btn>
+            </form>
+    </v-card-text>
+  </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>

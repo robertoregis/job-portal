@@ -1,7 +1,11 @@
 <!-- layouts/default.vue -->
 <script setup lang="ts">
+  import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   const show = useShow();
+  const info: any = useInfo();
+  const router = useRouter();
+  const route = useRoute();
 
   let wasLargeScreen = window.innerWidth >= 960
 

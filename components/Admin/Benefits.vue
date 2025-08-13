@@ -85,6 +85,7 @@
     }
 
     const updateBenefit = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/benefits/${id}`, {
             method: 'PATCH',
             body: benefit.value
@@ -101,6 +102,7 @@
     }
 
     const removeBenefit = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/benefits/${id}`, {
             method: 'DELETE'
         })

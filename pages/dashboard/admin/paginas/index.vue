@@ -1,9 +1,12 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
   import { formatDate } from '@/composables/formatDate';
+  import { useShow } from '@/stores/show';
   definePageMeta({
     layout: 'dashboard',
   })
+  const { notify } = useNotification();
+  const show = useShow();
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)
@@ -43,7 +46,20 @@
     }
   }
 
+  const removePage = async (id: string) => {
+      show.setOverlayDashboard(true)
+      const { data, error } = await useFetch(`/api/pages/${id}`, {
+          method: 'DELETE'
+      })
+      show.setOverlayDashboard(false)
+      if (error.value) {
+          notify({ title: 'Erro', text: 'Erro ao remover a página', type: 'error' })
+          return
+      }
 
+      notify({ title: 'Parabéns!', text: 'A página foi removida com sucesso', type: 'success' })
+      getPages()
+  }
 
   const { data: pages, error, refresh, pending } = await useFetch('/api/pages', {
     method: 'GET',
@@ -105,17 +121,28 @@
                 hover
                 @click="navigation(page.id)"
               >
-                <div class="d-flex justify-space-between align-start">
+                <div class="d-flex justify-space-between align-center">
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">{{ page.title }}</div>
                     <div class="text-caption text-grey">
                       Ativa: {{ page.is_active ? 'Sim' : 'Não' }}
                     </div>
                   </div>
-                  <div class="text-caption text-grey-darken-1">{{ page.created_at_formatted }}</div>
+
+                  <div class="d-flex align-center">
+                    <div class="text-caption text-grey-darken-1 mr-3">{{ page.created_at_formatted }}</div>
+                    <v-btn
+                      icon="mdi-delete"
+                      size="x-small"
+                      color="error"
+                      @click.stop="removePage(page.id)"
+                      title="Remover página"
+                    />
+                  </div>
                 </div>
               </v-card>
             </v-list-item>
+
           </v-list>
         </v-card-text>
       </v-card>

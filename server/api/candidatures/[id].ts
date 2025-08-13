@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     // Buscar dados do candidato
     const { data: candidate, error: candidateError } = await supabase
       .from('candidates')
-      .select('id, name, image_url')
+      .select('id, name, image_url, email')
       .eq('id', candidature.candidate_id)
       .single()
 
@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
         : null,
       candidate_name: candidate?.name || null,
       candidate_image_url: candidate?.image_url || null,
+      candidate_email: candidate?.email || null,
       address: `${candidature?.city || ''} - ${candidature?.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }
   }

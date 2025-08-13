@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { useInfo } from '@/stores/info';
   import { name_formated } from '@/composables/textFunctions';
+  import { useShow } from '@/stores/show';
+  const { notify } = useNotification();
 
   const info: any = useInfo();
   const page = ref(1)

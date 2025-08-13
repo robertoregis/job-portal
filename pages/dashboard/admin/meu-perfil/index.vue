@@ -35,8 +35,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="">Meu perfil</span>
-        <span class="text-caption font-weight-regular">Confira e atualize seus dados pessoais</span>
+        <span class="text-gradient-primary font-weight-bold">Meu perfil</span>
+        <span class="text-caption">Confira e atualize seus dados pessoais</span>
       </div>
     </v-col>
   </v-row>

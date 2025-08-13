@@ -12,6 +12,7 @@
   })
 
   if (error.value) {
+    console.log(error.value)
   } else {
       servicesList.value = services.value
   }

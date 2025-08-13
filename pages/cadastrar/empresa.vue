@@ -18,6 +18,7 @@
   const router = useRouter();
   const showPassword = ref(false)
   const showPasswordConfirm = ref(false)
+  const token = ref<any>(null)
 
   const { handleSubmit, handleReset, values } = useForm<FormSchema>({
     validationSchema: {
@@ -41,6 +42,21 @@
   const password = useField<string>('password')
   const passwordConfirm = useField<string>('passwordConfirm')
 
+  const sendMail = async (candidateName: string, candidateEmail: string) => {
+    const { data, error } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`${candidateName} <${candidateEmail}>`],
+        subject: 'O seu cadastro foi feito - Conect RH One',
+        template: 'email_confirmation_template',
+        variables: {
+          name: candidateName,
+          link: window.location.origin + `/entrar/empresa?token=${token.value}`
+        }
+      }
+    })
+  }
+
   const getProfile = async (id: string) => {
     const { data, error } = await useFetch(`/api/profiles/${id}`, {
       method: 'GET'
@@ -62,6 +78,7 @@
       setTimeout(() => {
         const company = dataCompany.value.data
         info.setUser({ ...dataCompany.value.data[0], type: 'company' })
+        sendMail(values.name, info.user.email)
         notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
         show.setOverlayDashboard(false)
         router.push(`/dashboard/empresa/${company.id}/meu-perfil/editar`)
@@ -83,7 +100,11 @@
 
     // Tratamento de erros
     if (error.value) {
-      notify({ title: '', text: 'Erro ao criar cadastro', type: 'error' })
+      if (error.value.statusMessage?.includes('already been registered')) {
+        notify({ title: '', text: 'O email já existe', type: 'error' })
+      } else {
+        notify({ title: '', text: 'Erro ao criar cadastro', type: 'error' })
+      }
       show.setOverlayDashboard(false)
     } else {
       getProfile(data.value.id)

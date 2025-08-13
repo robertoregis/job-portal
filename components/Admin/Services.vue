@@ -83,6 +83,7 @@
     }
 
     const updateService = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/services/${id}`, {
             method: 'PATCH',
             body: service.value
@@ -99,6 +100,7 @@
     }
 
     const removeService = async (id: string) => {
+        show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/services/${id}`, {
             method: 'DELETE'
         })
