@@ -69,8 +69,8 @@ const getProfile = async (id: string) => {
       return
     }
 
-    admin.value = dataAdmin.value
-    info.setUser({ ...dataAdmin.value[0], type: 'admin' })
+    admin.value = dataAdmin.value.data
+    info.setUser({ ...dataAdmin.value.data[0], type: 'admin' })
   }
 
   // Após carregar o usuário, checa o redirecionamento
@@ -122,6 +122,7 @@ onMounted(async () => {
   if (session) {
     await getProfile(session.user.id)
   } else {
+    alert('kkk')
     // Logout limpo se não houver sessão
     await supabase.auth.signOut()
     info.setUser({})
