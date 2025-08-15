@@ -9,15 +9,26 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id } = getQuery(event)
-    if (!profile_id) {
-      throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
+    const query = getQuery(event)
+
+    const profile_id = query.profile_id as string | undefined
+    const page = query.page ? parseInt(query.page as string, 10) : 1
+    const pageSize = query.pageSize ? parseInt(query.pageSize as string, 10) : 10
+
+    const from = (page - 1) * pageSize
+    const to = from + pageSize - 1
+
+    let queryBuilder = supabase
+      .from('admins')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    if (profile_id) {
+      queryBuilder = queryBuilder.eq('profile_id', profile_id)
     }
 
-    const { data, error } = await supabase
-      .from('admins')
-      .select('*')
-      .eq('profile_id', profile_id)
+    const { data, error, count } = await queryBuilder
 
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
@@ -30,7 +41,13 @@ export default defineEventHandler(async (event) => {
       address: `${admin.city || ''} - ${admin.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }))
 
-    return formattedData
+    return {
+      data: formattedData,
+      count,
+      page: page,
+      pageSize: pageSize,
+      totalPages: Math.ceil((count ?? 0) / pageSize)
+    }
   }
 
   if (method === 'POST') {

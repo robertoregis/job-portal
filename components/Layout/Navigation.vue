@@ -307,6 +307,12 @@ onMounted(() => {
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/administradores`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-account-tie-hat</v-icon>
+              <span>Administradores</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
             <NuxtLink :to="`/dashboard/admin/paginas`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-file-document</v-icon>
               <span>Páginas</span>

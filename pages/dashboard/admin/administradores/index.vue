@@ -7,11 +7,11 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Páginas - Conect RH One`,
+    title: `Administradores - Conect RH One`,
     meta: [
       {
           name: 'description',
-          content: 'Gerencie todas as páginas do site e controle sua exibição.'
+          content: 'Conheça todos os administradores do sistema.'
       }
     ]
   })
@@ -23,60 +23,55 @@
   const page = ref(1)
   const pageSize = ref(10)
   const totalPages = ref(1)
-  const pagesList = ref<any[]>([])
+  const adminsList = ref<any[]>([])
 
   watch(page, () => {
-    getPages()
+    getAdmins()
   })
 
   // Navegação
   const navigation = (id: number) => {
-    router.push(`/dashboard/admin/paginas/${id}`)
+    router.push(`/dashboard/admin/administradores/${id}`)
   }
 
-  const getPages = async () => {
+  const getAdmins = async () => {
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }
 
-    // Filtro por empresa (se houver)
-    if (info.user.id) {
-      params.page_id = info.user.id
-    }
-
-    const { data, error } = await useFetch('/api/pages', {
+    const { data, error } = await useFetch('/api/admins', {
       method: 'GET',
       params
     })
 
     if (error.value) {
     } else {
-      pagesList.value = data.value?.data || []
+      adminsList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1
     }
   }
 
-  const removePage = async (id: string) => {
+  const removeAdmin = async (id: string) => {
       show.setOverlayDashboard(true)
-      const { data, error } = await useFetch(`/api/pages/${id}`, {
+      const { data, error } = await useFetch(`/api/admins/${id}`, {
           method: 'DELETE'
       })
       show.setOverlayDashboard(false)
       if (error.value) {
-          notify({ title: 'Erro', text: 'Erro ao remover a página', type: 'error' })
+          notify({ title: 'Erro', text: 'Erro ao remover o administrador', type: 'error' })
           return
       }
       createLog({
-        title: `Removeu a página`,
+        title: `Removeu o administrador`,
         profile_id: info.profile.id,
-        type: 'delete_page'
+        type: 'delete_admin'
       })
-      notify({ title: 'Parabéns!', text: 'A página foi removida com sucesso', type: 'success' })
-      getPages()
+      notify({ title: 'Parabéns!', text: 'O administrador foi removido com sucesso', type: 'success' })
+      getAdmins()
   }
 
-  const { data: pages, error, refresh, pending } = await useFetch('/api/pages', {
+  const { data: admins, error, refresh, pending } = await useFetch('/api/admins', {
     method: 'GET',
     params: {
       page: page.value.toString(),
@@ -86,8 +81,8 @@
 
   if (error.value) {
   } else {
-    pagesList.value = pages.value?.data || []
-    totalPages.value = pages.value?.totalPages || 1
+    adminsList.value = admins.value?.data || []
+    totalPages.value = admins.value?.totalPages || 1
   }
 
 </script>
@@ -96,8 +91,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="text-gradient-primary font-weight-bold">Páginas</span>
-        <span class="text-caption">Confira e gerencie todas as páginas.</span>
+        <span class="text-gradient-primary font-weight-bold">Administradores</span>
+        <span class="text-caption">Confira todos os administradores.</span>
       </div>
     </v-col>
   </v-row>
@@ -106,51 +101,72 @@
   <v-row no-gutters class="mt-4">
     <v-col cols="12">
       <div class="d-flex">
-        <v-btn text="Criar página" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/admin/paginas/criar`)" />
+        <v-btn text="Criar administrador" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/admin/administradores/criar`)" />
       </div>
     </v-col>
   </v-row>
 
-  <!-- Lista de páginas -->
+  <!-- Lista de administradores -->
   <v-row no-gutters>
     <v-col cols="12" class="mt-4">
       <v-card>
         <v-card-text class="pa-0">
           <v-list>
-            <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Páginas</v-list-subheader>
+            <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Administradores</v-list-subheader>
 
-            <v-list-item v-if="pagesList.length === 0" class="px-4 text-grey">
-              Nenhuma página foi encontrada.
+            <v-list-item v-if="adminsList.length === 0" class="px-4 text-grey">
+              Nenhum administrador foi encontrado.
             </v-list-item>
 
             <v-list-item
-              v-for="page in pagesList"
-              :key="page.id"
+              v-for="admin in adminsList"
+              :key="admin.id"
               style="min-height: unset"
             >
               <v-card
                 class="pa-2 border mb-2"
-                :class="`${!page.is_active ? 'opacity-50' : ''}`"
                 elevation="2"
                 ripple
                 hover
-                @click="navigation(page.id)"
+                @click="navigation(admin.id)"
               >
                 <div class="d-flex justify-space-between align-center">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ page.title }}</div>
-                    <div class="text-caption text-grey">
-                      Ativa: {{ page.is_active ? 'Sim' : 'Não' }}
+                    <div class="d-flex align-center relative">
+                      <v-avatar>
+                        <v-img
+                          :alt="admin.name"
+                          :src="admin.image_url"
+                        ></v-img>
+                      </v-avatar>
+                      <v-icon
+                        v-if="admin.is_master"
+                        icon="mdi-crown"
+                        color="yellow-darken-3"
+                        size="20"
+                        style="
+                          position: absolute;
+                          top: 0;
+                          left: 0;
+                          background: white;
+                          border-radius: 50%;
+                        "
+                      />
+                      <div class="text-subtitle-1 font-weight-medium ml-2">{{ admin.name }}</div>
+                    </div>
+                    <div class="text-caption">
+                      {{ admin.address }}
                     </div>
                   </div>
 
                   <div class="d-flex align-center">
-                    <div class="text-caption text-grey-darken-1 mr-3">{{ page.created_at_formatted }}</div>
+                    <div class="text-caption text-grey-darken-1 mr-3">{{ admin.created_at_formatted }}</div>
                     <v-btn
+                      v-if="info.user.is_master"
                       icon="mdi-delete"
                       size="x-small"
                       color="error"
-                      @click.stop="removePage(page.id)"
+                      @click.stop="removeAdmin(admin.id)"
                       title="Remover página"
                     />
                   </div>
