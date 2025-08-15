@@ -122,7 +122,6 @@ onMounted(async () => {
   if (session) {
     await getProfile(session.user.id)
   } else {
-    alert('kkk')
     // Logout limpo se não houver sessão
     await supabase.auth.signOut()
     info.setUser({})
