@@ -69,7 +69,7 @@
                 <v-badge
                   :dot="hasNotices"
                   :color="hasNotices ? 'orange' : 'transparent'"
-                  offset-x="2"
+                  offset-x="5"
                   offset-y="2"
                 >
                   <v-icon size="24">mdi-bell</v-icon>
@@ -101,8 +101,8 @@
 <style lang="scss" scoped>
 .notification-btn {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  right: 50px;
   z-index: 999;
 }
 </style>

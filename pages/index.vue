@@ -30,7 +30,7 @@
 <template>
   <main>
     <v-sheet width="100%">
-      <HomeImageBackground />
+      <HomeImageBackground image="/background.jpg" />
     </v-sheet>
 
     <v-sheet width="100%" class="mt-4">
@@ -85,7 +85,7 @@
                   <v-card class="mx-auto" elevation="2" hover>
                     <v-card-title class="d-flex align-center">
                       <v-icon class="mr-2" size="28">{{ service.icon }}</v-icon>
-                      <span class="text-h6 font-weight-bold">{{ service.title }}</span>
+                      <span class="text-subtitle-1 font-weight-bold">{{ service.title }}</span>
                     </v-card-title>
                     <v-card-subtitle class="mb-2 text--secondary">{{ service.subtitle }}</v-card-subtitle>
                     <v-card-text class="bg-surface-light pt-2">
