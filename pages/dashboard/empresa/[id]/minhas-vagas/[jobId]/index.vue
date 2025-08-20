@@ -118,7 +118,7 @@
     </v-col>
   </v-row>
 
-  <v-row no-gutters class="mt-5">
+  <v-row v-if="info.user.is_approved" no-gutters class="mt-5">
     <v-col cols="12">
       <div class="d-flex">
         <v-card hover ripple @click="navigation" class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="180" style="min-height: 100px">

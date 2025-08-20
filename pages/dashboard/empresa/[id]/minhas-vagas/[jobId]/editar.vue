@@ -83,7 +83,7 @@
       </div>
     </v-col>
   </v-row>
-  <v-row class="mt-5">
+  <v-row v-if="info.user.is_approved" class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
         <v-card-title class="text-h6">

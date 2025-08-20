@@ -173,7 +173,8 @@
   <v-row no-gutters>
     <v-col cols="12" :class="selectedStatus || selectedActive ? 'mt-4' : ''">
       <div class="d-flex">
-        <v-btn text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/empresa/${info.user.id}/vagas/criar`)" />
+        <v-btn v-if="info.user.is_approved" text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/empresa/${info.user.id}/vagas/criar`)" />
+        <span class="bg-warning py-1 px-2 mt-1">Para criar vaga a sua conta precisa está aprovada</span>
       </div>
     </v-col>
   </v-row>
