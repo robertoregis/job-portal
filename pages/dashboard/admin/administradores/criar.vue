@@ -152,6 +152,7 @@
             <v-text-field
               v-model="admin.email"
               label="E-mail"
+              type="email"
               density="compact"
               hide-details
               class="mb-2"

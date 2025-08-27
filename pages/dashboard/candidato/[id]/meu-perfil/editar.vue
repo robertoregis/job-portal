@@ -758,6 +758,10 @@
       </v-col>
 
       <v-col cols="12" class="border mt-4">
+        <PerfilUserBehavioral />
+      </v-col>
+
+      <v-col cols="12" class="border mt-4">
         <PerfilUserLanguages />
       </v-col>
       

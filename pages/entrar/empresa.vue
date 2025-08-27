@@ -193,6 +193,7 @@
                 v-model="email.value.value"
                 :error-messages="email.errorMessage.value"
                 label="E-mail"
+                type="email"
                 density="comfortable"
               />
 
@@ -263,6 +264,7 @@
               <v-text-field
                 v-model="emailResetPassword"
                 label="E-mail"
+                type="email"
                 density="comfortable"
               />
 

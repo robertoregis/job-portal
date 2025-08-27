@@ -117,6 +117,28 @@
     }
   })
 
+  const goCandidate = () => {
+    if(info.user && info.user.id) {
+      router.push(`/dashboard/candidato/${info.user.id}`)
+    } else {
+      router.push('/cadastrar/candidato')
+    }
+  }
+
+  const goLogin = () => {
+    if(info.user && info.user.id) {
+      if(info.user.type === 'candidate') {
+        router.push(`/dashboard/candidato/${info.user.id}`)
+      } else if(info.user.type === 'company') {
+        router.push(`/dashboard/empresa/${info.user.id}`)
+      } else if(info.user.type === 'admin') {
+        router.push(`/dashboard/admin`)
+      }
+    } else {
+      dialog.value = true
+    }
+  }
+
   const logout = async () => {
     createLog({
       title: `Deslogou`,
@@ -157,6 +179,9 @@
               <li class="mx-2">
                 <NuxtLink to="/empresa" class="no-underline text-title text-subtitle-1">Empresa</NuxtLink>
               </li>
+              <li class="mx-2">
+                <a @click.prevent.stop="goCandidate" role="dialog" tabindex="0" class="pointer text-title text-subtitle-1">Candidato</a>
+              </li>
               
             </ul>
           </div>
@@ -167,9 +192,8 @@
             @click="show.setMenu(!show.menu)"
           ></v-btn>
           <div class="d-none d-md-flex">
-            <v-btn v-if="info.user && info.user.id" @click="navigationDashboard" rounded="xl" class="ml-5 bg-gradient-status">Dashboard</v-btn>
+            <v-btn @click="goLogin" rounded="xl" class="bg-gradient-primary ml-5">Login</v-btn>
             <v-btn v-if="info.user && info.user.id" @click="logout" rounded="xl" class="ml-2" color="error">Sair</v-btn>
-            <v-btn v-else @click="dialog = true" rounded="xl" :class="`${info.user && info.user.id ? 'ml-2' : 'ml-5'}`" class="bg-gradient-primary">Login</v-btn>
           </div>
         </div>
 

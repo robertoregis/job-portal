@@ -138,7 +138,7 @@
   </v-row>
 
   <!-- Filtros -->
-  <v-row no-gutters class="mt-5">
+  <v-row v-if="info.user.is_approved" no-gutters class="mt-5">
     <v-col cols="12">
       <div class="d-flex flex-wrap">
         <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
@@ -173,7 +173,7 @@
   </v-row>
 
   <!-- Lista de candidaturas -->
-  <v-row no-gutters class="mt-4">
+  <v-row v-if="info.user.is_approved" no-gutters class="mt-4">
     <v-col v-if="selectedStatus" cols="12" class="mb-2">
       <div class="d-flex align-center">
         <v-chip

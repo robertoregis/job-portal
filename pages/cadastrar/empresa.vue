@@ -177,6 +177,7 @@
                 v-model="email.value.value"
                 :error-messages="email.errorMessage.value"
                 label="E-mail"
+                type="email"
                 density="comfortable"
               />
 

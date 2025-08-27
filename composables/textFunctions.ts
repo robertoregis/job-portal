@@ -128,3 +128,22 @@ export function formatString(str: string) {
   str = str.replace(/[^a-z0-9]/g, '-');
   return str;
 }
+
+export function formatPhone(input: string) {
+  // remove tudo que não for número
+  let digits = input.replace(/\D/g, '');
+
+  // limita no máximo a 11 dígitos (DDD + celular)
+  if (digits.length > 11) {
+    digits = digits.slice(0, 11);
+  }
+
+  // aplica máscara simples (DDD + 5 + 4)
+  if (digits.length === 11) {
+    return digits.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  } else if (digits.length === 10) {
+    return digits.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  }
+
+  return digits; // retorna só os números se não couber em formatação
+}

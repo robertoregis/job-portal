@@ -119,6 +119,30 @@
     }
   })
 
+  const goCandidate = () => {
+    if(info.user && info.user.id) {
+      router.push(`/dashboard/candidato/${info.user.id}`)
+    } else {
+      router.push('/cadastrar/candidato')
+    }
+    show.setMenu(false)
+  }
+
+  const goLogin = () => {
+    if(info.user && info.user.id) {
+      if(info.user.type === 'candidate') {
+        router.push(`/dashboard/candidato/${info.user.id}`)
+      } else if(info.user.type === 'company') {
+        router.push(`/dashboard/empresa/${info.user.id}`)
+      } else if(info.user.type === 'admin') {
+        router.push(`/dashboard/admin`)
+      }
+      show.setMenu(false)
+    } else {
+      dialog.value = true
+    }
+  }
+
   const logout = async () => {
     show.setOverlayDashboard(true)
     const supabase = useNuxtApp().$supabase
@@ -162,14 +186,18 @@
               <span>Empresa</span>
             </NuxtLink>
           </v-list-item>
+          <v-list-item class="d-flex justify-center" style="min-height: unset">
+            <div @click="goCandidate" role="dialog" tabindex="0" class="pointer d-flex align-center text-white text-subtitle-2">
+              <span>Candidato</span>
+            </div>
+          </v-list-item>
         </v-list>
       </v-col>
 
       <v-col cols="12">
         <div class="d-flex flex-column align-center">
-          <v-btn v-if="info.user && info.user.id" @click="navigationDashboard" rounded="xl" class="mt-5">Dashboard</v-btn>
+          <v-btn @click="goLogin" rounded="xl" class="mt-2">Login</v-btn>
           <v-btn v-if="info.user && info.user.id" @click="logout" rounded="xl" class="mt-2" color="error">Sair</v-btn>
-          <v-btn v-else @click="dialog = true" rounded="xl" :class="`${info.user && info.user.id ? 'mt-2' : 'mt-3'}`" class="">Login</v-btn>
         </div>
       </v-col>
     </v-row>
@@ -247,6 +275,7 @@
           v-model="email.value.value"
           :error-messages="email.errorMessage.value"
           label="E-mail"
+          type="email"
           density="comfortable"
         />
 

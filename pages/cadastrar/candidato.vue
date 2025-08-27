@@ -84,7 +84,7 @@
       }
 
       setTimeout(() => {
-        const candidate = dataCandidate.value
+        const candidate = dataCandidate.value[0]
         info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
         sendMail(values.name, info.user.email)
         //localStorage.setItem('user', JSON.stringify(candidate))
@@ -171,6 +171,7 @@
                 :error-messages="email.errorMessage.value"
                 label="E-mail"
                 density="comfortable"
+                type="email"
               />
 
               <v-text-field

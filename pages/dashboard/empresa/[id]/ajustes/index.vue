@@ -65,9 +65,9 @@
   if (error.value) {
   } else {
     formdata.value = {
-      allow_candidate_email: data.value[0].allow_candidate_email,
+      allow_candidate_email: data.value.allow_candidate_email,
     }
-    config.value = data.value[0]
+    config.value = data.value
   }
 
   const showPassword = ref(false)
@@ -116,8 +116,15 @@
     </v-col>
   </v-row>
 
-  <v-row no-gutters class="mt-5">
-    <v-col cols="12" class="border">
+  <v-row  no-gutters class="mt-5">
+    <v-col v-if="!info.user.is_approved" cols="12" class="border">
+      <v-card>
+        <v-card-title>
+          <span class="text-subtitle-1">A sua conta não está aprovada</span>
+        </v-card-title>
+      </v-card>
+    </v-col>
+    <v-col v-if="info.user.is_approved" cols="12" class="border">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
@@ -142,7 +149,7 @@
       </v-card>
     </v-col>
 
-    <v-col cols="12" class="border mt-4">
+    <v-col v-if="info.user.is_approved" cols="12" class="border mt-4">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
