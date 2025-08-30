@@ -4,7 +4,7 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Minhas candidaturas - Conect RH One`,
+    title: `Minhas candidaturas - Conect One RH`,
     meta: [
       {
           name: 'description',

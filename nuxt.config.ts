@@ -29,13 +29,13 @@ export default defineNuxtConfig({
           key: 'favicon',
           rel: 'icon',
           type: 'image/png',
-          href: '/favicon-indicapix.png',
+          href: '/',
         },
         {
           key: 'mobileicon',
           rel: 'apple-touch-icon',
           sizes: '512x512',
-          href: '/mobileicon-indicapix.png',
+          href: '/',
         },
         {
           rel: 'preconnect',
@@ -56,7 +56,8 @@ export default defineNuxtConfig({
 
     public: {
       SUPABASE_URL: process.env.NUXT_PUBLIC_SUPABASE_URL,
-      SUPABASE_ANON_KEY: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY
+      SUPABASE_ANON_KEY: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
+      EMAIL_OFFICIAL: process.env.NUXT_PUBLIC_EMAIL_OFFICIAL
     }
   }
 })

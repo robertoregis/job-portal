@@ -8,7 +8,7 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Criar vaga - Conect RH One`,
+    title: `Criar vaga - Conect One RH`,
     meta: [
       {
           name: 'description',
@@ -21,8 +21,8 @@
   const { createNotice, createLog } = useNotice();
 
   const router = useRouter();
-  const job = ref({
-    position: null,
+  const job = ref<any>({
+    title: null,
     contract_type: null,
     work_format: null,
     salary: null,
@@ -42,7 +42,7 @@
     is_closed: false,
     update_fields_at: null
   })
-
+  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
   const work_formats = ['Presencial', 'Remoto', 'Híbrido']
   const educations = [
@@ -56,6 +56,23 @@
     'Doutorado',
   ]
   const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+
+  const sendMail = async (companyName: string, jobName: string, jobDescription: string) => {
+    const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`Conect One RH <${emailOfficial}>`],
+        subject: 'Uma nova vaga foi criada',
+        template: 'template_create_job',
+        variables: {
+          name_company: companyName,
+          job_name: jobName,
+          job_description: jobDescription,
+          date: formatDate(new Date(), 3)
+        }
+      }
+    })
+  }
 
   const createJob = async () => {
     show.setOverlayDashboard(true)
@@ -93,11 +110,21 @@
       })
       createNotice({
         title: 'Vaga criada',
-        description: `Parabéns, você acabou de criar a vaga ${job.value.position}`,
+        description: `Parabéns, você acabou de criar a vaga ${job.value.title}`,
         subtitle: 'Vaga',
         profile_id: info.profile.id,
+        type: 'info',
+        is_master: true
+      })
+      createNotice({
+        title: 'Vaga criada',
+        description: `A vaga "${job.value.title}" foi criada pela empresa: ${job.value.company_name}`,
+        subtitle: 'Candidatura',
+        profile_id: info.profile.id,
+        is_master: true,
         type: 'info'
       })
+      sendMail(info.user.name, job.value.title, job.value.description)
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'A vaga foi criada com sucesso', type: 'success' })
       router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
@@ -107,7 +134,7 @@
 
   const resetJob = () => {
     job.value = {
-      position: null,
+      title: null,
       contract_type: null,
       work_format: null,
       salary: null,
@@ -149,7 +176,7 @@
         <v-card-text>
           <v-form @submit.prevent="createJob">
             <v-text-field
-              v-model="job.position"
+              v-model="job.title"
               label="Cargo"
               density="compact"
               hide-details

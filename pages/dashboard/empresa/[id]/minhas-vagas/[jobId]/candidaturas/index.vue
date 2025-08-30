@@ -7,7 +7,7 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Candidaturas - Conect RH One`,
+    title: `Candidaturas - Conect One RH`,
     meta: [
       {
         name: 'description',
@@ -200,7 +200,8 @@
               <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation(item.id)">
                 <div class="d-flex justify-space-between align-start mb-2">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ item.title }}</div>
+                    <div class="text-subtitle-1 font-weight-bold">{{ item.candidate_name }}</div>
+                    <div class="text-subtitle-2 font-weight-medium">{{ item.title }}</div>
                     <div class="text-caption  text-grey">Status: {{ item.status }}</div>
                   </div>
 

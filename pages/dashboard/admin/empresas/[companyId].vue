@@ -35,6 +35,7 @@
       description: `A empresa ${company.value.name} foi ${company.value.is_approved ? 'aprovada' : 'desprovada'}`,
       subtitle: 'Empresa',
       profile_id: info.profile.id,
+      is_master: true,
       type: 'info'
     })
     createLog({
@@ -55,7 +56,7 @@
   } else {
     company.value = data.value
     useHead({
-      title: `${company.value.name} - Conect RH One`,
+      title: `${company.value.name} - Conect One RH`,
       meta: [
         {
             name: 'description',

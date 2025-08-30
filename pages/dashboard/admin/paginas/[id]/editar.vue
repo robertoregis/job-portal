@@ -4,7 +4,7 @@
   import { useShow } from '@/stores/show';
   const { notify } = useNotification();
   useHead({
-    title: `Editar página - Conect RH One`,
+    title: `Editar página - Conect One RH`,
     meta: [
       {
           name: 'description',

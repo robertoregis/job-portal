@@ -5,11 +5,11 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Minhas vagas - Conect RH One`,
+    title: `Minhas vagas - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Gerencie todas as vagas da sua empresa publicadas na Conect RH One.'
+          content: 'Gerencie todas as vagas da sua empresa publicadas na Conect One RH.'
       }
     ]
   })
@@ -174,7 +174,7 @@
     <v-col cols="12" :class="selectedStatus || selectedActive ? 'mt-4' : ''">
       <div class="d-flex">
         <v-btn v-if="info.user.is_approved" text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/empresa/${info.user.id}/vagas/criar`)" />
-        <span class="bg-warning py-1 px-2 mt-1">Para criar vaga a sua conta precisa está aprovada</span>
+        <span v-else class="bg-warning py-1 px-2 mt-1">Para criar vaga a sua conta precisa está aprovada</span>
       </div>
     </v-col>
   </v-row>
@@ -206,7 +206,7 @@
               >
                 <div class="d-flex justify-space-between align-start mb-1">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ job.position }}</div>
+                    <div class="text-subtitle-1 font-weight-medium">{{ job.title }}</div>
                     <div class="text-caption text-grey-darken-1">
                       {{ job.company_name || 'Empresa não informada' }}
                     </div>

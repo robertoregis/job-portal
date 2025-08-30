@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
       // Permitir edição completa, incluindo status e flags
       const updateData: any = {}
       const fields = [
-        'position',
+        'title',
         'contract_type',
         'work_format',
         'salary',

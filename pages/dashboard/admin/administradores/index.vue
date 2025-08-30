@@ -7,7 +7,7 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Administradores - Conect RH One`,
+    title: `Administradores - Conect One RH`,
     meta: [
       {
           name: 'description',

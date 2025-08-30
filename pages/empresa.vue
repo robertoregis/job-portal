@@ -10,11 +10,11 @@
   const info: any = useInfo();
   const show = useShow();
   useHead({
-    title: `Empresa - Conect RH One`,
+    title: `Empresa - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Descubra as vantagens para empresas na Conect RH One: divulgue vagas, encontre talentos qualificados e contrate com rapidez.'
+          content: 'Descubra as vantagens para empresas na Conect One RH: divulgue vagas, encontre talentos qualificados e contrate com rapidez.'
       }
     ]
   })
@@ -154,7 +154,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <p class="text-subtitle-1 mb-0">
-              Na Conect RH One, acreditamos que equipes de sucesso começam com as pessoas certas. 
+              Na Conect One RH, acreditamos que equipes de sucesso começam com as pessoas certas. 
               Por isso, oferecemos uma plataforma completa para conectar talentos às oportunidades ideais.
             </p>
           </v-col>
@@ -175,7 +175,7 @@
             <div class="d-flex flex-column align-center rounded pa-4">
               <span class="text-h5 font-weight-bold text-white">Construa equipes fortes com quem realmente faz a diferença</span>
               <p class="text-body-1 text-white mt-3 text-center max-w-700 mb-4">
-                Com a Conect RH One, você tem acesso a talentos qualificados, ferramentas inovadoras e insights estratégicos que ajudam a sua empresa a crescer mais rápido e de forma sustentável.
+                Com a Conect One RH, você tem acesso a talentos qualificados, ferramentas inovadoras e insights estratégicos que ajudam a sua empresa a crescer mais rápido e de forma sustentável.
               </p>
               <v-btn append-icon="mdi-comment-account" @click="dialog = true" flat color="white" rounded="xl" size="x-large">Quero saber mais!</v-btn>
             </div>
@@ -198,10 +198,10 @@
                   <v-card class="mx-auto" elevation="2" hover>
                     <v-card-title class="d-flex align-center">
                       <v-icon class="mr-2" size="28">{{ benefit.icon }}</v-icon>
-                      <span class="text-subtitle-1 font-weight-bold">{{ benefit.title }}</span>
+                      <span class="text-subtitle-1 font-weight-bold custom-subtitle-and-title">{{ benefit.title }}</span>
                     </v-card-title>
-                    <v-card-subtitle class="mb-2 text--secondary">{{ benefit.subtitle }}</v-card-subtitle>
-                    <v-card-text class="bg-surface-light pt-0">
+                    <v-card-subtitle v-if="benefit.subtitle" class="mb-2 custom-subtitle-and-title">{{ benefit.subtitle }}</v-card-subtitle>
+                    <v-card-text class="bg-surface-light pt-2">
                       {{ benefit.description }}
                     </v-card-text>
                   </v-card>

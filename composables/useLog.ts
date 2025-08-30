@@ -18,7 +18,7 @@ export function useLog() {
     })
 
     if (error.value) {
-      console.error('Erro ao criar aviso:', error.value)
+      console.error('Erro ao criar log:', error.value)
       return null
     }
     return data.value

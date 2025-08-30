@@ -319,6 +319,12 @@ onMounted(() => {
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/avisos`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-bell</v-icon>
+              <span>Avisos</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
             <NuxtLink :to="`/dashboard/admin/ajustes`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-cog</v-icon>
               <span>Ajustes</span>

@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     const body = await readBody(event)
     let {
-      position,
+      title,
       contract_type,
       work_format,
       salary,
@@ -132,7 +132,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Tratando strings vazias
-    position = emptyStringToNull(position)
+    title = emptyStringToNull(title)
     contract_type = emptyStringToNull(contract_type)
     work_format = emptyStringToNull(work_format)
     salary = emptyStringToNull(salary)
@@ -158,7 +158,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await supabase
       .from('jobs')
       .insert([{
-        position,
+        title,
         contract_type,
         work_format,
         salary,

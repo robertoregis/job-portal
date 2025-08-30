@@ -6,18 +6,19 @@
   import { useInfo } from '#imports';
   import { useShow } from '@/stores/show';
   import { useNotice } from '@/composables/useNotice';
-  const { createLog } = useNotice();
+  const { createLog, createNotice } = useNotice();
   const info: any = useInfo();
   const show = useShow();
   useHead({
-    title: `Cadastrar - Empresa - Conect RH One`,
+    title: `Cadastrar - Empresa - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+          content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
       }
     ]
   })
+  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   const { notify } = useNotification();
   const loading = ref<boolean>(true)
   interface FormSchema {
@@ -53,16 +54,29 @@
   const password = useField<string>('password')
   const passwordConfirm = useField<string>('passwordConfirm')
 
-  const sendMail = async (candidateName: string, candidateEmail: string) => {
+  const sendMail = async (companyName: string, companyEmail: string) => {
     const { data, error } = await useFetch('/api/emails/send', {
       method: 'POST',
       body: {
-        to: [`${candidateName} <${candidateEmail}>`],
-        subject: 'O seu cadastro foi feito - Conect RH One',
+        to: [`${companyName} <${companyEmail}>`],
+        subject: 'O seu cadastro foi feito',
         template: 'email_confirmation_template',
         variables: {
-          name: candidateName,
+          name: companyName,
           link: window.location.origin + `/entrar/empresa?token=${token.value}`
+        }
+      }
+    })
+
+    const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`Conect One RH <${emailOfficial}>`],
+        subject: 'Um empresa se cadastrou',
+        template: 'template_create_company',
+        variables: {
+          name_company: companyName,
+          date: formatDate(new Date(), 3)
         }
       }
     })
@@ -90,6 +104,14 @@
         const company = dataCompany.value.data
         info.setUser({ ...dataCompany.value.data[0], type: 'company' })
         sendMail(values.name, info.user.email)
+        createNotice({
+          title: 'Empresa criada',
+          description: `Uma nova empresa foi criada: ${values.name}`,
+          subtitle: 'Empresa',
+          profile_id: info.profile.id,
+          is_master: true,
+          type: 'info',
+        })
         createLog({
             title: `Cadastrou a conta`,
             profile_id: info.profile.id,

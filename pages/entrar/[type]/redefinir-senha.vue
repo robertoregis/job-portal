@@ -10,11 +10,11 @@
   const info: any = useInfo();
   const show = useShow();
   useHead({
-    title: `Redefinir Senha - Conect RH One`,
+    title: `Redefinir Senha - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Redefina sua senha e recupere o acesso à sua conta na Conect RH One.'
+          content: 'Redefina sua senha e recupere o acesso à sua conta na Conect One RH.'
       }
     ]
   })

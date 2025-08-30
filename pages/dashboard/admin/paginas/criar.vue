@@ -8,11 +8,11 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Criar página - Conect RH One`,
+    title: `Criar página - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Crie novas páginas para o site da Conect RH One.'
+          content: 'Crie novas páginas para o site da Conect One RH.'
       }
     ]
   })

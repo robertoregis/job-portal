@@ -13,11 +13,11 @@
     password: string
   }
   useHead({
-    title: `Entrar - Candidato - Conect RH One`,
+    title: `Entrar - Candidato - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+          content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
       }
     ]
   })
@@ -72,7 +72,7 @@
       if(token.value && token.value === info.user.code_confirmation) {
         updateConfirmation(info.user.id)
       } else {
-        router.push(`/`)
+        router.push(`/dashboard/empresa/${info.user.id}`)
       }
   }
 
@@ -118,7 +118,7 @@
         profile_id: info.profile.id,
         type: 'register_confirmation'
       })
-      router.push(`/`)
+      router.push(`/dashboard/empresa/${id}`)
     } catch (err) {
       console.log(err)
     }

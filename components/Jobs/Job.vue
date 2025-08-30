@@ -16,7 +16,8 @@
       const info: any = useInfo()
       const router = useRouter();
       const { notify } = useNotification();
-      const { createLog } = useNotice();
+      const { createLog, createNotice } = useNotice();
+      const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
       const apply = () => {
         if (info.user && info.user.id && info.user.type === 'candidate') {
           dialogCreateCandidature.value = true
@@ -33,6 +34,23 @@
         icon_status: 'mdi-send',
         title: null
       })
+
+      const sendMail = async (companyName: string, candidateName: string, jobName: string,) => {
+        const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
+          method: 'POST',
+          body: {
+            to: [`Conect One RH <${emailOfficial}>`],
+            subject: 'Uma nova candidatura foi feita',
+            template: 'template_create_candidature',
+            variables: {
+              name_company: companyName,
+              job_name: jobName,
+              name_candidate: candidateName,
+              date: formatDate(new Date(), 3)
+            }
+          }
+        })
+      }
 
       const resetCandidature = () => {
         candidature.value = {
@@ -52,17 +70,27 @@
             ...candidature.value,
             candidate_id: info.user.id,
             job_id: job.value.id,
-            title: job.value.position
+            title: job.value.title
           }
         })
         if (error.value) {
-          notify({ title: '', text: 'Erro ao criar candidatura', type: 'error' })
+          const message = error.value.data?.statusMessage || 'Erro ao criar candidatura'
+          notify({ title: '', text: message, type: 'error' })
         } else {
+          createNotice({
+            title: 'Candidatura feita',
+            description: `O candidato ${info.user.name} fez uma candidatura para a vaga "${job.value.title}" da empresa: ${job.value.company_name}`,
+            subtitle: 'Candidatura',
+            profile_id: info.profile.id,
+            is_master: true,
+            type: 'info',
+          })
           createLog({
             title: `Criou o candidatura`,
             profile_id: info.profile.id,
             type: 'create_candidature'
           })
+          sendMail(job.value.company_name, info.user.name, job.value.title)
           router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${data.value.id}`)
           resetCandidature()
         }
@@ -97,7 +125,7 @@
                 :src="job.company_image_url"
               ></v-img>
             </v-avatar>
-            <span>{{ job.position }}</span>
+            <span>{{ job.title }}</span>
           </div>
           <span class="text-caption text-titleLight">{{ job.created_at_formatted }}</span>
         </v-card-title>

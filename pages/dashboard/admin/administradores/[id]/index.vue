@@ -31,7 +31,7 @@
   } else {
     admin.value = data.value
     useHead({
-      title: `${admin.value.name} - Conect RH One`,
+      title: `${admin.value.name} - Conect One RH`,
       meta: [
         {
             name: 'description',

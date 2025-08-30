@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     if (candidate_id) query = query.eq('candidate_id', candidate_id as string)
     if (job_id) query = query.eq('job_id', job_id as string)
     if (status) query = query.eq('status', status as string)
-
+    query.eq('is_active', true)
     const { data, error, count }: any = await query
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if (existingCandidature) {
-      throw createError({ statusCode: 409, statusMessage: 'Candidature already exists for this job and candidate' })
+      throw createError({ statusCode: 409, statusMessage: 'Você já se candidatou a essa vaga' })
     }
 
     title = emptyStringToNull(title)

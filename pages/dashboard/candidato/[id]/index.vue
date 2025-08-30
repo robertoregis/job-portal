@@ -4,11 +4,11 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Dashboard - Conect RH One`,
+    title: `Dashboard - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Veja suas candidaturas e acompanhe seu progresso na Conect RH One.'
+          content: 'Veja suas candidaturas e acompanhe seu progresso na Conect One RH.'
       }
     ]
   })
