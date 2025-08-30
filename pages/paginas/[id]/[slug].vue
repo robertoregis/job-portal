@@ -17,7 +17,7 @@
   } else {
     page.value = data.value
     useHead({
-    title: `${page.value.title} - Conect RH One`,
+    title: `${page.value.title} - Conect One RH`,
       meta: [
         {
             name: 'description',

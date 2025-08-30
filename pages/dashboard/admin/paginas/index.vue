@@ -7,7 +7,7 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Páginas - Conect RH One`,
+    title: `Páginas - Conect One RH`,
     meta: [
       {
           name: 'description',

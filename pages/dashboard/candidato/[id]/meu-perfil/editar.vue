@@ -5,7 +5,7 @@
   import IMask from 'imask'
   const { notify } = useNotification();
   useHead({
-    title: `Editar perfil - Conect RH One`,
+    title: `Editar perfil - Conect One RH`,
     meta: [
       {
           name: 'description',
@@ -706,47 +706,51 @@
           <v-divider></v-divider>
           <v-card-text>
             <div class="d-flex flex-column">
-              <div v-if="info.user.curriculum_url" class="mb-4">
-                <a
-                  :href="info.user.curriculum_url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-decoration-none text-subtitle-1"
-                >
-                  Ver currículo atual
-                </a>
-                <v-btn
-                  color="error"
-                  class="ml-4"
-                  @click="deletePDF(true, info.user.curriculum_id)"
-                  size="small"
-                >
-                  <v-icon left>mdi-delete</v-icon>
-                  Remover currículo
-                </v-btn>
-              </div>
-              <span class="text-caption mb-2">Envie seu currículo (PDF):</span>
+              <template v-if="info.user.curriculum_url">
+                <div>
+                  <a
+                    :href="info.user.curriculum_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-decoration-none text-subtitle-1"
+                  >
+                    Ver currículo atual
+                  </a>
+                  <v-btn
+                    color="error"
+                    class="ml-4"
+                    @click="deletePDF(true, info.user.curriculum_id)"
+                    size="small"
+                  >
+                    <v-icon left>mdi-delete</v-icon>
+                    Remover currículo
+                  </v-btn>
+                </div>
+              </template>
+              <template v-else>
+                <span class="text-caption mb-2">Envie seu currículo (PDF):</span>
 
-              <v-file-input
-                ref="fileInputPDF"
-                accept="application/pdf"
-                v-model="filePDF"
-                :label="filePDF ? filePDF.name : (info.user.curriculum_url ? 'Arquivo selecionado' : 'Escolher arquivo PDF')"
-                show-size
-                prepend-icon="mdi-file-pdf-box"
-                clearable
-              />
+                <v-file-input
+                  ref="fileInputPDF"
+                  accept="application/pdf"
+                  v-model="filePDF"
+                  :label="filePDF ? filePDF.name : (info.user.curriculum_url ? 'Arquivo selecionado' : 'Escolher arquivo PDF')"
+                  show-size
+                  prepend-icon="mdi-file-pdf-box"
+                  clearable
+                />
 
-              <div class="d-flex align-start">
-                <v-btn
-                  class="mt-2 bg-gradient-primary"
-                  :disabled="!filePDF"
-                  @click="uploadPDF"
-                >
-                  <v-icon left>mdi-upload</v-icon>
-                  Enviar currículo
-                </v-btn>
-              </div>
+                <div class="d-flex align-start">
+                  <v-btn
+                    class="mt-2 bg-gradient-primary"
+                    :disabled="!filePDF"
+                    @click="uploadPDF"
+                  >
+                    <v-icon left>mdi-upload</v-icon>
+                    Enviar currículo
+                  </v-btn>
+                </div>
+              </template>
             </div>
           </v-card-text>
         </v-card>

@@ -10,7 +10,7 @@
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
   useHead({
-    title: `Editar perfil - Conect RH One`,
+    title: `Editar perfil - Conect One RH`,
     meta: [
       {
           name: 'description',

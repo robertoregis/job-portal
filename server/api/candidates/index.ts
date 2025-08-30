@@ -83,6 +83,19 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    const { data: dataExperience, error: errorExperience } = await supabase
+      .from('experience_group')
+      .insert([{ candidate_id: data.id }])
+      .select()
+      .single()
+
+    if (errorExperience) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: errorExperience.message
+      })
+    }
+
     return data
   }
 

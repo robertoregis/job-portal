@@ -44,6 +44,7 @@
     })
     if (error.value) {
     } else {
+      info.setCountsNotices(data.value?.count)
       countsNotices.value = data.value?.count
       hasNotices.value = data.value?.hasNotices
     }

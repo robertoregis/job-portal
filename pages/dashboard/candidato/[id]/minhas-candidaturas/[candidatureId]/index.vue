@@ -14,17 +14,23 @@
   const info: any = useInfo();
   const config = ref<any>({})
   const message = ref<string>('')
+  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
+  const dialog = ref<boolean>(false)
+  const declineReason = ref<string>('')
+  const valid = ref(false);
+  const formRef = ref(null);
+  const router = useRouter();
 
   const sendMail = async () => {
     const { data, error } = await useFetch('/api/emails/send', {
       method: 'POST',
       body: {
         to: [`${info.user.name} <${config.value.company_email}>`],
-        subject: 'Chegou um email de contato - Conect RH One',
+        subject: 'Chegou um email de contato',
         template: 'contact_email_candidate_template',
         variables: {
           name: info.user.name,
-          job: job.value.position,
+          job: job.value.title,
           name_company: config.value.company_name,
           message: message.value
         }
@@ -39,11 +45,11 @@
         method: 'POST',
         body: {
           to: [`${info.user.name} <${config.value.company_email}>`],
-          subject: 'Seu email de contato foi enviado - Conect RH One',
+          subject: 'Seu email de contato foi enviado',
           template: 'email_contact_confirmation_template',
           variables: {
             name: info.user.name,
-            job: job.value.position,
+            job: job.value.title,
             name_company: config.value.company_name,
           }
         }
@@ -76,7 +82,7 @@
     } else {
       job.value = data.value
       useHead({
-        title: `${job.value.position} - Conect RH One`,
+        title: `${job.value.title} - Conect One RH`,
         meta: [
           {
               name: 'description',
@@ -98,104 +104,45 @@
     getJob(candidature.value.job_id)
   }
 
-  const fetchCandidature = async (id: string) => {
-    const { data, error } = await useFetch(`/api/candidatures/${id}`, { method: 'GET' })
+  const decline = async () => {
+    if(!declineReason.value) {
+      notify({ title: 'Erro', text: 'É preciso dizer o motivo', type: 'error' })
+      return
+    }
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
+      method: 'PATCH',
+      body: {
+        is_delete: true,
+        is_active: false,
+        decline_reason: declineReason.value
+      }
+    })
 
     if (error.value) {
-      return
-    } else {
-      candidature.value = data.value
-      getJob(candidature.value.job_id)
-    }
-  }
-
-
-  const filePDF = ref<File | null>(null)
-  const fileInputPDF = ref<HTMLInputElement | null>(null)
-
-  const uploadPDF = async () => {
-    if (!filePDF.value) {
-      notify({ title: 'Erro', text: 'Selecione um arquivo PDF', type: 'error' })
-      return
-    }
-
-    // opcional: validar extensão e tipo mime no frontend
-    if (filePDF.value.type !== 'application/pdf') {
-      notify({ title: 'Erro', text: 'Apenas arquivos PDF são permitidos', type: 'error' })
-      return
-    }
-
-    show.setOverlayDashboard(true)
-
-    const formData = new FormData()
-    formData.append('file', filePDF.value)
-
-    // Aqui você manda o candidate_id e o type correto (candidate ou candidature)
-    // Exemplo usando candidate_id para candidato
-    const url = `/api/archives?candidature_id=${candidature.value.id}&type=candidature`
-
-    const { data: pdfData, error: pdfError }: any = await useFetch(url, {
-      method: 'POST',
-      body: formData
-    })
-
-    if (pdfError.value) {
-      notify({ title: 'Erro', text: 'Erro ao enviar arquivo', type: 'error' })
-    } else {
-      if(candidature.value.curriculum_id) {
-        await deletePDF(false, candidature.value.curriculum_id)
-      }
-      createLog({
-        title: `Currículo enviado`,
-        profile_id: info.profile.id,
-        type: 'send_curriculum'
-      })
-      notify({ title: 'Sucesso', text: 'Currículo enviado com sucesso!', type: 'success' })
-      // Atualize seu store com o curriculum_url e curriculum_id retornados
-      // Exemplo:
-      setTimeout(() => {
-        filePDF.value = null
-        fetchCandidature(candidature.value.id)
-      }, 1000)
-    }
-
-    setTimeout(() => {
+      console.error('Erro ao declinar candidatura:', error.value)
       show.setOverlayDashboard(false)
-    })
-  }
-
-  const deletePDF = async (isLoading: boolean, curriculumId: string) => {
-    if (!candidature.value.curriculum_id) {
-      notify({ title: 'Erro', text: 'Nenhum currículo para remover', type: 'error' })
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao declinar a candidatura', type: 'error' })
       return
     }
-    if(isLoading) {
-      show.setOverlayDashboard(true)
-    }
-
-    const url = `/api/archives?curriculum_id=${encodeURIComponent(curriculumId)}&type=candidature&candidature_id=${candidature.value.id}`
-    const { error }: any = await useFetch(url, {
-      method: 'DELETE'
-    })
-    
-    setTimeout(() => {
-      if(isLoading) {
-        if(error.value) {
-          notify({ title: 'Erro', text: 'Erro ao remover currículo', type: 'error' })
-        } else {
-          createLog({
-            title: `Currículo removido`,
-            profile_id: info.profile.id,
-            type: 'delete_curriculum'
-          })
-          notify({ title: 'Sucesso', text: 'Currículo removido', type: 'success' })
-          fetchCandidature(candidature.value.id)
-          filePDF.value = null
+    const { data: dataSend, error: errorSend } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`Conect One RH <${emailOfficial}>`],
+        subject: 'Um candidato declinou da vaga',
+        template: 'template_decline_candidature',
+        variables: {
+          name_candidate: info.user.name,
+          name_job: job.value.title,
+          name_company: config.value.company_name,
+          decline_reason: declineReason.value
         }
-        show.setOverlayDashboard(false)
       }
-    }, 1000)
-
+    })
+    show.setOverlayDashboard(false)
+    notify({ title: 'Sucesso', text: 'A sua candidatura foi declinada!', type: 'success' })
+    declineReason.value = ''
+    router.push(`/dashboard/candidato/${info.user.id}/minhas-candidaturas`)
   }
 </script>
 
@@ -240,56 +187,23 @@
       </v-card>
     </v-col>
     <v-col cols="12" class="border mt-4">
-        <v-card>
-          <v-card-title>Currículo</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <div class="d-flex flex-column">
-              <div v-if="candidature.curriculum_id" class="mb-4">
-                <a
-                  :href="candidature.curriculum_id"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-decoration-none text-subtitle-1"
-                >
-                  Ver currículo atual
-                </a>
-                <v-btn
-                  color="error"
-                  class="ml-4"
-                  @click="deletePDF(true, candidature.curriculum_id)"
-                  size="small"
-                >
-                  <v-icon left>mdi-delete</v-icon>
-                  Remover currículo
-                </v-btn>
-              </div>
-              <span class="text-caption mb-2">Envie seu currículo (PDF):</span>
-
-              <v-file-input
-                ref="fileInputPDF"
-                accept="application/pdf"
-                v-model="filePDF"
-                :label="filePDF ? filePDF.name : (candidature.curriculum_id ? 'Arquivo selecionado' : 'Escolher arquivo PDF')"
-                show-size
-                prepend-icon="mdi-file-pdf-box"
-                clearable
-              />
-
-              <div class="d-flex align-start">
-                <v-btn
-                  class="mt-2 bg-gradient-primary"
-                  :disabled="!filePDF"
-                  @click="uploadPDF"
-                >
-                  <v-icon left>mdi-upload</v-icon>
-                  Enviar currículo
-                </v-btn>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+      <v-card>
+        <v-card-text>
+          <v-row no-gutters>
+            <v-col cols="12" class="d-flex">
+              <v-btn
+                color="error"
+                class=""
+                @click="dialog = true"
+              >
+                <v-icon left class="mr-1">mdi-account-cancel-outline</v-icon>
+                Declinar do processo seletivo
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-col>
     <v-col cols="12" class="border mt-4">
       <v-card>
         <v-card-title>
@@ -304,7 +218,7 @@
             <v-col cols="12" class="px-4 pa-2">
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
-                <span class="text-body-2 ml-2">{{ job.position }}</span>
+                <span class="text-body-2 ml-2">{{ job.title }}</span>
               </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Tipo de contrato:</span>
@@ -418,6 +332,48 @@
     </v-col>
 
   </v-row>
+  
+  <v-dialog
+    v-model="dialog"
+    max-width="460"
+  >
+      <v-card
+        prepend-icon="mdi-account-cancel-outline"
+        title="Declinar do processo seletivo"
+      >
+      <v-card-text>
+          <v-row dense>
+            <v-col cols="12">
+              <p class="text-body-2 mb-1">Você realmente deseja declinar dessa vaga? Se sim, nos diga o seu motivo, pois é muito importante saber a sua opnião.</p>
+              <p class="text-body-2">Saiba que depois disso a candidatura irá sumir.</p>
+            </v-col>
+            <v-col cols="12 mt-1">
+                <v-textarea
+                v-model="declineReason"
+                label="Motivo"
+                variant="filled"
+                auto-grow
+                density="compact"
+                hide-details
+                class="mb-1"
+                />
+            </v-col>
+          </v-row>
+      </v-card-text>
+
+      <v-divider />
+
+      <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text="Declinar"
+            color="error"
+            variant="flat"
+            @click="decline"
+          />
+      </v-card-actions>
+      </v-card>
+  </v-dialog>
 </template>
 
 <style scoped lang="scss">

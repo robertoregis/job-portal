@@ -5,7 +5,7 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Empresas - Conect RH One`,
+    title: `Empresas - Conect One RH`,
     meta: [
       {
           name: 'description',

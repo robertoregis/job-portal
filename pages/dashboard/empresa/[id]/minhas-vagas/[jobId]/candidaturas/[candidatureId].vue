@@ -30,7 +30,7 @@
       method: 'POST',
       body: {
         to: [`${candidateName} <${candidateEmail}>`],
-        subject: 'O status da sua candidatura mudou - Conect RH One',
+        subject: 'O status da sua candidatura mudou',
         template: 'contact_email_candidate_template',
         variables: {
           name: candidateName,
@@ -109,7 +109,7 @@
   } else {
     candidature.value = data.value
     useHead({
-      title: `${candidature.value.title} - Conect RH One`,
+      title: `${candidature.value.title} - Conect One RH`,
       meta: [
         {
             name: 'description',
@@ -152,7 +152,7 @@
                   Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ candidature.status }}</span>
                 </v-chip>
               </div>
-              <div class="d-flex align-center">
+              <div class="d-flex align-center mt-1">
                 <span class="text-subtitle-2 font-weight-bold">Candidato:</span>
                 <span class="text-body-2 ml-2">{{ candidature.candidate_name }}</span>
               </div>

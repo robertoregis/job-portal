@@ -4,11 +4,11 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Dashboard - Conect RH One`,
+    title: `Dashboard - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Acompanhe suas vagas e estatísticas de contratação na Conect RH One.'
+          content: 'Acompanhe suas vagas e estatísticas de contratação na Conect One RH.'
       }
     ]
   })
@@ -57,7 +57,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar candidaturas:', error.value)
+      console.error('Erro ao carregar os avisos:', error.value)
     } else {
       noticesList.value = data.value?.data || []
     }
@@ -193,7 +193,7 @@
               >
                 <div class="d-flex justify-space-between align-start mb-1">
                   <div>
-                    <div class="text-subtitle-1 font-weight-medium">{{ job.position }}</div>
+                    <div class="text-subtitle-1 font-weight-medium">{{ job.title }}</div>
                     <div class="text-caption text-grey-darken-1">
                       {{ job.company_name || 'Empresa não informada' }}
                     </div>

@@ -16,6 +16,15 @@
   const softSkillsList = ref<any[]>([])
   const loading = ref<boolean>(true)
 
+  const getFormatDate = (date: string) => {
+    if (!date) return ''
+    const parts = date.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return date
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+
   const navigation = () => {
     router.back()
   }
@@ -52,7 +61,7 @@
   } else {
     candidate.value = data.value
     useHead({
-      title: `${candidate.value.name} - Conect RH One`,
+      title: `${candidate.value.name} - Conect One RH`,
       meta: [
         {
             name: 'description',
@@ -115,7 +124,7 @@
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Data de nascimento:</span>
-                <span class="text-body-2 ml-2">{{ candidate.birth_date }}</span>
+                <span class="text-body-2 ml-2">{{ getFormatDate(candidate.birth_date) }}</span>
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Estado civil:</span>
@@ -154,6 +163,28 @@
 
     <v-col cols="12" class="border mt-4">
       <v-card>
+        <v-card-text>
+          <v-row no-gutters>
+            <v-col cols="12" class="d-flex">
+              <a
+                v-if="candidate.curriculum_url"
+                :href="candidate.curriculum_url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
+              >
+                <Icon name="mdi:file-link" />
+                <span class="ml-2">Ver currículo atual</span>
+              </a>
+              <span v-else class="font-weight-bold">Não tem currículo no momento!</span>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-col>
+
+    <v-col cols="12" class="border mt-4">
+      <v-card>
         <v-card-text class="pa-0">
           <v-list>
             <v-list-item class="mt-2" style="min-height: unset">
@@ -164,7 +195,6 @@
                 </span>
               </v-list-item-content>
             </v-list-item>
-            <v-divider></v-divider>
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
@@ -206,8 +236,12 @@
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Experiências profissionais</v-list-item-title>
                 <div class="d-flex flex-column mt-2">
                   <div v-for="(experience, index) in experiencesList" :key="experience.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
-                    <span class="text-caption font-weight-bold">{{ experience.company_name }}</span>
-                    <span class="text-body-2">{{ experience.period }}</span>
+                    <span class="text-caption font-weight-bold">{{ experience.position }}</span>
+                    <div class="d-flex align-center">
+                      <span class="text-body-2 mr-2">{{ experience.company_name }}</span>
+                      <span v-if="experience.start_date || experience.end_date" class="text-small-2 bg-grey-darken-2 px-2 rounded-xl">{{ getFormatDate(experience.start_date) }} - {{ getFormatDate(experience.end_date) }}</span>
+                    </div>
+                    <p v-if="experience.description" class="pa-1 mt-1">{{ experience.description }}</p>
                   </div>
                 </div>
               </v-list-item-content>

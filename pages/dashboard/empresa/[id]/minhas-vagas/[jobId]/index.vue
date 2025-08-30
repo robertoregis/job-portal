@@ -71,7 +71,7 @@
     job.value = data.value
     createNotice({
       title: 'Vaga atualizada',
-      description: `A vaga ${job.value.position} teve seu status atualizado`,
+      description: `A vaga ${job.value.title} teve seu status atualizado`,
       subtitle: 'Vaga',
       profile_id: info.profile.id,
       type: 'info'
@@ -93,7 +93,7 @@
   } else {
     job.value = data.value
     useHead({
-      title: `${job.value.position} - Conect RH One`,
+      title: `${job.value.title} - Conect One RH`,
       meta: [
         {
             name: 'description',
@@ -159,7 +159,7 @@
         <v-col cols="12" class="px-4 pa-2">
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
-            <span class="text-body-2 ml-2">{{ job.position }}</span>
+            <span class="text-body-2 ml-2">{{ job.title }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Tipo de contrato:</span>

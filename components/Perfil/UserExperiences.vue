@@ -8,38 +8,77 @@
   const show = useShow();
   const pickerVisible = ref(false)
   const typeDate = ref<string>('')
-  const editingExperienceIndex = ref<any>(null)
-  const experienceId = ref<string>('')
-  const onDateSelected = (val: string, type: string) => {
+  const order = ref<string>('')
+  const experienceGroup = ref<any>({})
+  const onDateSelected = (val: string, type: string, order: string) => {
     if (type === 'start_date') {
-      experience.value.start_date = val  // ISO direto
+      if(order === 'one') {
+        experienceOne.value.start_date = val
+      } else if(order === 'two') {
+        experienceTwo.value.start_date = val
+      } else if(order === 'three') {
+        experienceThree.value.start_date = val
+      }
     } else if (type === 'end_date') {
-      experience.value.end_date = val    // ISO direto
+      if(order === 'one') {
+        experienceOne.value.end_date = val
+      } else if(order === 'two') {
+        experienceTwo.value.end_date = val
+      } else if(order === 'three') {
+        experienceThree.value.end_date = val
+      }
     }
     pickerVisible.value = false
   }
-  const formattedEndDate = computed(() => {
-    if (!experience.value.end_date) return ''
-    return new Date(experience.value.end_date).toLocaleDateString('pt-BR')
+  const formattedEndDateOne = computed(() => {
+    if (!experienceOne.value.end_date) return ''
+    return new Date(experienceOne.value.end_date).toLocaleDateString('pt-BR')
   })
-  const formattedStartDate = computed(() => {
-    if (!experience.value.start_date) return ''
-    return new Date(experience.value.start_date).toLocaleDateString('pt-BR')
+  const formattedStartDateOne = computed(() => {
+    if (!experienceOne.value.start_date) return ''
+    return new Date(experienceOne.value.start_date).toLocaleDateString('pt-BR')
   })
-  const openDate = (type: string) => {
+  const formattedEndDateTwo = computed(() => {
+    if (!experienceTwo.value.end_date) return ''
+    return new Date(experienceTwo.value.end_date).toLocaleDateString('pt-BR')
+  })
+  const formattedStartDateTwo = computed(() => {
+    if (!experienceTwo.value.start_date) return ''
+    return new Date(experienceTwo.value.start_date).toLocaleDateString('pt-BR')
+  })
+  const formattedEndDateThree = computed(() => {
+    if (!experienceThree.value.end_date) return ''
+    return new Date(experienceThree.value.end_date).toLocaleDateString('pt-BR')
+  })
+  const formattedStartDateThree = computed(() => {
+    if (!experienceThree.value.start_date) return ''
+    return new Date(experienceThree.value.start_date).toLocaleDateString('pt-BR')
+  })
+  const openDate = (type: string, orderType: string) => {
     typeDate.value =  type;
     pickerVisible.value = true;
+    order.value = orderType;
   }
   //// Experiência profissional
-  const periods = [
-    'Menos de 6 meses',
-    'Entre 6 meses e 1 ano',
-    'Entre 1 a 3 anos',
-    'Entre 3 a 5 anos',
-    'Mais de 5 anos',
-  ]
-  const experience = ref<any>({
-    period: null,
+  const experienceOne = ref<any>({
+    id: null,
+    position: null,
+    end_date: null,
+    start_date: null,
+    company_name: null,
+    description: null
+  })
+  const experienceTwo = ref<any>({
+    id: null,
+    position: null,
+    end_date: null,
+    start_date: null,
+    company_name: null,
+    description: null
+  })
+  const experienceThree = ref<any>({
+    id: null,
+    position: null,
     end_date: null,
     start_date: null,
     company_name: null,
@@ -47,76 +86,78 @@
   })
   const dialogExperience = ref(false)
   const experiencesList = ref<any>([])
-  
-  const editExperience = (index: any, id: string) => {
-    const item = experiencesList.value[index]
-    experience.value = { ...item }
-    experienceId.value = id
-    editingExperienceIndex.value = index
-    dialogExperience.value = true
-  }
-  const clearExperience = () => {
-    experience.value = {
-      period: null,
-      end_date: null,
-      start_date: null,
-      company_name: null,
-      description: null
-    }
-    dialogExperience.value = false;
-    editingExperienceIndex.value = null
-    experienceId.value = ''
-  }
-  ///
 
-  const changeExperience = () => {
-      if (!experience.value.period || !experience.value.company_name) {
-        notify({ title: 'Erro', text: 'Selecione o nome da empresa e o período', type: 'error' })
-        return
-      }
-      // Opção 1: verificar se não é null nem undefined
-      if (editingExperienceIndex.value !== null && editingExperienceIndex.value !== undefined) {
-          updateExperience(experienceId.value)
-      } else {
-          createExperience()
-      }
-  }
-
-  const createExperience = async () => {
-    show.setOverlayDashboard(true)
+  const createExperience = async (experience: any, order: number) => {
       const { data, error } = await useFetch('/api/experiences', {
           method: 'POST',
           body: {
-              period: experience.value.period,
-              start_date: experience.value.start_date,
-              end_date: experience.value.end_date,
-              description: experience.value.description,
-              company_name: experience.value.company_name,
-              candidate_id: info.user.id
+              position: experience.position,
+              start_date: experience.start_date,
+              end_date: experience.end_date,
+              description: experience.description,
+              company_name: experience.company_name,
+              candidate_id: info.user.id,
+              order: order,
+              experience_group_id: experienceGroup.value.id
           }
       })
-
-      show.setOverlayDashboard(false)
       if (error.value) {
-        notify({ title: 'Erro', text: 'Erro ao criar a exeriência', type: 'error' })
         return
       }
       createLog({
-        title: `Criou a experiência`,
+        title: `Criou a experiência: ${experience.position} - ${experience.company_name}`,
         profile_id: info.profile.id,
         type: 'create_experience'
       })
-      notify({ title: 'Parabéns!', text: 'A exeriência foi criada com sucesso', type: 'success' })
-      getExperiences()
-      clearExperience()
+  }
 
+  const changeExperiences = () => {
+    show.setOverlayDashboard(true)
+    let count = 0
+    if(experienceOne.value.id) {
+      count++
+      updateExperience(experienceOne.value.id, experienceOne.value)
+    } else {
+      if(experienceOne.value.position && experienceOne.value.company_name) {
+        count++
+        createExperience(experienceOne.value, 1)
+      }
+    }
+    if(experienceTwo.value.id) {
+      count++
+      updateExperience(experienceTwo.value.id, experienceTwo.value)
+    } else {
+      if(experienceTwo.value.position && experienceTwo.value.company_name) {
+        count++
+        createExperience(experienceTwo.value, 2)
+      }
+    }
+    if(experienceThree.value.id) {
+      count++
+      updateExperience(experienceThree.value.id, experienceThree.value)
+    } else {
+      if(experienceThree.value.position && experienceThree.value.company_name) {
+        count++
+        createExperience(experienceThree.value, 3)
+      }
+    }
+    setTimeout(() => {
+      show.setOverlayDashboard(false)
+      if(count > 0) {
+        notify({ title: 'Parabéns!', text: 'Você atualizou as suas experiências', type: 'success' })
+        dialogExperience.value = false;
+        getExperiences()
+      }
+    }, 500)
+    
   }
 
   const getExperiences = async () => {
       const { data, error } = await useFetch('/api/experiences', {
           method: 'GET',
           params: {
-              candidate_id: info.user.id
+            candidate_id: info.user.id,
+            experience_group_id: experienceGroup.value.id
           }
       })
 
@@ -126,50 +167,37 @@
       }
 
       experiencesList.value = data.value
+      const experience1 = data.value.find((item: any) => item.order === 1)
+      if(experience1) {
+        experienceOne.value = experience1
+      }
+      const experience2 = data.value.find((item: any) => item.order === 2)
+      if(experience2) {
+        experienceTwo.value = experience2
+      }
+      const experience3 = data.value.find((item: any) => item.order === 3)
+      if(experience3) {
+        experienceThree.value = experience3
+      }
   }
 
-  const updateExperience = async (id: string) => {
-    show.setOverlayDashboard(true)
+  const updateExperience = async (id: string, experience: any) => {
       const { data, error } = await useFetch(`/api/experiences/${id}`, {
           method: 'PATCH',
-          body: experience.value
+          body: experience
       })
 
-      show.setOverlayDashboard(false)
       if (error.value) {
-        notify({ title: 'Erro', text: 'Erro ao editar a exeriência', type: 'error' })
         return
       }
       createLog({
-        title: `Editou a experiência`,
+        title: `Editou a experiência: ${experience.position} - ${experience.company_name}`,
         profile_id: info.profile.id,
         type: 'update_experience'
       })
-      notify({ title: 'Parabéns!', text: 'A exeriência foi editada com sucesso', type: 'success' })
-      getExperiences()
-      clearExperience()
   }
 
-  const removeExperience = async (id: string) => {
-    show.setOverlayDashboard(true)
-      const { data, error } = await useFetch(`/api/experiences/${id}`, {
-          method: 'DELETE'
-      })
-      show.setOverlayDashboard(false)
-      if (error.value) {
-        notify({ title: 'Erro', text: 'Erro ao remover a exeriência', type: 'error' })
-        return
-      }
-      createLog({
-        title: `Removeu a experiência`,
-        profile_id: info.profile.id,
-        type: 'delete_experience'
-      })
-      notify({ title: 'Parabéns!', text: 'A exeriência foi removida com sucesso', type: 'success' })
-      getExperiences()
-  }
-
-  const { data: experiences, error, refresh, pending } = await useFetch('/api/experiences', {
+  const { data, error, refresh, pending } = await useFetch('/api/experience_group', {
       method: 'GET',
       params: {
           candidate_id: info.user.id
@@ -178,7 +206,8 @@
 
   if (error.value) {
   } else {
-      experiencesList.value = experiences.value
+      experienceGroup.value = data.value
+      getExperiences()
   }
 </script>
 
@@ -186,7 +215,7 @@
   <v-dialog v-model="pickerVisible" width="auto">
     <v-card>
       <v-date-picker
-        @update:model-value="(val: any) => onDateSelected(val, typeDate)"
+        @update:model-value="(val: any) => onDateSelected(val, typeDate, order)"
       ></v-date-picker>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -210,114 +239,265 @@
           class="pa-1 border mb-1 rounded"
         >
           <v-list-item-content>
-            <v-list-item-title class="font-weight-bold">{{ item.company_name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ item.period }}</v-list-item-subtitle>
+            <v-list-item-title class="font-weight-bold">{{ item.position }}</v-list-item-title>
+            <v-list-item-subtitle>{{ item.company_name }}</v-list-item-subtitle>
           </v-list-item-content>
-          <!-- Botões de ação no canto superior direito -->
-          <template #append>
-          <div class="d-flex align-center justify-end ga-1">
-              <v-btn
-              icon="mdi-pencil"
-              size="x-small"
-              @click="editExperience(i, item.id)"
-              ></v-btn>
-
-              <v-btn
-              icon="mdi-delete"
-              size="x-small"
-              color="error"
-              @click="removeExperience(item.id)"
-              ></v-btn>
-          </div>
-          </template>
         </v-list-item>
       </v-list>
 
       <v-btn class="bg-gradient-primary" @click="dialogExperience = true">
-        Adicionar
+        {{ experiencesList.length > 2 ? 'Editar' : 'Adicionar' }}
       </v-btn>
     </v-card-text>
   </v-card>
   <v-dialog
     v-model="dialogExperience"
-    max-width="400"
+    max-width="800"
   >
     <v-card
         prepend-icon="mdi-account-tie"
-        title="Criar experiência profissional"
+        title="Adicionar experiência profissional"
       >
         <v-card-text>
           <v-row dense>
-            <v-col
-              cols="12"
-            >
-              <v-text-field
-                v-model="experience.company_name"
-                required
-                :counter="10"
-                label="Nome da empresa"
-                density="compact"
-                hide-details
-                class="mb-1"
-              ></v-text-field>
+            <v-col cols="12">
+              <p class="text-body-2">
+                Mencione abaixo suas três últimas experiências profissionais.
+              </p>
+              <p class="text-body-2 font-weight-bold">
+                É preciso preencher o Nome da empresa e o Cargo para atualizar.
+              </p>
             </v-col>
+            <v-col cols="12" class="border pa-2 mt-2">
+              <v-row dense>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceOne.company_name"
+                    required
+                    :counter="10"
+                    label="Nome da empresa"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
 
-            <v-col
-              cols="12"
-            >
-              <v-text-field
-                :model-value="formattedStartDate"
-                label="Data inicial"
-                readonly
-                @click="openDate(`start_date`)"
-                density="compact"
-                hide-details
-                class="mb-1"
-                required
-              ></v-text-field>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedStartDateOne"
+                    label="Data inicial"
+                    readonly
+                    @click="openDate(`start_date`, 'one')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedEndDateOne"
+                    label="Data final"
+                    readonly
+                    @click="openDate(`end_date`, 'one')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceOne.position"
+                    required
+                    :counter="10"
+                    label="Cargo"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                >
+                  <v-textarea
+                    label="Descrição"
+                    v-model="experienceOne.description"
+                    name="input-7-1"
+                    variant="filled"
+                    auto-grow
+                    hide-details
+                    density="compact"
+                    class="mb-1"
+                    rows="2"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
             </v-col>
+            <v-col cols="12" class="border pa-2 mt-2">
+              <v-row dense>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceTwo.company_name"
+                    required
+                    :counter="10"
+                    label="Nome da empresa"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
 
-            <v-col
-              cols="12"
-            >
-              <v-text-field
-                :model-value="formattedEndDate"
-                label="Data final"
-                readonly
-                @click="openDate(`end_date`)"
-                density="compact"
-                hide-details
-                class="mb-1"
-                required
-              ></v-text-field>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedStartDateTwo"
+                    label="Data inicial"
+                    readonly
+                    @click="openDate(`start_date`, 'two')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedEndDateTwo"
+                    label="Data final"
+                    readonly
+                    @click="openDate(`end_date`, 'two')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceTwo.position"
+                    required
+                    :counter="10"
+                    label="Cargo"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                >
+                  <v-textarea
+                    label="Descrição"
+                    v-model="experienceTwo.description"
+                    name="input-7-1"
+                    variant="filled"
+                    auto-grow
+                    hide-details
+                    density="compact"
+                    class="mb-1"
+                    rows="2"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
             </v-col>
+            <v-col cols="12" class="border pa-2 mt-2">
+              <v-row dense>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceThree.company_name"
+                    required
+                    :counter="10"
+                    label="Nome da empresa"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
 
-            <v-col
-              cols="12"
-            >
-            <v-select
-              v-model="experience.period"
-              :items="periods"
-              label="Périodo"
-              hide-details
-              density="compact"
-              class="mb-1"
-            />
-            </v-col>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedStartDateThree"
+                    label="Data inicial"
+                    readonly
+                    @click="openDate(`start_date`, 'three')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
 
-            <v-col
-              cols="12"
-            >
-              <v-textarea
-                label="Descrição"
-                v-model="experience.description"
-                name="input-7-1"
-                variant="filled"
-                auto-grow
-                hide-details
-                density="compact"
-                class="mb-1"
-              ></v-textarea>
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    :model-value="formattedEndDateThree"
+                    label="Data final"
+                    readonly
+                    @click="openDate(`end_date`, 'three')"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12" sm="6"
+                >
+                  <v-text-field
+                    v-model="experienceThree.position"
+                    required
+                    :counter="10"
+                    label="Cargo"
+                    density="compact"
+                    hide-details
+                    class="mb-1"
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                >
+                  <v-textarea
+                    label="Descrição"
+                    v-model="experienceThree.description"
+                    name="input-7-1"
+                    variant="filled"
+                    auto-grow
+                    hide-details
+                    density="compact"
+                    class="mb-1"
+                    rows="2"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
 
@@ -327,19 +507,11 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-
-          <v-btn
-            text="Fechar"
-            color="error"
-            variant="flat"
-            @click="clearExperience"
-          ></v-btn>
-
           <v-btn
             color="success"
-            :text="`${editingExperienceIndex !== null ? 'Salvar' : 'Adicionar'}`"
+            text="Salvar"
             variant="flat"
-            @click="changeExperience"
+            @click="changeExperiences()"
           ></v-btn>
         </v-card-actions>
       </v-card>

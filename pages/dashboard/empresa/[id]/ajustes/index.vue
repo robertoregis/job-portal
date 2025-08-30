@@ -9,7 +9,7 @@
     passwordConfirm: string
   }
   useHead({
-    title: `Ajustes - Conect RH One`,
+    title: `Ajustes - Conect One RH`,
     meta: [
       {
           name: 'description',

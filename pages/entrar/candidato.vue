@@ -13,11 +13,11 @@
     password: string
   }
   useHead({
-    title: `Entrar - Candidato - Conect RH One`,
+    title: `Entrar - Candidato - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+          content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
       }
     ]
   })

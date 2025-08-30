@@ -119,7 +119,7 @@
 
   const goCandidate = () => {
     if(info.user && info.user.id) {
-      router.push(`/dashboard/candidato/${info.user.id}`)
+      router.push(`/dashboard/candidato/${info.user.id}/meu-perfil`)
     } else {
       router.push('/cadastrar/candidato')
     }
@@ -128,7 +128,7 @@
   const goLogin = () => {
     if(info.user && info.user.id) {
       if(info.user.type === 'candidate') {
-        router.push(`/dashboard/candidato/${info.user.id}`)
+        router.push(`/dashboard/candidato/${info.user.id}/meu-perfil`)
       } else if(info.user.type === 'company') {
         router.push(`/dashboard/empresa/${info.user.id}`)
       } else if(info.user.type === 'admin') {
@@ -179,7 +179,7 @@
               <li class="mx-2">
                 <NuxtLink to="/empresa" class="no-underline text-title text-subtitle-1">Empresa</NuxtLink>
               </li>
-              <li class="mx-2">
+              <li v-if="!info.user.id" class="mx-2">
                 <a @click.prevent.stop="goCandidate" role="dialog" tabindex="0" class="pointer text-title text-subtitle-1">Candidato</a>
               </li>
               

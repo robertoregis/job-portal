@@ -4,7 +4,7 @@
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
   useHead({
-    title: `Avisos - Conect RH One`,
+    title: `Avisos - Conect One RH`,
     meta: [
       {
           name: 'description',
@@ -50,6 +50,7 @@
     method: 'GET',
     params: {
       profile_id: info.profile.id,
+      is_master: true,
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }
@@ -82,7 +83,7 @@
               v-for="(notice, index) in noticesList"
               :key="notice.id"
             >
-              <v-list-item class="py-3">
+              <v-list-item class="py-3 bg-orange-accent-1">
                 <v-list-item-title class="text-caption font-weight-bold">
                   {{ notice.title }}
                 </v-list-item-title>

@@ -3,7 +3,8 @@
   import { useInfo } from '#imports';
   import { useShow } from '@/stores/show';
   import { useNotice } from '@/composables/useNotice';
-  const { createLog } = useNotice();
+  import { formatDate } from '@/composables/formatDate';
+  const { createLog, createNotice } = useNotice();
   const info: any = useInfo();
   const show = useShow()
   const { notify } = useNotification();
@@ -15,14 +16,15 @@
     passwordConfirm: string
   }
   useHead({
-    title: `Cadastrar - Candidato - Conect RH One`,
+    title: `Cadastrar - Candidato - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Cadastre-se gratuitamente na Conect RH One e conecte-se com empresas ou candidatos de forma simples e rápida.'
+          content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
       }
     ]
   })
+  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   const router = useRouter();
   const showPassword = ref(false)
   const showPasswordConfirm = ref(false)
@@ -55,11 +57,23 @@
       method: 'POST',
       body: {
         to: [`${candidateName} <${candidateEmail}>`],
-        subject: 'O seu cadastro foi feito - Conect RH One',
+        subject: 'O seu cadastro foi feito',
         template: 'email_confirmation_template',
         variables: {
           name: candidateName,
           link: window.location.origin + `/entrar/candidato?token=${token.value}`
+        }
+      }
+    })
+    const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`Conect One RH <${emailOfficial}>`],
+        subject: 'Um candidato se cadastrou',
+        template: 'template_create_candidate',
+        variables: {
+          name_candidate: candidateName,
+          date: formatDate(new Date(), 3)
         }
       }
     })
@@ -88,6 +102,14 @@
         info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
         sendMail(values.name, info.user.email)
         //localStorage.setItem('user', JSON.stringify(candidate))
+        createNotice({
+          title: 'Candidato criado',
+          description: `Um novo candidato foi criado: ${values.name}`,
+          subtitle: 'Candidato',
+          profile_id: info.profile.id,
+          is_master: true,
+          type: 'info',
+        })
         createLog({
             title: `Cadastrou a conta`,
             profile_id: info.profile.id,

@@ -9,11 +9,11 @@
     layout: 'default' // ou outro nome, conforme os arquivos em layouts/
   })
   useHead({
-    title: `Vagas - Conect RH One`,
+    title: `Vagas - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Confira todas as oportunidades disponíveis na Conect RH One e encontre a vaga ideal para o seu perfil.'
+          content: 'Confira todas as oportunidades disponíveis na Conect One RH e encontre a vaga ideal para o seu perfil.'
       }
     ]
   })

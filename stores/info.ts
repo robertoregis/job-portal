@@ -4,6 +4,7 @@ export interface InterfaceInfo {
 	info: object;
 	user: object;
 	profile: object;
+	countsNotices: number;
 }
 
 export const useInfo = defineStore("info", {
@@ -11,6 +12,7 @@ export const useInfo = defineStore("info", {
 		info: {},
 		user: {},
 		profile: {},
+		countsNotices: 0
 	}),
 	actions: {
 		setInfo(dataInfo: object) {
@@ -21,6 +23,9 @@ export const useInfo = defineStore("info", {
 		},
 		setProfile(dataProfile: object) {
 			this.profile = dataProfile
+		},
+		setCountsNotices(dataCount: number) {
+			this.countsNotices = dataCount
 		}
 	},
 	getters: {

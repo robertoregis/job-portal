@@ -6,7 +6,7 @@
   import IMask from 'imask'
   const { notify } = useNotification();
   useHead({
-    title: `Editar perfil - Conect RH One`,
+    title: `Editar perfil - Conect One RH`,
     meta: [
       {
           name: 'description',

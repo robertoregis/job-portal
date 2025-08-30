@@ -30,7 +30,7 @@
   } else {
     company.value = data.value
     useHead({
-      title: `${company.value.name} - Conect RH One`,
+      title: `${company.value.name} - Conect One RH`,
       meta: [
         {
             name: 'description',

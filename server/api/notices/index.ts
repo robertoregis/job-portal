@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id, page, pageSize } = getQuery(event)
+    const { profile_id, page, pageSize, is_master } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
     const size = pageSize ? parseInt(pageSize as string, 10) : 10
@@ -25,6 +25,12 @@ export default defineEventHandler(async (event) => {
 
     if (profile_id) {
       query = query.eq('profile_id', profile_id as string)
+    }
+
+    if(is_master) {
+      query = query.eq('is_master', is_master)
+    } else {
+      query = query.eq('is_master', false)
     }
 
     const { data, error, count } = await query
@@ -48,7 +54,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { title, description, type, profile_id, subtitle } = body
+    let { title, description, type, profile_id, subtitle, is_master } = body
 
     if (!profile_id) {
       throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
@@ -60,6 +66,11 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'type is required' })
     }
 
+    let is_master_end = false;
+    if(is_master) {
+      is_master_end = is_master
+    }
+
     title = emptyStringToNull(title)
     description = emptyStringToNull(description)
     type = emptyStringToNull(type)
@@ -67,7 +78,7 @@ export default defineEventHandler(async (event) => {
 
     const { data, error } = await supabase
       .from('notices')
-      .insert([{ title, description, type, profile_id, subtitle }])
+      .insert([{ title, description, type, profile_id, subtitle, is_master: is_master_end }])
       .select()
       .single()
 

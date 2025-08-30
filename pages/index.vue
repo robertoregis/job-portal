@@ -4,11 +4,11 @@
     layout: 'default'
   })
   useHead({
-    title: `Conect RH One`,
+    title: `Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'A Conect RH One conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
+          content: 'A Conect One RH conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
       }
     ]
   })
@@ -30,7 +30,7 @@
 <template>
   <main>
     <v-sheet width="100%">
-      <HomeImageBackground image="/background.jpg" />
+      <HomeVideoBackground video="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/videos/RH%20ANIMACAO%203D%2004.mp4" />
     </v-sheet>
 
     <v-sheet width="100%" class="mt-4">
@@ -38,14 +38,14 @@
         <v-row no-gutters>
           <v-col cols="12">
             <div class="d-flex flex-column align-center pa-3 rounded">
-              <h1 class="text-h4 font-weight-bold">Conect RH One</h1>
+              <h1 class="text-h4 font-weight-bold">Conect One RH</h1>
               <v-avatar color="info" size="x-large" class="mt-4">
                 <!-- Logo ou ícone -->
               </v-avatar>
               <div class="d-flex max-w-600 mt-4">
                 <p class="text-subtitle-1 mb-0">
                   Somos a ponte entre talentos extraordinários e empresas que desejam crescer. 
-                  Na Conect RH One, nossa missão é facilitar conexões humanas inteligentes, simplificar processos seletivos e potencializar carreiras e negócios.
+                  Na Conect One RH, nossa missão é facilitar conexões humanas inteligentes, simplificar processos seletivos e potencializar carreiras e negócios.
                   Com tecnologia de ponta e um time apaixonado pelo que faz, transformamos cada oportunidade em sucesso real.
                 </p>
               </div>
@@ -62,7 +62,7 @@
             <div class="d-flex flex-column align-center rounded pa-4">
               <h1 class="text-h4 font-weight-bold">O que fazemos de melhor</h1>
               <p class="text-body-1 mt-2 max-w-700">
-                Na Conect RH One, oferecemos soluções completas que unem empresas e candidatos em um ecossistema moderno, ágil e transparente. 
+                Na Conect One RH, oferecemos soluções completas que unem empresas e candidatos em um ecossistema moderno, ágil e transparente. 
                 Descubra como podemos transformar a maneira de atrair, selecionar e reter talentos.
               </p>
             </div>
@@ -85,9 +85,9 @@
                   <v-card class="mx-auto" elevation="2" hover>
                     <v-card-title class="d-flex align-center">
                       <v-icon class="mr-2" size="28">{{ service.icon }}</v-icon>
-                      <span class="text-subtitle-1 font-weight-bold">{{ service.title }}</span>
+                      <span class="text-subtitle-1 font-weight-bold custom-subtitle-and-title">{{ service.title }}</span>
                     </v-card-title>
-                    <v-card-subtitle class="mb-2 text--secondary">{{ service.subtitle }}</v-card-subtitle>
+                    <v-card-subtitle v-if="service.subtitle" class="mb-2 custom-subtitle-and-title">{{ service.subtitle }}</v-card-subtitle>
                     <v-card-text class="bg-surface-light pt-2">
                       {{ service.description }}
                     </v-card-text>

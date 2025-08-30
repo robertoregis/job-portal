@@ -7,11 +7,11 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Conect RH One`,
+    title: `Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'A Conect RH One conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
+          content: 'A Conect One RH conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
       }
     ]
   })
@@ -93,7 +93,7 @@
         <v-card-text>
           <v-form @submit.prevent="updateJob">
             <v-text-field
-              v-model="job.position"
+              v-model="job.title"
               label="Cargo"
               density="compact"
               hide-details

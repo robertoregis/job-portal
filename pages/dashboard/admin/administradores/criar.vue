@@ -8,11 +8,11 @@
     layout: 'dashboard'
   })
   useHead({
-    title: `Criar administrador - Conect RH One`,
+    title: `Criar administrador - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Crie novos administradores para te ajudar com a Conect RH One.'
+          content: 'Crie novos administradores para te ajudar com a Conect One RH.'
       }
     ]
   })
@@ -60,7 +60,7 @@
       method: 'POST',
       body: {
         to: [`${candidateName} <${candidateEmail}>`],
-        subject: 'O seu cadastro foi feito - Conect RH One',
+        subject: 'O seu cadastro foi feito',
         template: 'template_create_admin_connect',
         variables: {
           name: candidateName,
@@ -96,17 +96,18 @@
     } else {
       createNotice({
         title: 'Administrador criado',
-        description: `Parabéns, você acabou de criar um novo administrador: ${admin.value.name}`,
+        description: `Acaba de ser criado o administrador: ${admin.value.name}`,
         subtitle: 'Administrador',
         profile_id: info.profile.id,
-        type: 'info'
+        type: 'info',
+        is_master: true
       })
       createLog({
         title: `Criou o administrador`,
         profile_id: info.profile.id,
         type: 'create_admin'
       })
-      sendMail(admin.value.name, 'roberttoregiss@gmail.com', password)
+      sendMail(admin.value.name, admin.value.email, password)
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'O administrador foi criado com sucesso e enviado um email', type: 'success' })
       router.push(`/dashboard/admin/administradores`)

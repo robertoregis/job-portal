@@ -4,7 +4,7 @@
     layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
   })
   useHead({
-    title: `Avisos - Conect RH One`,
+    title: `Avisos - Conect One RH`,
     meta: [
       {
           name: 'description',

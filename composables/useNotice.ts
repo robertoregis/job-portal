@@ -5,7 +5,8 @@ export function useNotice() {
     description?: string, 
     subtitle?: string, 
     profile_id: string, 
-    type: string 
+    type: string,
+    is_master?: boolean
   }) => {
     const { data, error } = await useFetch('/api/notices', {
       method: 'POST',
@@ -14,7 +15,8 @@ export function useNotice() {
         description: notice.description || '',
         type: notice.type || '',
         subtitle: notice.subtitle || '',
-        profile_id: notice.profile_id
+        profile_id: notice.profile_id,
+        is_master: notice.is_master || false
       }
     })
 
@@ -30,7 +32,8 @@ export function useNotice() {
     description?: string, 
     subtitle?: string, 
     profile_id: string, 
-    type: string 
+    type: string,
+    is_master?: boolean
   }) => {
     const { data, error } = await useFetch('/api/logs', {
       method: 'POST',
@@ -39,11 +42,12 @@ export function useNotice() {
         description: log.description || '',
         type: log.type || '',
         profile_id: log.profile_id,
+        is_master: log.is_master || false
       }
     })
 
     if (error.value) {
-      console.error('Erro ao criar aviso:', error.value)
+      console.error('Erro ao criar log:', error.value)
       return null
     }
     return data.value
