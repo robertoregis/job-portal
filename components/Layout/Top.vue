@@ -11,111 +11,13 @@
   const show = useShow()
   const router = useRouter();
   const dialog = ref<boolean>(false)
-  const dialogLoginAdmin = ref<boolean>(false)
   const { notify } = useNotification();
   const { createLog } = useNotice();
-
-  const showPassword = ref(false)
-  const showPasswordConfirm = ref(false)
-
-  const { handleSubmit, handleReset, values } = useForm<FormSchema>({
-    validationSchema: {
-      email(value: string) {
-        return /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(value) || 'O e-mail precisa ser válido.'
-      },
-      password(value: string) {
-        return value?.length >= 6 || 'A senha precisa ter no mínimo 6 caracteres.'
-      },
-    },
-  })
-
-  const email = useField<string>('email')
-  const password = useField<string>('password')
 
   const navigation = (type: string) => {
     dialog.value = false;
     router.push(`/cadastrar/${type}`)
   }
-
-  const navigationDashboard = () => {
-    let dashboardType = ''
-
-    switch (info.user.type) {
-      case 'candidate':
-        dashboardType = 'candidato'
-        break
-      case 'company':
-        dashboardType = 'empresa'
-        break
-      case 'admin':
-        dashboardType = 'admin'
-        break
-      default:
-        dashboardType = '' // ou alguma rota padrão, se quiser
-    }
-
-    if (dashboardType && info.user.id) {
-      if(dashboardType === 'admin') {
-        router.push(`/dashboard/${dashboardType}`)
-      } else {
-        router.push(`/dashboard/${dashboardType}/${info.user.id}`)
-      }
-    } else {
-      // opcional: lidar com usuário inválido
-      console.error('Tipo de usuário desconhecido ou ID não definido')
-    }
-  }
-
-
-  const getProfile = async (id: string) => {
-    const { data, error } = await useFetch(`/api/profiles/${id}`, {
-      method: 'GET'
-    })
-
-    const profile = data.value
-    info.setProfile(data.value)
-
-    const { data: dataAdmin, error: errorAdmin } = await useFetch(`/api/admins`, {
-        method: 'GET',
-        params: { profile_id: profile.id }
-      })
-
-      if (errorAdmin.value) {
-        console.error('Erro ao carregar admin:', errorAdmin.value)
-        return
-      }
-
-      const admin = dataAdmin.value.data
-      info.setUser({ ...dataAdmin.value.data[0], type: 'admin' })
-      show.setOverlayDashboard(false)
-      createLog({
-        title: `Logou`,
-        profile_id: info.profile.id,
-        type: 'login'
-      })
-      //localStorage.setItem('user', JSON.stringify(admin))
-      notify({ title: '', text: 'Logado com sucesso', type: 'success' })
-      dialog.value = false;
-      dialogLoginAdmin.value = false;
-  }
-
-  const submit = handleSubmit(async (values) => {
-    //alert(JSON.stringify(values, null, 2))
-    show.setOverlayDashboard(true)
-    const supabase = useNuxtApp().$supabase
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password
-    })
-
-    if (error) {
-      notify({ title: '', text: 'Seu email ou a sua senha estão errados', type: 'error' })
-      show.setOverlayDashboard(false)
-    } else {
-      getProfile(data.session.user.id)
-    }
-  })
 
   const goCandidate = () => {
     if(info.user && info.user.id) {
@@ -160,7 +62,6 @@
     <v-container class="py-3">
       <div class="d-flex justify-space-between align-center">
         <h1 class="text-h6 font-weight-bold">Conect One RH</h1>
-
 
         <v-spacer></v-spacer>
 
@@ -237,62 +138,7 @@
       >
         Sou uma empresa
       </v-btn>
-      <v-btn
-        variant="text"
-        size="small"
-        color="grey"
-        prepend-icon="mdi-shield-key"
-        @click="dialogLoginAdmin = true"
-      >
-        Administrador
-      </v-btn>
     </v-card-actions>
-  </v-card>
-  </v-dialog>
-
-  <v-dialog
-    v-model="dialogLoginAdmin"
-    max-width="400"
-  >
-    <v-card class="pa-5">
-    <!-- TÍTULO COM ÍCONE -->
-    <template v-slot:title>
-      <div class="d-flex align-center">
-        <v-icon class="mr-2">mdi-location-enter</v-icon>
-        <span class="text-h6 font-weight-bold">Entrar como administrador</span>
-      </div>
-    </template>
-
-    <!-- AÇÕES -->
-    <v-card-text class="d-flex flex-column px-4 pb-4 pt-2">
-      <form @submit.prevent="submit">
-
-              <v-text-field
-                v-model="email.value.value"
-                :error-messages="email.errorMessage.value"
-                label="E-mail"
-                density="comfortable"
-              />
-
-              <v-text-field
-                v-model="password.value.value"
-                :error-messages="password.errorMessage.value"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showPassword = !showPassword"
-                :type="showPassword ? 'text' : 'password'"
-                label="Senha"
-                density="comfortable"
-              />
-
-              <v-btn class="me-4" type="submit">
-                Entrar
-              </v-btn>
-
-              <v-btn @click="handleReset">
-                Limpar
-              </v-btn>
-            </form>
-    </v-card-text>
   </v-card>
   </v-dialog>
 </template>

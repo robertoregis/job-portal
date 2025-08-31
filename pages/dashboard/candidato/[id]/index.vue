@@ -95,7 +95,7 @@
           <v-card
             hover
             ripple
-            @click="navigation('/dashboard/candidato/123/minhas-candidaturas')"
+            @click="navigation(`/dashboard/candidato/${info.user.id}/minhas-candidaturas`)"
             class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
             elevation="2"
             style="min-height: 120px;"
@@ -178,7 +178,7 @@
                 elevation="2"
                 ripple
                 hover
-                @click="navigation(`/dashboard/candidato/123/minhas-candidaturas/${candidature.id}`)"
+                @click="navigation(`/dashboard/candidato/${info.user.id}/minhas-candidaturas/${candidature.id}`)"
               >
                 <div class="d-flex justify-space-between align-start mb-2">
                   <div>

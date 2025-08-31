@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     .from('candidatures')
     .select('id', { count: 'exact', head: true })
     .eq('job_id', job_id)
+    .eq('is_active', true)
 
   if (totalError) {
     throw createError({ statusCode: 500, statusMessage: totalError.message })
@@ -22,6 +23,7 @@ export default defineEventHandler(async (event) => {
     .from('candidatures')
     .select('id', { count: 'exact', head: true })
     .eq('job_id', job_id)
+    .eq('is_active', true)
     .eq('status', 'Aprovada')
 
   if (approvedError) {
@@ -33,6 +35,7 @@ export default defineEventHandler(async (event) => {
     .from('candidatures')
     .select('id', { count: 'exact', head: true })
     .eq('job_id', job_id)
+    .eq('is_active', true)
     .eq('status', 'Rejeitada')
 
   if (rejectedError) {

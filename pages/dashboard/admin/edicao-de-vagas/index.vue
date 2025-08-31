@@ -105,6 +105,7 @@
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">{{ jobEdit.job_data.title }}</div>
                     <div class="text-caption text-grey">
+                      {{ jobEdit.job_data.company_name }}
                     </div>
                   </div>
                   <div class="text-caption text-grey-darken-1">{{ jobEdit.created_at_formatted }}</div>

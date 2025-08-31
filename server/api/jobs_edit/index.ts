@@ -13,31 +13,29 @@ export default defineEventHandler(async (event) => {
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
     const size = pageSize ? parseInt(pageSize as string, 10) : 10
-
     const from = (pageNumber - 1) * size
     const to = from + size - 1
 
     let query = supabase
       .from('jobs_edit')
-      .select('*', { count: 'exact' })
+      .select('*, companies(name)', { count: 'exact' }) // já puxa o nome da empresa
       .order('created_at', { ascending: false })
       .range(from, to)
+      .eq('is_closed', false)
+      .eq('status', 'pending')
 
-    if (job_id) {
-      query = query.eq('job_id', job_id as string)
-    }
+    if (job_id) query = query.eq('job_id', job_id as string)
 
     query.eq('is_closed', false).eq('status', 'pending')
 
     const { data, error, count } = await query
-    if (error) {
-      throw createError({ statusCode: 500, statusMessage: error.message })
-    }
+    if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
     const formattedData = data.map((c: any) => ({
-      ...c,
-      created_at_formatted: c.created_at ? formatDateTimestamp(c.created_at, 3) : null,
-    }))
+    ...c,
+    company_name: c.company?.name || null,
+    created_at_formatted: c.created_at ? formatDateTimestamp(c.created_at, 3) : null
+  }))
 
     return {
       data: formattedData,
@@ -47,6 +45,7 @@ export default defineEventHandler(async (event) => {
       totalPages: Math.ceil((count ?? 0) / size),
     }
   }
+
 
   if (method === 'POST') {
     const body = await readBody(event)
