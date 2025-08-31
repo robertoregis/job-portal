@@ -43,14 +43,7 @@
   const email = useField<string>('email')
   const password = useField<string>('password')
 
-  const getProfile = async (id: string) => {
-    const { data, error } = await useFetch(`/api/profiles/${id}`, {
-      method: 'GET'
-    })
-
-    const profile = data.value
-    info.setProfile(data.value)
-
+  const goCandidate = async (profile: any) => {
     const { data: dataCandidate, error: errorCandidate } = await useFetch(`/api/candidates`, {
         method: 'GET',
         params: { profile_id: profile.id }
@@ -75,7 +68,43 @@
       } else {
         router.push(`/`)
       }
-      
+  }
+
+  const goAdmin = async (profile: any) => {
+    const { data: dataAdmin, error: errorAdmin } = await useFetch(`/api/admins`, {
+        method: 'GET',
+        params: { profile_id: profile.id }
+      })
+
+      if (errorAdmin.value) {
+        console.error('Erro ao carregar candidato:', errorAdmin.value)
+        return
+      }
+
+      const admin = dataAdmin.value
+      info.setUser({ ...dataAdmin.value[0], type: 'admin' })
+      show.setOverlayDashboard(false)
+      createLog({
+        title: `Logou`,
+        profile_id: info.profile.id,
+        type: 'login'
+      })
+      notify({ title: '', text: 'Logado com sucesso', type: 'success' })
+      router.push(`/dashboard/admin`)
+  }
+
+  const getProfile = async (id: string) => {
+    const { data, error } = await useFetch(`/api/profiles/${id}`, {
+      method: 'GET'
+    })
+
+    const profile = data.value
+    info.setProfile(data.value)
+    if(data.value.type === 'admin') {
+      goAdmin(data.value)
+    } else if(data.value.type === 'candidate') {
+      goCandidate(data.value)
+    }
   }
 
   const submit = handleSubmit(async (values) => {

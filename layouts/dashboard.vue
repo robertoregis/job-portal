@@ -53,7 +53,16 @@
 <template>
   <v-app>
     <v-layout class="">
-      
+      <v-card
+        v-if="info.user.type === 'candidate' && !info.user.curriculum_url"
+        class="floating-notify pa-3 d-flex align-center bg-warning"
+        elevation="10"
+      >
+        <v-icon size="24" class="mr-2" color="white">mdi-alert-circle</v-icon>
+        <v-card-text class="text-white mb-0 pa-0">
+          Adicione um currículo no seu perfil.
+        </v-card-text>
+      </v-card>
       <LayoutNavigation />
       
       <v-main class="overflow-y-auto" style="height: 100vh;">
@@ -105,5 +114,21 @@
   top: 12px;
   right: 50px;
   z-index: 999;
+}
+.floating-notify {
+  position: fixed;       /* sempre sobre o conteúdo */
+  bottom: 24px;             /* distância do topo */
+  right: 24px;           /* distância da direita */
+  width: 300px;          /* largura fixa */
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  background-color: white;
+  transition: all 0.3s ease;
+  z-index: 9999;         /* acima de tudo */
+}
+
+.floating-notify:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.35);
 }
 </style>

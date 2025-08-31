@@ -15,7 +15,7 @@
   const counts = ref<any>({
     total: 0
   })
-
+  const jobsEditList = ref<any[]>([])
   const jobStatusOptions = [
     { name: 'Aberta para inscrição', icon: 'mdi-briefcase-plus' },
     { name: 'Inscrições encerradas', icon: 'mdi-briefcase-remove' },
@@ -34,6 +34,25 @@
     selectedStatus.value = selected
   }
 
+  const getJobsEdit = async () => {
+    const params: Record<string, any> = {
+      page: 1,
+      pageSize: 3,
+      jobs_edit: job.value.id
+    }
+
+    const { data, error } = await useFetch('/api/jobs_edit', {
+      method: 'GET',
+      params
+    })
+    console.log(data)
+    if (error.value) {
+      console.error('Erro ao carregar os pedidos de edição:', error.value)
+    } else {
+      jobsEditList.value = data.value?.data || []
+    }
+  }
+
   const getCounts = async () => {
     const { data, error } = await useFetch('/api/candidatures/countsforjob', {
       method: 'GET',
@@ -43,6 +62,7 @@
       console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value.total = data.value?.total || 0
+      getJobsEdit()
     }
   }
 
@@ -157,6 +177,9 @@
         </v-col>
 
         <v-col cols="12" class="px-4 pa-2">
+          <div v-if="jobsEditList.length > 0" class="d-flex align-center mb-2">
+            <span class="bg-warning py-1 px-2 mt-1">Existe pedido de edição pendente</span>
+          </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
             <span class="text-body-2 ml-2">{{ job.title }}</span>

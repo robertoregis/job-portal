@@ -70,7 +70,9 @@ export default defineEventHandler(async (event) => {
         'city',
         'benefits_simple',
         'undergraduate_areas_simple',
-        'knowledge_simple'
+        'knowledge_simple',
+        'knowledge',
+        'undergraduate_areas'
       ]
 
       for (const field of fields) {
@@ -79,19 +81,34 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      const { data, error } = await supabase
+      const { data: job, error } = await supabase
         .from('jobs')
         .update(updateData)
         .eq('id', id)
         .select()
         .single()
 
-      if (error) {
-        throw createError({ statusCode: 500, statusMessage: error.message })
+      if (error || !job) {
+        throw createError({ statusCode: 500, statusMessage: error?.message || 'Erro ao atualizar vaga' })
       }
 
-      return data
+      // Pega o profile_id da empresa
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .select('profile_id')
+        .eq('id', job.company_id)
+        .single()
+
+      if (companyError) {
+        throw createError({ statusCode: 500, statusMessage: companyError.message })
+      }
+
+      return {
+        ...job,
+        profile_id: company?.profile_id ?? null
+      }
     }
+
 
     if (method === 'DELETE') {
       const { error } = await supabase

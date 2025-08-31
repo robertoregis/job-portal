@@ -21,7 +21,8 @@
   const route = useRoute();
   const router = useRouter();
   const job = ref<any>({})
-
+  const motive_edit = ref<string>('')
+  const dialogRequest = ref<boolean>(false)
   const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
   const work_formats = ['Presencial', 'Remoto', 'Híbrido']
   const educations = [
@@ -35,17 +36,62 @@
     'Doutorado',
   ]
   const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const jobsEditList = ref<any[]>([])
+  const getJobsEdit = async () => {
+    const params: Record<string, any> = {
+      page: 1,
+      pageSize: 3,
+      jobs_edit: job.value.id
+    }
 
-  const updateJob = async () => {
+    const { data, error } = await useFetch('/api/jobs_edit', {
+      method: 'GET',
+      params
+    })
+    console.log(data)
+    if (error.value) {
+      console.error('Erro ao carregar os pedidos de edição:', error.value)
+    } else {
+      jobsEditList.value = data.value?.data || []
+    }
+  }
+
+  const createRequestJob = async () => {
+    if(!motive_edit.value) {
+      notify({ title: 'Erro', text: 'É preciso dizer o motivo', type: 'error' })
+      return
+    }
     show.setOverlayDashboard(true)
     let benefitsArray: any = job.value.benefits_simple
-    if (job.value.benefits) {
+    if (job.value.benefits_simple) {
       benefitsArray = benefitsArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+      job.value.benefits = benefitsArray
+    } else {
+      job.value.benefits = []
     }
-    job.value.benefits = benefitsArray
-    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
-      method: 'PUT',
-      body: job.value
+    let undergraduate_areasArray: any = job.value.undergraduate_areas_simple
+    if (job.value.undergraduate_areas_simple) {
+      undergraduate_areasArray = undergraduate_areasArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+      job.value.undergraduate_areas = undergraduate_areasArray
+    } else {
+      job.value.undergraduate_areas = []
+    }
+    let knowledgeArray: any = job.value.knowledge_simple
+    if (job.value.knowledge_simple) {
+      knowledgeArray = knowledgeArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
+      job.value.knowledge = knowledgeArray
+    } else {
+      job.value.knowledge = []
+    }
+    const { data, error } = await useFetch(`/api/jobs_edit`, {
+      method: 'POST',
+      body: {
+        job_data: job.value,
+        profile_id: info.profile.id,
+        job_id: job.value.id,
+        company_id: job.value.company_id,
+        motive_edit: motive_edit
+      }
     })
 
     if (error.value) {
@@ -55,13 +101,13 @@
       return
     }
     createLog({
-      title: `Atualizou o perfil`,
+      title: `Criou uma atualização para a vaga: ${job.value.title}`,
       profile_id: info.profile.id,
-      type: 'update_perfil'
+      type: 'create_job_edit'
     })
+    notify({ title: 'Parabéns!', text: 'O pedido para atualizar a vaga foi criado', type: 'success' })
     show.setOverlayDashboard(false)
-    notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
-    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
+    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${job.value.id}`)
   }
 
   const { data, error, pending } = await useFetch(`/api/jobs/${route.params.jobId}`, {
@@ -71,6 +117,7 @@
   if (error.value) {
   } else {
     job.value = data.value
+    getJobsEdit()
   }
 </script>
 
@@ -83,6 +130,13 @@
       </div>
     </v-col>
   </v-row>
+  <v-row v-if="jobsEditList.length > 0">
+    <v-col cols="12">
+      <div class="d-flex align-center mb-2">
+        <span class="bg-warning py-1 px-2 mt-1">Existe pedido de edição pendente</span>
+      </div>
+    </v-col>
+  </v-row>
   <v-row v-if="info.user.is_approved" class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
@@ -91,7 +145,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-form @submit.prevent="updateJob">
+          <v-form @submit.prevent="dialogRequest = true">
             <v-text-field
               v-model="job.title"
               label="Cargo"
@@ -212,6 +266,48 @@
       </v-card>
     </v-col>
   </v-row>
+  <v-dialog
+    v-model="dialogRequest"
+    max-width="400"
+    persistent
+  >
+    <v-card
+      title="Criar pedido de edição"
+    >
+      <v-card-text>
+          <v-row dense>
+            <v-col cols="12">
+              <p class="text-body-2 mb-1">Para editar uma vaga ela precisa ser aprovada pela nossa equipe para evitar problemas futuros.</p>
+              <p class="text-body-2">Nos informe o motivo e o que foi editado.</p>
+            </v-col>
+            <v-col cols="12 mt-1">
+                <v-textarea
+                v-model="motive_edit"
+                label="Motivo"
+                variant="filled"
+                auto-grow
+                density="compact"
+                hide-details
+                class="mb-1"
+                />
+            </v-col>
+          </v-row>
+      </v-card-text>
+
+      <v-divider />
+      <template v-slot:actions>
+        <v-spacer></v-spacer>
+
+        <v-btn color="error" variant="flat" @click="dialogRequest = false">
+          Cancelar
+        </v-btn>
+
+        <v-btn color="success" variant="flat" @click="createRequestJob">
+          Criar
+        </v-btn>
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped lang="scss">
