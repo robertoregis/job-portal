@@ -1,12 +1,15 @@
 <script setup lang="ts">
   import { useShow } from '@/stores/show';
   import { useInfo } from '@/stores/info';
+  import { useNotice } from '@/composables/useNotice';
+  import { name_formated } from '@/composables/textFunctions';
   definePageMeta({
     layout: 'dashboard'
   })
   const router = useRouter()
   const route = useRoute()
   const show = useShow();
+  const { createNotice, createLog } = useNotice();
   const info: any = useInfo();
   const { notify } = useNotification();
   const candidate = ref<any>({})
@@ -52,6 +55,41 @@
       notify({ title: 'Erro', text: 'Falha ao carregar dados do candidato', type: 'error' })
     }
   }
+
+  const downloadPDF = async () => {
+    show.setOverlayDashboard(true)
+    try {
+      const res = await fetch(`/api/generate/pdf/${candidate.value.id}`);
+      if (!res.ok) {
+        show.setOverlayDashboard(false)
+        notify({ title: 'Erro', text: 'Ocorreu um erro ao gerar relatório', type: 'error' })
+        return
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `relatorio-${name_formated(candidate.value.name)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      createLog({
+        title: `Gerou relatório do candidato: ${candidate.value.name}`,
+        profile_id: info.profile.id,
+        type: 'report_candidate'
+      })
+      window.URL.revokeObjectURL(url);
+      show.setOverlayDashboard(false)
+      notify({ title: 'Parabéns!', text: 'Relatório gerado com sucesso', type: 'success' })
+    } catch (error) {
+      console.error(error);
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Ocorreu um erro ao gerar relatório', type: 'error' })
+    }
+  };
+
   
   const { data, error, pending } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
     method: 'GET'
@@ -107,6 +145,11 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12">
+              <v-btn class="bg-gradient-primary" prepend-icon="mdi-download" @click="downloadPDF">
+                Gerar relatório
+              </v-btn>
+            </v-col>
+            <v-col cols="12 mt-2">
               <div class="d-flex">
                 <v-chip
                   color="primary"

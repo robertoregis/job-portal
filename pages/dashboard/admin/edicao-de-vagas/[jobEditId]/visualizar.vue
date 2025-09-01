@@ -48,7 +48,7 @@
       }
     })
     createNotice({
-      title: 'A edição da vaga foi aprovada',
+      title: 'Edição da vaga foi aprovada',
       description: `A vaga ${job.value.title} foi aprovada e editada com sucesso.`,
       subtitle: 'Edição de vaga',
       profile_id: data.value.profile_id,
@@ -89,7 +89,7 @@
       }
 
       createNotice({
-        title: 'A edição da vaga foi recusada',
+        title: 'Edição da vaga foi recusada',
         description: `A edição para a vaga ${job.value.title} foi recusada. Motivo da recusa: ${motive_recusation.value}`,
         subtitle: 'Edição de vaga',
         profile_id: data.value.profile_id,

@@ -28,6 +28,10 @@
     } 
   }
 
+  const goPerfil = (link: any) => {
+    router.push(link)
+  }
+
   onMounted(() => {
     if(window.innerWidth >= 960) {
       show.setNavigation(true)
@@ -55,6 +59,9 @@
     <v-layout class="">
       <v-card
         v-if="info.user.type === 'candidate' && !info.user.curriculum_url"
+        hover
+        ripple
+        @click="goPerfil(`/dashboard/candidato/${info.user.id}/meu-perfil`)"
         class="floating-notify pa-3 d-flex align-center bg-warning"
         elevation="10"
       >

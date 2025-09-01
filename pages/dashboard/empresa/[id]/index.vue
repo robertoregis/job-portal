@@ -96,7 +96,7 @@
           <v-card
             hover
             ripple
-            @click="navigation('/dashboard/empresa/123/minhas-vagas')"
+            @click="navigation(`/dashboard/empresa/${info.user.id}/minhas-vagas`)"
             class="pa-2 text-center d-flex flex-column justify-center align-center bg-gradient-primary"
             elevation="2"
             style="min-height: 120px;"

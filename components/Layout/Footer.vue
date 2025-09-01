@@ -63,13 +63,13 @@
               order-md="1"
             >
               <div>
-                <NuxtLink to="/" class="no-underline mr-2">
+                <NuxtLink to="https://www.instagram.com/conectonerh/?igsh=MXY2ZHdkZTNoenhsbg%3D%3D#" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-instagram" size="large" />
                 </NuxtLink>
-                <NuxtLink to="/" class="no-underline mr-2">
+                <NuxtLink to="/" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-facebook" size="large" />
                 </NuxtLink>
-                <NuxtLink to="/" class="no-underline mr-2">
+                <NuxtLink to="/" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-linkedin" size="large" />
                 </NuxtLink>
               </div>

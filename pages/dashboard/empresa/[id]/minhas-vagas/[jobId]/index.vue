@@ -309,7 +309,7 @@
           text="Editar vaga"
           variant="flat"
           class="bg-gradient-primary"
-          @click="$router.push(`/dashboard/empresa/123/minhas-vagas/${route.params.jobId}/editar`)"
+          @click="$router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/editar`)"
         />
       </div>
     </v-col>
