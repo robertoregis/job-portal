@@ -44,8 +44,18 @@
     job_types: [],
   })
   const imagePreview = ref<any>(null)
-
   const typeDate = ref<string>('')
+  const areasOfInterestList = [
+    'Administrativa', 'Corporativa', 'Financeira', 'Comercial',
+    'Marketing', 'Recursos Humanos', 'Operacional', 'Logística',
+    'Tecnologia da Informação', 'Jurídica', 'Compras', 'Suprimentos',
+    'Departamento Pessoal', 'Fiscal'
+  ]
+  const jobTypesList = [
+    'Gerente', 'Sub Gerente', 'Coordenador', 'Supervisor',
+    'Especialista', 'Analista', 'Assistente', 'Auxiliar',
+    'Diretor', 'CO', 'COO', 'CFO'
+  ]
   
   watch(stateSelected, async (newState, oldState) => {
     if (newState) {
@@ -638,28 +648,24 @@
                     class="mb-2"
                   ></v-textarea>
 
-                  <v-combobox
+                  <v-select
                     v-model="formdata.areas_of_interest"
+                    :items="areasOfInterestList"
                     label="Áreas de interesse"
-                    multiple
-                    chips
-                    clearable
+                    density="compact"
                     hide-details
-                    chip-color="primary"
-                    placeholder="Digite e pressione Enter"
                     class="mb-2"
+                    required
                   />
 
-                  <v-combobox
+                  <v-select
                     v-model="formdata.job_types"
+                    :items="jobTypesList"
                     label="Tipos de vagas que procura"
-                    multiple
-                    chips
-                    clearable
+                    density="compact"
                     hide-details
-                    chip-color="primary"
-                    placeholder="Digite e pressione Enter"
                     class="mb-2"
+                    required
                   />
 
                   <v-text-field

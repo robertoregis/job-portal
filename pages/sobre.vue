@@ -27,7 +27,7 @@
         <v-row v-if="!loading">
           <v-col cols="12">
             <div class="d-flex justify-center">
-              <img src="/logo.png" alt="Logo Conect One RH" style="width: 68px;">
+              <img src="/logo-simbolo.png" alt="Logo Conect One RH" style="width: 68px;">
             </div>
           </v-col>
           <v-col cols="12">
