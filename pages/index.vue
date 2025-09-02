@@ -39,8 +39,11 @@
           <v-col cols="12">
             <div class="d-flex flex-column align-center pa-3 rounded">
               <h1 class="text-h4 font-weight-bold">Conect One RH</h1>
-              <v-avatar color="info" size="x-large" class="mt-4">
-                <!-- Logo ou ícone -->
+              <v-avatar size="80" class="mt-2">
+                <v-img
+                  alt="logo com símbolo da Conect One RH"
+                  src="/logo-simbolo.png"
+                ></v-img>
               </v-avatar>
               <div class="d-flex max-w-600 mt-4">
                 <p class="text-subtitle-1 mb-0">
