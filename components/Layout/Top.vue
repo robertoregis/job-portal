@@ -61,7 +61,9 @@
   <v-sheet width="100%" class="border-b-sm border-secondary">
     <v-container class="py-3">
       <div class="d-flex justify-space-between align-center">
-        <h1 class="text-h6 font-weight-bold">Conect One RH</h1>
+        <div class="img-logo">
+          <img src="/logo-text.png" alt="logo com símbolo da Conect One RH" style="max-width: 100%;"></img>
+        </div>
 
         <v-spacer></v-spacer>
 
@@ -144,4 +146,14 @@
 </template>
 
 <style lang="scss" scoped>
+  @media(min-width: 250px) {
+    .img-logo {
+      width: 120px;
+    }
+  }
+  @media(min-width: 600px) {
+    .img-logo {
+      width: 180px;
+    }
+  }
 </style>

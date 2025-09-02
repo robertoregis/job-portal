@@ -29,13 +29,13 @@ export default defineNuxtConfig({
           key: 'favicon',
           rel: 'icon',
           type: 'image/png',
-          href: '/',
+          href: '/favicon.png',
         },
         {
           key: 'mobileicon',
           rel: 'apple-touch-icon',
           sizes: '512x512',
-          href: '/',
+          href: '/mobileicon.png',
         },
         {
           rel: 'preconnect',

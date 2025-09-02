@@ -99,8 +99,13 @@ onMounted(() => {
     <v-row v-if="authentication.user.type === 'candidate'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">
-          <v-avatar color="white" size="50"></v-avatar>
-          <div class="d-flex flex-column align-center mt-6">
+          <v-avatar size="60">
+            <v-img
+              alt="logo com símbolo da Conect One RH"
+              src="/logo-simbolo.png"
+            ></v-img>
+          </v-avatar>
+          <div class="d-flex flex-column align-center mt-4">
             <v-avatar v-if="authentication.user.image_url" size="70">
               <v-img
                 alt=""
@@ -187,8 +192,13 @@ onMounted(() => {
     <v-row v-if="authentication.user.type === 'company'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">
-          <v-avatar color="white" size="50"></v-avatar>
-          <div class="d-flex flex-column align-center mt-6">
+          <v-avatar size="60">
+            <v-img
+              alt="logo com símbolo da Conect One RH"
+              src="/logo-simbolo.png"
+            ></v-img>
+          </v-avatar>
+          <div class="d-flex flex-column align-center mt-4">
             <v-avatar v-if="authentication.user.image_url" size="70">
               <v-img
                 alt="John"
@@ -271,8 +281,13 @@ onMounted(() => {
     <v-row v-if="authentication.user.type === 'admin'" class="pa-3" no-gutters>
       <v-col cols="12" class="mt-2">
         <div class="d-flex flex-column align-center">
-          <v-avatar color="white" size="50"></v-avatar>
-          <div class="d-flex flex-column align-center mt-6">
+          <v-avatar size="60">
+            <v-img
+              alt="logo com símbolo da Conect One RH"
+              src="/logo-simbolo.png"
+            ></v-img>
+          </v-avatar>
+          <div class="d-flex flex-column align-center mt-4">
             <v-avatar v-if="authentication.user.image_url" size="70">
               <v-img
                 alt="John"
