@@ -77,6 +77,7 @@
         <span class="text-caption">Confira e atualize seus dados pessoais</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   
   <v-row no-gutters class="mt-5">
@@ -89,6 +90,10 @@
           class="bg-gradient-primary"
         />
       </div>
+    </v-col>
+
+    <v-col v-if="!info.user.is_complete" cols="12" class="bg-error mt-4 pa-2">
+      <p class="text-center">Conclua o seu perfil para candidatar-se as vagas!</p>
     </v-col>
 
     <v-col cols="12" class="border mt-4">
@@ -190,6 +195,15 @@
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Sobre mim</v-list-item-title>
                 <span class="text-body-2">
                   {{ candidate.about }}
+                </span>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Pretensão salarial</v-list-item-title>
+                <span class="text-body-2">
+                  {{ candidate.salary_expectations }}
                 </span>
               </v-list-item-content>
             </v-list-item>

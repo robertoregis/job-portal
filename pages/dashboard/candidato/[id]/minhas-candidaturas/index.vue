@@ -19,14 +19,12 @@
   const totalPages = ref(1)
   const candidaturesList = ref<any[]>([])
   const candidaturaStatusOptions = [
-    { name: 'Enviada', icon: 'mdi-send' },
-    { name: 'Em análise', icon: 'mdi-magnify' },
-    { name: 'Em entrevista', icon: 'mdi-account-question' },
-    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
-    { name: 'Aprovado', icon: 'mdi-check-circle' },
-    { name: 'Rejeitado', icon: 'mdi-close-circle' },
-    { name: 'Arquivada', icon: 'mdi-archive' },
-    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+    { code: 1, name: 'Desclassificado', icon: 'mdi-close-circle' },
+    { code: 2, name: 'Análise de Currículo', icon: 'mdi-magnify' },
+    { code: 3, name: 'Análise Comportamental', icon: 'mdi-account-search' },
+    { code: 4, name: 'Entrevita de Expectativa', icon: 'mdi-account-question' },
+    { code: 5, name: 'Pré-Selecionados', icon: 'mdi-progress-clock' },
+    { code: 6, name: 'Contratados', icon: 'mdi-check-circle' }
   ]
 
   const selectedStatus = ref<string | null>(null)
@@ -102,6 +100,7 @@
         <span class="text-caption">Confira todas em um mesmo lugar</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Filtros -->

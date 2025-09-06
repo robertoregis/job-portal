@@ -49,6 +49,7 @@
         <span class="text-caption">Gerencie os dados da sua empresa</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row no-gutters class="mt-5">

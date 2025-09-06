@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     const candidateIds = [...new Set(data.map((c: any) => c.candidate_id))]
     const { data: candidatesData, error: candidateError } = await supabase
       .from('candidates')
-      .select('id, name, image_url, marital_status, birth_date')
+      .select('id, name, image_url, salary_expectations, city, state')
       .in('id', candidateIds)
 
     if (candidateError) {
@@ -45,10 +45,12 @@ export default defineEventHandler(async (event) => {
 
     const candidateMap = candidatesData.reduce((acc: any, candidate: any) => {
       acc[candidate.id] = {
+        id: candidate.id,
         name: candidate.name,
         image_url: candidate.image_url,
-        marital_status: candidate.marital_status,
-        birth_date: candidate.birth_date
+        salary_expectations: candidate.salary_expectations,
+        city: candidate.city,
+        state: candidate.state
       }
       return acc
     }, {})
@@ -57,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const jobIds = [...new Set(data.map((c: any) => c.job_id))]
     const { data: jobsData, error: jobError } = await supabase
       .from('jobs')
-      .select('id, contract_type, salary, work_format')
+      .select('id, contract_type, salary, title')
       .in('id', jobIds)
 
     if (jobError) {
@@ -68,7 +70,7 @@ export default defineEventHandler(async (event) => {
       acc[job.id] = {
         contract_type: job.contract_type,
         salary: job.salary,
-        work_format: job.work_format
+        title: job.title
       }
       return acc
     }, {})
@@ -77,12 +79,13 @@ export default defineEventHandler(async (event) => {
       ...c,
       created_at_formatted: c.created_at ? formatDateTimestamp(c.created_at, 3) : null,
       candidate_name: candidateMap[c.candidate_id]?.name || null,
+      candidate_id: candidateMap[c.candidate_id]?.id || null,
       candidate_image_url: candidateMap[c.candidate_id]?.image_url || null,
-      candidate_marital_status: candidateMap[c.candidate_id]?.marital_status || null,
-      candidate_birth_date: candidateMap[c.candidate_id]?.birth_date || null,
+      candidate_salary_expectations: candidateMap[c.candidate_id]?.salary_expectations || null,
+      candidate_address: `${candidateMap[c.candidate_id]?.city || ''} - ${candidateMap[c.candidate_id]?.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, ''),
       contract_type: jobMap[c.job_id]?.contract_type || null,
       salary: jobMap[c.job_id]?.salary || null,
-      work_format: jobMap[c.job_id]?.work_format || null
+      title: jobMap[c.job_id]?.title || null,
     }))
 
     return {
@@ -97,10 +100,26 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { state, city, job_id, candidate_id, status, icon_status, title } = body
+    let { state, city, job_id, candidate_id, status, icon_status, title, code_status } = body
 
     if (!candidate_id || !job_id) {
       throw createError({ statusCode: 400, statusMessage: 'candidate_id and job_id are required' })
+    }
+
+    // Buscar dados dos candidatos
+    const { data: candidateData, error: candidateError } = await supabase
+      .from('candidates')
+      .select('id, name, is_complete, completion_percentage')
+      .eq('id', candidate_id)
+      .single()
+
+
+    if (candidateError) {
+      throw createError({ statusCode: 500, statusMessage: candidateError.message })
+    }
+
+    if(!candidateData.is_complete) {
+      throw createError({ statusCode: 409, statusMessage: 'Você precisa completar o teu perfil' })
     }
 
     // Verifica se já existe candidatura igual
@@ -122,8 +141,9 @@ export default defineEventHandler(async (event) => {
     title = emptyStringToNull(title)
     state = emptyStringToNull(state)
     city = emptyStringToNull(city)
-    status = emptyStringToNull(status) || 'Enviada'
-    icon_status = emptyStringToNull(icon_status) || 'mdi-send'
+    status = emptyStringToNull(status) || 'Análise de Currículo'
+    icon_status = emptyStringToNull(icon_status) || 'mdi-magnify'
+    code_status = emptyStringToNull(code_status) || 2
 
     const { data, error } = await supabase
       .from('candidatures')
@@ -134,7 +154,8 @@ export default defineEventHandler(async (event) => {
         candidate_id,
         status,
         icon_status,
-        title
+        title,
+        code_status
       }])
       .select()
       .single()

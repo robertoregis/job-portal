@@ -21,30 +21,14 @@
   const route = useRoute();
   const router = useRouter()
   const job = ref<any>({})
-  const statuses = [
-    { code: 1, title: 'Desclassificado', icon: 'mdi-close-circle', count: 1 },
-    { code: 2, title: 'Análise de Currículo', icon: 'mdi-magnify', count: 9 },
-    { code: 3, title: 'Análise Comportamental', icon: 'mdi-account-search', count: 6 },
-    { code: 4, title: 'Entrevita de Expectativa', icon: 'mdi-account-question', count: 3 },
-    { code: 5, title: 'Pré-Selecionados', icon: 'mdi-progress-clock', count: 0 },
-    { code: 6, title: 'Contratados', icon: 'mdi-check-circle', count: 8 }
+  const candidaturaStatusOptions = [
+    { code: 1, name: 'Desclassificado', icon: 'mdi-close-circle' },
+    { code: 2, name: 'Análise de Currículo', icon: 'mdi-magnify' },
+    { code: 3, name: 'Análise Comportamental', icon: 'mdi-account-search' },
+    { code: 4, name: 'Entrevita de Expectativa', icon: 'mdi-account-question' },
+    { code: 5, name: 'Pré-Selecionados', icon: 'mdi-progress-clock' },
+    { code: 6, name: 'Contratados', icon: 'mdi-check-circle' }
   ]
-
-  let idCounter = 1
-  const candidaturesForTest: any[] = []
-
-  statuses.forEach(status => {
-    for (let i = 0; i < status.count; i++) {
-      candidaturesForTest.push({
-        id: idCounter++,
-        candidate_name: `Candidato ${idCounter}`,
-        title: `Vaga ${Math.ceil(Math.random() * 5)}`,
-        code_status: status.code,
-        status: status.title,
-        icon_status: status.icon
-      })
-    }
-  })
 
   const page = ref(1)
   const pageSize = ref(500)
@@ -57,6 +41,24 @@
     approved: 0,
     rejected: 0
   })
+
+  const getFormatDate = (date: string) => {
+    if (!date) return ''
+    const parts = date.split('-') // ["yyyy", "mm", "dd"]
+    if (parts.length !== 3) return date
+
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+
+  const onStatusSelect = (selected: string | null) => {
+    if (!selected) {
+      selectedIconStatus.value = ''
+      return
+    }
+    const result = candidaturaStatusOptions.find(option => option.name === selected)
+    selectedIconStatus.value = result ? result.icon : ''
+  }
 
   const getJob = async () => {
     const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
@@ -116,7 +118,7 @@
   }
 
   const navigation = (candidatureId: number, candidateId: string) => {
-    router.push(`/dashboard/empresa/${info.user.id}/candidaturas/${candidatureId}/candidatos/${candidateId}`)
+    router.push(`/dashboard/admin/candidaturas/${candidatureId}/candidatos/${candidateId}`)
   }
 
   const { data: candidatures, error, refresh, pending } = await useFetch('/api/candidatures', {
@@ -162,11 +164,11 @@
   </v-row>
 
   <!-- Lista de candidaturas -->
-  <v-row v-if="info.user.is_approved" no-gutters class="mt-4">
+  <v-row no-gutters class="mt-4">
     <v-col cols="12">
       <v-row>
         <v-col
-          v-for="status in statuses"
+          v-for="status in candidaturaStatusOptions"
           :key="status.code"
           cols="12"
           sm="6"
@@ -174,7 +176,7 @@
         >
           <v-card>
             <v-card-title class="text-subtitle-1 font-weight-bold text-gradient-primary custom-subtitle-and-title">
-              {{ status.title }}
+              {{ status.name }}
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="pa-0">

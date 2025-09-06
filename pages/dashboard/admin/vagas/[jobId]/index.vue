@@ -16,19 +16,29 @@
     total: 0
   })
   const jobsEditList = ref<any[]>([])
+  const jobStatusOptions = [
+    { name: 'Aberta', icon: 'mdi-briefcase-plus' },
+    { name: 'Encerrada', icon: 'mdi-briefcase-off' },
+  ]
+
+  const selectedStatus = ref<any>('')
+  const onStatusSelect = (selected: any) => {
+    job.value.status = selected.name
+    job.value.icon_status = selected.icon
+    selectedStatus.value = selected
+  }
 
   const getJobsEdit = async () => {
     const params: Record<string, any> = {
       page: 1,
       pageSize: 3,
-      job_idt: job.value.id
+      job_id: job.value.id
     }
 
     const { data, error } = await useFetch('/api/jobs_edit', {
       method: 'GET',
       params
     })
-    console.log(data)
     if (error.value) {
       console.error('Erro ao carregar os pedidos de edição:', error.value)
     } else {
@@ -49,8 +59,34 @@
     }
   }
 
+  const updateJobStatus = async () => {
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+      method: 'PATCH',
+      body: {
+        status: job.value.status,
+        icon_status: job.value.icon_status,
+      }
+    })
+
+    if (error.value) {
+      console.error('Erro ao atualizar vaga:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
+      return
+    }
+    createLog({
+      title: `Atualizou a vaga`,
+      profile_id: info.profile.id,
+      type: 'update_job'
+    })
+    job.value = data.value
+    show.setOverlayDashboard(false)
+    notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
+  }
+
   const navigation = (id: number) => {
-    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/candidaturas`)
+    router.push(`/dashboard/admin/vagas/${route.params.jobId}/candidaturas`)
   }
 
   const { data, error, pending } = await useFetch(`/api/jobs/${route.params.jobId}`, {
@@ -60,6 +96,7 @@
   if (error.value) {
   } else {
     job.value = data.value
+    selectedStatus.value = job.value.status
     useHead({
       title: `${job.value.title} - Conect One RH`,
       meta: [
@@ -87,7 +124,7 @@
     <LayoutButtonBack />
   </v-row>
 
-  <v-row v-if="info.user.is_approved" no-gutters class="mt-5">
+  <v-row no-gutters class="mt-5">
     <v-col cols="12">
       <div class="d-flex">
         <v-card hover ripple @click="navigation" class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="180" style="min-height: 100px">
@@ -210,15 +247,46 @@
       </v-list>
     </v-col>
 
-    <v-col cols="12" class="mt-4">
-      <div class="d-flex">
-        <v-btn
-          text="Editar vaga"
-          variant="flat"
-          class="bg-gradient-primary"
-          @click="$router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/editar`)"
-        />
-      </div>
+    <!-- NOVA SEÇÃO: Controles de status e ativação -->
+    <v-col cols="12" class="border mt-4">
+      <v-card flat class="pa-4">
+        <div class="d-flex align-center mb-4">
+          <v-icon class="mr-2 text-gradient-primary">mdi-tune</v-icon>
+          <h3 class="text-subtitle-1 font-weight-bold text-gradient-primary">Gerenciar status da vaga</h3>
+        </div>
+
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-select
+              :items="jobStatusOptions"
+              v-model="selectedStatus"
+              item-title="name"
+              return-object
+              density="comfortable"
+              variant="outlined"
+              hide-details
+              color="primary"
+              @update:modelValue="onStatusSelect"
+            />
+          </v-col>
+
+          <v-col cols="12" md="6" class="d-flex align-center">
+            <v-switch
+              v-model="job.is_active"
+              :label="`${job.is_active ? 'Ativada' : 'Desativada'}`"
+              color="success"
+              inset
+              hide-details
+            />
+          </v-col>
+
+          <v-col cols="12">
+            <v-btn class="mt-2 bg-gradient-primary" @click="updateJobStatus">
+              Salvar alterações
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
     </v-col>
 
   </v-row>

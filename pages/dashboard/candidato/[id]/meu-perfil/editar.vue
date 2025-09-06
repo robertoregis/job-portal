@@ -40,6 +40,7 @@
     city: null,
     about: null,
     marital_status: null,
+    salary_expectations: null,
     areas_of_interest: [],
     job_types: [],
   })
@@ -76,6 +77,45 @@
       formdata.value.city = newCity;
     }
   })
+
+  const profilePoints = {
+    name: 10,
+    phone: 10,
+    birth_date: 5,
+    cpf: 10,
+    state: 5,
+    city: 5,
+    about: 10,
+    marital_status: 10,
+    salary_expectations: 15,
+    areas_of_interest: 10,
+    job_types: 10,
+  }
+
+  const calculateProfileScore = (profile: any, profilePoints: any) => {
+    let total = 0
+    let achieved = 0
+
+    for (const key in profilePoints) {
+      const points = profilePoints[key]
+      total += points
+
+      const fieldValue = profile[key]
+      const isFilled =
+        fieldValue !== null &&
+        fieldValue !== '' &&
+        !(Array.isArray(fieldValue) && fieldValue.length === 0)
+
+      if (isFilled) {
+        achieved += points
+      }
+    }
+
+    const percentage = Math.round((achieved / total) * 100)
+    const isComplete = percentage === 100
+
+    return { percentage, isComplete }
+  }
 
   const getStates = async () => {
       loading.value = true; // marca que está carregando
@@ -142,6 +182,15 @@
   const updateCandidate = async () => {
     show.setOverlayDashboard(true)
     try {
+      const resultCalculate = calculateProfileScore(formdata.value, profilePoints)
+      formdata.value.is_complete = resultCalculate.isComplete;
+      formdata.value.completion_percentage = `${resultCalculate.percentage}%`;
+      if(citySelected.value) {
+        formdata.value.city = citySelected.value
+      }
+      if(stateSelected.value) {
+        formdata.value.state = stateSelected.value
+      }
       const { data, error } = await useFetch(`/api/candidates/${info.user.id}`, {
         method: 'PATCH',
         body: formdata.value
@@ -188,6 +237,7 @@
       marital_status: data.value.marital_status,
       areas_of_interest: data.value.areas_of_interest,
       job_types: data.value.job_types,
+      salary_expectations: data.value.salary_expectations
     }
     if(info.user.image_url) {
       imagePreview.value = info.user.image_url
@@ -440,6 +490,10 @@
         <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
+    <v-col v-if="!info.user.is_complete" cols="12" class="bg-error mt-4 pa-2">
+      <p class="text-center">Conclua o seu perfil para candidatar-se as vagas!</p>
+    </v-col>
   </v-row>
 
   <v-row no-gutters class="mt-5">
@@ -592,6 +646,14 @@
                     class="mb-2"
                   ></v-select>
 
+                  <v-text-field
+                    v-model="formdata.salary_expectations"
+                    label="Pretensão salarial"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
                   <v-select
                     v-model="stateSelected"
                     label="Estado"
@@ -653,9 +715,10 @@
                     :items="areasOfInterestList"
                     label="Áreas de interesse"
                     density="compact"
+                    multiple
+                    chips
                     hide-details
                     class="mb-2"
-                    required
                   />
 
                   <v-select
@@ -663,9 +726,10 @@
                     :items="jobTypesList"
                     label="Tipos de vagas que procura"
                     density="compact"
+                    multiple
+                    chips
                     hide-details
                     class="mb-2"
-                    required
                   />
 
                   <v-text-field

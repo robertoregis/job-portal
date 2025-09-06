@@ -66,9 +66,10 @@ export default defineEventHandler(async (event) => {
   if (type === 'company') {
     if (type === 'company') {
       // Cria a empresa
+      let representative_email = email;
       const { data: company, error: companyError } = await supabase
         .from('companies')
-        .insert([{ name, email, profile_id: profile.id, code_confirmation: token }])
+        .insert([{ name, email, representative_email, profile_id: profile.id, code_confirmation: token }])
         .select()
         .single()  // pegamos o company criado para usar o id
 

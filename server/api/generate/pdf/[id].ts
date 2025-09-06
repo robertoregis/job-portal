@@ -5,20 +5,29 @@ import supabase from "@/server/utils/supabase";
 
 export default defineEventHandler(async (event) => {
   const method = event.req.method
-  const id = getRouterParam(event, 'id')
-  if (!id) throw new Error("ID do candidato é obrigatório");
+  const feedbackId = getRouterParam(event, 'id');
+  if (!feedbackId) throw new Error("ID do parecer é obrigatório");
 
-  // Busca no Supabase
-  const { data: candidate, error } = await supabase
-    .from("candidates")
-    .select("*")
-    .eq("id", id)
+  // Busca o feedback com dados da candidatura e do candidato
+  const { data: feedback, error: feedbackError } = await supabase
+    .from("feedbacks")
+    .select(`
+      *,
+      candidatures!inner(
+        candidate: candidates(*),
+        job: jobs(title)
+      )
+    `)
+    .eq("id", feedbackId)
     .single();
 
-  if (error || !candidate) {
+  if (feedbackError || !feedback) {
     event.node.res.statusCode = 404;
-    return event.node.res.end("Candidato não encontrado");
+    return event.node.res.end("Feedback não encontrado");
   }
+
+  const candidate = feedback.candidatures?.candidate;
+  const jobTitle = feedback.candidatures?.job?.title || '';
 
   let browser;
   try {
@@ -45,6 +54,7 @@ export default defineEventHandler(async (event) => {
             .candidate { display: flex; align-items: center; margin-bottom: 30px; }
             .candidate img { width: 68px; height: 68px; object-fit: cover; border-radius: 50%; margin-right: 20px; }
             ul { padding-left: 20px; margin: 0; }
+            .feedback { padding: 3px; background: #e1e1e1; }
           </style>
         </head>
         <body>
@@ -63,7 +73,7 @@ export default defineEventHandler(async (event) => {
             <div><strong>Email:</strong> ${candidate.email || ''}</div>
             <div><strong>Telefone:</strong> ${candidate.phone || ''}</div>
             <div><strong>Status:</strong> ${candidate.marital_status || ''}</div>
-            <div><strong>Endereço:</strong> ${candidate.city || ''} - ${candidate.states || ''}</div>
+            <div><strong>Endereço:</strong> ${candidate.city || ''} - ${candidate.state || ''}</div>
             <div><strong>Data de Nascimento:</strong> ${candidate.birth_date || ''}</div>
           </div>
 
@@ -100,6 +110,13 @@ export default defineEventHandler(async (event) => {
             <ul>
               ${(candidate.job_types || []).map((e:any) => `<li>${e}</li>`).join("")}
             </ul>
+          </div>
+
+          <div class="section">
+            <h3>Parecer</h3>
+            <div style="padding: 2px; background: #f1efefff;">
+              ${feedback.content}
+            </div>
           </div>
         </body>
       </html>

@@ -5,11 +5,11 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Minhas vagas - Conect One RH`,
+    title: `Vagas - Conect One RH`,
     meta: [
       {
           name: 'description',
-          content: 'Gerencie todas as vagas da sua empresa publicadas na Conect One RH.'
+          content: 'Gerencie todas as vagas publicadas na Conect One RH.'
       }
     ]
   })
@@ -32,10 +32,8 @@
     selectedIconStatus.value = result?.icon || ''
   }
 
-  const selectedActive = ref<string | null>(null)
-
   // Resetar página ao mudar filtro
-  watch([selectedStatus, selectedActive], () => {
+  watch([selectedStatus], () => {
     page.value = 1
     getJobs()
   })
@@ -46,7 +44,7 @@
 
   // Navegação
   const navigation = (id: number) => {
-    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${id}`)
+    router.push(`/dashboard/admin/vagas/${id}`)
   }
 
   const getJobs = async () => {
@@ -56,16 +54,6 @@
     }
 
     if (selectedStatus.value) params.status = selectedStatus.value
-    if (selectedActive.value === 'Sim') {
-      params.is_active = true
-    } else if (selectedActive.value === 'Não') {
-      params.is_active = false
-    }
-
-    // Filtro por empresa (se houver)
-    if (info.user.id) {
-      params.company_id = info.user.id
-    }
 
     const { data, error } = await useFetch('/api/jobs', {
       method: 'GET',
@@ -85,7 +73,6 @@
   const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
     method: 'GET',
     params: {
-      company_id: info.user.id,
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
       status: selectedStatus.value
@@ -105,8 +92,8 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="text-gradient-primary font-weight-bold">Minhas vagas!</span>
-        <span class="text-caption">Confira todas as tuas vagas.</span>
+        <span class="text-gradient-primary font-weight-bold">Vagas!</span>
+        <span class="text-caption">Confira todas as vagas publicadas.</span>
       </div>
     </v-col>
     <LayoutButtonBack />
@@ -143,16 +130,6 @@
           <v-icon :icon="selectedIconStatus" start></v-icon>
           Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
         </v-chip>
-      </div>
-    </v-col>
-  </v-row>
-
-  <!-- Botão criar -->
-  <v-row no-gutters>
-    <v-col cols="12" :class="selectedStatus? 'mt-4' : ''">
-      <div class="d-flex">
-        <v-btn v-if="info.user.is_approved" text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/empresa/${info.user.id}/vagas/criar`)" />
-        <span v-else class="bg-warning py-1 px-2 mt-1">Para criar vaga a sua conta precisa está aprovada</span>
       </div>
     </v-col>
   </v-row>

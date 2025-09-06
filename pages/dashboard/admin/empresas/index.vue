@@ -95,6 +95,7 @@
         <span class="text-caption">Confira todas as empresas.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Filtros -->

@@ -78,6 +78,7 @@
         <span class="text-caption">Confira a pré-visualização</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row no-gutters class="mt-5">

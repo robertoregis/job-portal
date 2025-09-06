@@ -100,6 +100,7 @@
         <span class="text-caption">Confira e gerencie todas as páginas.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Botão criar -->

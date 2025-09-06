@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
     // Pega o profile_id da empresa
     const { data: company, error: companyError } = await supabase
       .from('companies')
-      .select('profile_id')
+      .select('profile_id, name, email')
       .eq('id', jobEdit.company_id)
       .single()
 
@@ -103,7 +103,9 @@ export default defineEventHandler(async (event) => {
 
     return {
       ...jobEdit,
-      profile_id: company?.profile_id ?? null
+      profile_id: company?.profile_id ?? null,
+      name_company: company?.name,
+      email: company?.email
 }
 
 

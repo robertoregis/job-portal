@@ -28,7 +28,7 @@
       id: "teamwork",
       text: "Você prefere trabalhar sozinho ou em equipe?",
       type: "radio",
-      options: ["Sozinho", "Em equipe", "Indiferente"],
+      options: ["CONTROLADO", "ENERGÉTICO", "ATENCIOSO", "SOCIÁVEL"],
       bind: "teamwork"
     },
     {

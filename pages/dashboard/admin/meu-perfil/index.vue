@@ -48,6 +48,7 @@
         <span class="text-caption">Confira e atualize seus dados pessoais</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   
   <v-row no-gutters class="mt-5">

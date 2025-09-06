@@ -31,12 +31,11 @@
     education_level: null,
     benefits: null,
     benefits_simple: null,
-    undergraduate_areas: null,
-    undergraduate_areas_simple: null,
+    undergraduate_areas: [],
     knowledge: null,
     knowledge_simple: null,
     description: null,
-    status: 'Aberta para inscrição',
+    status: 'Aberta',
     icon_status: 'mdi-briefcase-plus',
     is_active: false,
     is_closed: false,
@@ -56,6 +55,12 @@
     'Doutorado',
   ]
   const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const undergraduateAreasList = [
+    'Administrativa', 'Corporativa', 'Financeira', 'Comercial',
+    'Marketing', 'Recursos Humanos', 'Operacional', 'Logística',
+    'Tecnologia da Informação', 'Jurídica', 'Compras', 'Suprimentos',
+    'Departamento Pessoal', 'Fiscal'
+  ]
 
   const sendMail = async (companyName: string, jobName: string, jobDescription: string) => {
     const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
@@ -82,13 +87,6 @@
       job.value.benefits = benefitsArray
     } else {
       job.value.benefits = []
-    }
-    let undergraduate_areasArray: any = job.value.undergraduate_areas_simple
-    if (job.value.undergraduate_areas_simple) {
-      undergraduate_areasArray = undergraduate_areasArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
-      job.value.undergraduate_areas = undergraduate_areasArray
-    } else {
-      job.value.undergraduate_areas = []
     }
     let knowledgeArray: any = job.value.knowledge_simple
     if (job.value.knowledge_simple) {
@@ -171,6 +169,7 @@
         <span class="text-caption">Aumente o seu time criando uma vaga</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">
@@ -248,6 +247,17 @@
               class="mb-3"
             />
 
+            <v-select
+              v-model="job.undergraduate_areas"
+              :items="undergraduateAreasList"
+              label="Áreas de graduação"
+              density="compact"
+              multiple
+              chips
+              hide-details
+              class="mb-3"
+            />
+
             <v-textarea
               v-model="job.description"
               label="Descrição da vaga"
@@ -274,16 +284,6 @@
               v-model="job.knowledge_simple"
               label="Conhecimentos"
               placeholder="Ex: Planilhas, Informática, Design..."
-              auto-grow
-              density="compact"
-              hide-details
-              class="mb-3"
-            />
-
-            <v-textarea
-              v-model="job.undergraduate_areas_simple"
-              label="Áreas de graduação"
-              placeholder="Ex: Engenharia, Robôtica..."
               auto-grow
               density="compact"
               hide-details

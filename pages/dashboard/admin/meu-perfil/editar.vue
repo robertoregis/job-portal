@@ -309,6 +309,7 @@
         <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row no-gutters class="mt-5">

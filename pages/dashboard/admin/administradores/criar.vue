@@ -131,6 +131,7 @@
         <span class="text-caption">Crie um administrador para fazer parte da equipe</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">

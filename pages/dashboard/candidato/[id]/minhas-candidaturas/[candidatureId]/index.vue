@@ -154,6 +154,7 @@
         <span class="text-caption">Veja a sua candidatura</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row v-if="!loading" no-gutters class="mt-5">
     <v-col cols="12" class="border">
