@@ -27,6 +27,8 @@
   const pageSize = ref(10)
   const totalPages = ref(1)
   const loading = ref<boolean>(true)
+  const result_behavioral = ref<any>({})
+  const behavioral = ref<any>({})
   const candidaturaStatusOptions = [
     { code: 1, name: 'Desclassificado', icon: 'mdi-close-circle' },
     { code: 2, name: 'Análise de Currículo', icon: 'mdi-magnify' },
@@ -113,6 +115,7 @@
       })
       loading.value = false;
       getFeedbacks()
+      getBeharioval()
       getDataCandidate(candidate.value.id)
     }
   }
@@ -214,6 +217,49 @@
       notify({ title: 'Erro', text: 'Ocorreu um erro ao gerar relatório', type: 'error' })
     }
   };
+
+  const MAX_WIDTH = 300
+
+  const getWidth = (val: string | number) => {
+    let num = typeof val === 'number' ? val : parseInt(val.toString().replace('%', ''), 10)
+    return Math.round((num / 100) * MAX_WIDTH)
+  }
+
+  const getResultBeharioval = async () => {
+    const params: Record<string, any> = {
+      behavioral_profiles_id: behavioral.value.id
+    }
+
+    const { data, error } = await useFetch('/api/result_behavioral', {
+      method: 'GET',
+      params
+    })
+
+    if (data.value?.data?.length) {
+      const res = data.value.data[0]
+      result_behavioral.value = res
+    }
+  }
+
+  const getBeharioval = async () => {
+    const params: Record<string, any> = {
+      candidate_id: candidate.value.id
+    }
+
+    const { data, error } = await useFetch('/api/behavioral_profiles', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+    } else {
+      console.log(data.value)
+      behavioral.value = data.value.data[0]
+      if (Object.keys(behavioral.value).length > 0) {
+        getResultBeharioval()
+      }
+    }
+  }
 
   const { data, error, pending } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
     method: 'GET'
@@ -399,7 +445,46 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-
+            <v-divider v-if="result_behavioral && result_behavioral.id"></v-divider>
+             <v-list-item v-if="result_behavioral && result_behavioral.id" class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Perfil comportamental</v-list-item-title>
+                <div class="chart mb-2">
+                  <div class="chart-item">
+                    <h2>Dominância</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-1" :style="{ width: getWidth(result_behavioral.dominance) + 'px' }">
+                        {{ result_behavioral.dominance_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Influência</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-2" :style="{ width: getWidth(result_behavioral.influence) + 'px' }">
+                        {{ result_behavioral.influence_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Estabilidade</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-3" :style="{ width: getWidth(result_behavioral.steadiness) + 'px' }">
+                        {{ result_behavioral.steadiness_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Conformidade</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-4" :style="{ width: getWidth(result_behavioral.conscientiousness) + 'px' }">
+                        {{ result_behavioral.conscientiousness_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
             <!-- Experiências -->
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
@@ -606,4 +691,47 @@
 </template>
 
 <style lang="scss" scoped>
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chart-item h2 {
+  margin: 0 0 5px 0;
+  font-size: 13px;
+}
+
+.bar-bg {
+  width: 300px;
+  height: 30px;
+  background-color: #d4d2d2;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 15px 0 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  transition: width 0.5s ease;
+  font-size: 12px;
+}
+
+.bar-fill-1 {
+  background-color: #4caf50;
+}
+.bar-fill-2 {
+  background-color: #2155c4;
+}
+.bar-fill-3 {
+  background-color: #cc2525;
+}
+.bar-fill-4 {
+  background-color: #dbb434;
+}
 </style>

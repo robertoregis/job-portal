@@ -106,14 +106,14 @@
             @click="router.push(`/dashboard/candidato/${info.user.id}/meu-perfil/editar`)"
             :model-value="info.user.completion_percentage_formatted"
             :rotate="360"
-            :size="40"
+            :size="46"
             :width="5"
             color="white"
             class="cursor-pointer"
           >
             <span class="text-caption">{{ info.user.completion_percentage_formatted }}</span>
           </v-progress-circular>
-          <span class="mt-1 text-caption">Seu progresso...</span>
+          <span class="mt-1 text-caption">{{ info.user.completion_percentage >= 100 ? 'O seu perfil tá completo' : 'Seu progresso...' }}</span>
           <v-btn
             @click="logout"
             color="white"
@@ -271,6 +271,12 @@
             <NuxtLink :to="`/dashboard/admin/edicao-de-vagas`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-briefcase-edit</v-icon>
               <span>Edição de vagas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/questionarios`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-clipboard-text</v-icon>
+              <span>Questionários</span>
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">

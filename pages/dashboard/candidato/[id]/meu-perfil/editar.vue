@@ -30,7 +30,8 @@
   const cpfInputRef: any = ref(null)
   let phoneMaskInstance: any = null
   let cpfMaskInstance: any = null
-
+  const isLoad = ref<boolean>(false)
+  const behavioral = ref<any>({})
   const formdata = ref<any>({
     name: null,
     phone: null,
@@ -464,6 +465,23 @@
 
   }
 
+  const getBeharioval = async () => {
+    const params: Record<string, any> = {
+      candidate_id: info.user.id
+    }
+
+    const { data, error } = await useFetch('/api/behavioral_profiles', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+    } else {
+      console.log(data.value)
+      behavioral.value = data.value.data[0]
+    }
+  }
+
   onMounted(() => {
     if (phoneInputRef.value) {
       const nativePhoneInput = phoneInputRef.value.$el.querySelector('input')
@@ -488,12 +506,26 @@
         })
       }
     }
+
+    getBeharioval()
   })
 
   onBeforeUnmount(() => {
     phoneMaskInstance?.destroy()
     cpfMaskInstance?.destroy()
   })
+
+  const onQuestionarySubmitted = (type: string) => {
+    setTimeout(() => {
+      isLoad.value = true
+    }, 1000)
+    setTimeout(() => {
+      isLoad.value = false
+    }, 3000)
+    if(type === 'form') {
+      window.location.reload()
+    }
+  }
 </script>
 
 <template>
@@ -846,7 +878,7 @@
       </v-col>
 
       <v-col cols="12" class="border mt-4">
-        <PerfilUserBehavioral />
+        <PerfilUserBehavioral :behavioral="behavioral" :load="isLoad" @submitted="onQuestionarySubmitted" />
       </v-col>
 
       <v-col cols="12" class="border mt-4">
