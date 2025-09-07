@@ -104,14 +104,14 @@
         <div class="d-flex flex-column align-center">
           <v-progress-circular
             @click="router.push(`/dashboard/candidato/${info.user.id}/meu-perfil/editar`)"
-            :model-value="info.user.completion_percentage"
+            :model-value="info.user.completion_percentage_formatted"
             :rotate="360"
             :size="40"
             :width="5"
             color="white"
             class="cursor-pointer"
           >
-            <span class="text-caption">{{ info.user.completion_percentage }}</span>
+            <span class="text-caption">{{ info.user.completion_percentage_formatted }}</span>
           </v-progress-circular>
           <span class="mt-1 text-caption">Seu progresso...</span>
           <v-btn

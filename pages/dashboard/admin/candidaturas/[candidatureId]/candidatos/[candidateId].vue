@@ -527,9 +527,13 @@
                   <span class="text-caption font-weight-bold">{{ feedback.job_title }}</span>
                   
                   <!-- botão à direita -->
-                  <v-btn size="md" flat icon color="warning" class="pa-1" @click.stop="downloadPDF(feedback)">
-                    <v-icon>mdi-file-document-outline</v-icon>
-                  </v-btn>
+                   <v-tooltip text="Gerar relatório">
+                    <template #activator="{ props }">
+                      <v-btn v-bind="props" size="md" flat icon color="warning" class="pa-1" @click.stop="downloadPDF(feedback)">
+                        <v-icon>mdi-file-document-outline</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-tooltip>
                 </div>
               </div>
             </v-col>

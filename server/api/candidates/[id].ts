@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
       'about', 'birth_date', 'is_employed', 'job_types', 
       'areas_of_interest', 'instagram', 'site', 'linkedin',
       'code_confirmation', 'is_confirmation', 'salary_expectations',
-      'is_complete', 'completion_percentage'
+      'is_complete', 'completion_percentage', 'completion_percentage_formatted'
     ] // campos que podem ser atualizados
     for (const field of fields) {
       if (field in body) {

@@ -79,20 +79,30 @@
   })
 
   const profilePoints = {
-    name: 10,
-    phone: 10,
+    name: 5,
+    phone: 5,
     birth_date: 5,
-    cpf: 10,
+    cpf: 5,
     state: 5,
     city: 5,
-    about: 10,
-    marital_status: 10,
-    salary_expectations: 15,
+    about: 5,
+    marital_status: 5,
+    salary_expectations: 5,
     areas_of_interest: 10,
-    job_types: 10,
+    job_types: 5,
   }
 
-  const calculateProfileScore = (profile: any, profilePoints: any) => {
+  const totalCompletes = computed(() => {
+    const u = info.user || {}
+    return (
+      (u.is_complete_educations ? 10 : 0) +
+      (u.is_complete_experiences ? 10 : 0) +
+      (u.is_complete_soft_skills ? 10 : 0) +
+      (u.is_complete_behavioral ? 10 : 0)
+    )
+  })
+
+  const calculateProfileScore = (profile: any, profilePoints: any):any => {
     let total = 0
     let achieved = 0
 
@@ -111,8 +121,8 @@
       }
     }
 
-    const percentage = Math.round((achieved / total) * 100)
-    const isComplete = percentage === 100
+    const percentage = total > 0 ? Math.round((achieved / total) * 60) : 0
+    const isComplete = percentage + totalCompletes.value >= 100
 
     return { percentage, isComplete }
   }
@@ -184,7 +194,8 @@
     try {
       const resultCalculate = calculateProfileScore(formdata.value, profilePoints)
       formdata.value.is_complete = resultCalculate.isComplete;
-      formdata.value.completion_percentage = `${resultCalculate.percentage}%`;
+      formdata.value.completion_percentage = resultCalculate.percentage + totalCompletes.value;
+      formdata.value.completion_percentage_formatted = `${resultCalculate.percentage + totalCompletes.value}%`;
       if(citySelected.value) {
         formdata.value.city = citySelected.value
       }
@@ -214,6 +225,9 @@
       })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     } catch (err) {
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar', type: 'error' })

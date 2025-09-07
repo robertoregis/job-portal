@@ -73,7 +73,9 @@
                 institution: education.value.institution,
                 period: education.value.period,
                 notes: education.value.notes,
-                candidate_id: info.user.id
+                candidate_id: info.user.id,
+                candidate_is_complete_educations: info.user.is_complete_educations,
+                candidate_completion_percentage: info.user.completion_percentage
             }
         })
         show.setOverlayDashboard(false)
@@ -89,7 +91,9 @@
         notify({ title: 'Parabéns!', text: 'A escolaridade foi criada com sucesso', type: 'success' })
         getEducations()
         clearEducation()
-        
+        if(!info.user.is_complete_educations) {
+            window.location.reload()
+        }
     }
 
     const getEducations = async () => {
@@ -130,7 +134,12 @@
 
     const removeEducation = async (id: string) => {
         const { data, error } = await useFetch(`/api/educations/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            body: {
+                candidate_id: info.user.id,
+                candidate_is_complete_educations: info.user.is_complete_educations,
+                candidate_completion_percentage: info.user.completion_percentage
+            }
         })
         show.setOverlayDashboard(false)
         if (error.value) {
@@ -144,6 +153,11 @@
         })
         notify({ title: 'Parabéns!', text: 'A escolaridade foi removida com sucesso', type: 'success' })
         getEducations()
+        setTimeout(() => {
+            if(educationsList.value.length === 0) {
+                window.location.reload()
+            }
+        }, 500)
     }
 
     const { data: educations, error, refresh, pending } = await useFetch('/api/educations', {
