@@ -82,6 +82,10 @@ export default defineEventHandler(async (event) => {
       'code_confirmation'
     ]
 
+    if(updateData.representative_email) {
+      updateData.email = updateData.representative_email
+    }
+
     for (const field of fields) {
       if (field in body) {
         updateData[field] = emptyStringToNull(body[field])

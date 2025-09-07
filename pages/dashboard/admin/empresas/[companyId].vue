@@ -75,6 +75,7 @@
         <span class="text-caption">Gerencia a sua aprovação</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row no-gutters class="mt-5">

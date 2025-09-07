@@ -16,29 +16,12 @@
     total: 0
   })
   const jobsEditList = ref<any[]>([])
-  const jobStatusOptions = [
-    { name: 'Aberta para inscrição', icon: 'mdi-briefcase-plus' },
-    { name: 'Inscrições encerradas', icon: 'mdi-briefcase-remove' },
-    { name: 'Em processo seletivo', icon: 'mdi-briefcase-search' },
-    { name: 'Encerramento próximo', icon: 'mdi-briefcase-check' },
-    { name: 'Encerrada', icon: 'mdi-briefcase-off' },
-    { name: 'Pausada', icon: 'mdi-pause-circle' },
-    { name: 'Cancelada', icon: 'mdi-cancel' },
-  ]
-
-  const selectedStatus = ref(jobStatusOptions.find(o => o.name === job.value.status) || jobStatusOptions[0])
-
-  const onStatusSelect = (selected: any) => {
-    job.value.status = selected.name
-    job.value.icon_status = selected.icon
-    selectedStatus.value = selected
-  }
 
   const getJobsEdit = async () => {
     const params: Record<string, any> = {
       page: 1,
       pageSize: 3,
-      jobs_edit: job.value.id
+      job_idt: job.value.id
     }
 
     const { data, error } = await useFetch('/api/jobs_edit', {
@@ -64,41 +47,6 @@
       counts.value.total = data.value?.total || 0
       getJobsEdit()
     }
-  }
-
-  const updateJobStatus = async () => {
-    show.setOverlayDashboard(true)
-    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
-      method: 'PATCH',
-      body: {
-        status: job.value.status,
-        icon_status: job.value.icon_status,
-        is_active: job.value.is_active
-      }
-    })
-
-    if (error.value) {
-      console.error('Erro ao atualizar vaga:', error.value)
-      show.setOverlayDashboard(false)
-      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
-      return
-    }
-    createLog({
-      title: `Atualizou a vaga`,
-      profile_id: info.profile.id,
-      type: 'update_job'
-    })
-    job.value = data.value
-    createNotice({
-      title: 'Vaga atualizada',
-      description: `A vaga ${job.value.title} teve seu status atualizado`,
-      subtitle: 'Vaga',
-      profile_id: info.profile.id,
-      type: 'info'
-    })
-    show.setOverlayDashboard(false)
-    notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
-    //router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
   }
 
   const navigation = (id: number) => {
@@ -136,6 +84,7 @@
         </span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row v-if="info.user.is_approved" no-gutters class="mt-5">
@@ -230,6 +179,16 @@
         </v-list-item>
         <v-list-item class="mt-2" style="min-height: unset">
           <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de graduação</v-list-item-title>
+            <ul>
+              <template v-for="(area, index) in job.undergraduate_areas" :key="index">
+                <li class="text-body-2">- {{ area }};</li>
+              </template>
+            </ul>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="mt-2" style="min-height: unset">
+          <v-list-item-content>
             <v-list-item-title class="text-subtitle-1 font-weight-bold">Benefícios</v-list-item-title>
             <ul>
               <template v-for="(benefit, index) in job.benefits" :key="index">
@@ -248,59 +207,7 @@
             </ul>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item class="mt-2" style="min-height: unset">
-          <v-list-item-content>
-            <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de graduação</v-list-item-title>
-            <ul>
-              <template v-for="(area, index) in job.undergraduate_areas" :key="index">
-                <li class="text-body-2">- {{ area }};</li>
-              </template>
-            </ul>
-          </v-list-item-content>
-        </v-list-item>
       </v-list>
-    </v-col>
-
-    <!-- NOVA SEÇÃO: Controles de status e ativação -->
-    <v-col cols="12" class="border mt-4">
-      <v-card flat class="pa-4">
-        <div class="d-flex align-center mb-4">
-          <v-icon class="mr-2 text-gradient-primary">mdi-tune</v-icon>
-          <h3 class="text-subtitle-1 font-weight-bold text-gradient-primary">Gerenciar status da vaga</h3>
-        </div>
-
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-select
-              :items="jobStatusOptions"
-              v-model="selectedStatus"
-              item-title="name"
-              return-object
-              density="comfortable"
-              variant="outlined"
-              hide-details
-              color="primary"
-              @update:modelValue="onStatusSelect"
-            />
-          </v-col>
-
-          <v-col cols="12" md="6" class="d-flex align-center">
-            <v-switch
-              v-model="job.is_active"
-              :label="`${job.is_active ? 'Ativada' : 'Desativada'}`"
-              color="success"
-              inset
-              hide-details
-            />
-          </v-col>
-
-          <v-col cols="12">
-            <v-btn class="mt-2 bg-gradient-primary" @click="updateJobStatus">
-              Salvar alterações
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card>
     </v-col>
 
     <v-col cols="12" class="mt-4">

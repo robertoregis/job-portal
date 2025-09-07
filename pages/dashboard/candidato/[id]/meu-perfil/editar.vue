@@ -30,7 +30,8 @@
   const cpfInputRef: any = ref(null)
   let phoneMaskInstance: any = null
   let cpfMaskInstance: any = null
-
+  const isLoad = ref<boolean>(false)
+  const behavioral = ref<any>({})
   const formdata = ref<any>({
     name: null,
     phone: null,
@@ -40,6 +41,7 @@
     city: null,
     about: null,
     marital_status: null,
+    salary_expectations: null,
     areas_of_interest: [],
     job_types: [],
   })
@@ -76,6 +78,55 @@
       formdata.value.city = newCity;
     }
   })
+
+  const profilePoints = {
+    name: 5,
+    phone: 5,
+    birth_date: 5,
+    cpf: 5,
+    state: 5,
+    city: 5,
+    about: 5,
+    marital_status: 5,
+    salary_expectations: 5,
+    areas_of_interest: 10,
+    job_types: 5,
+  }
+
+  const totalCompletes = computed(() => {
+    const u = info.user || {}
+    return (
+      (u.is_complete_educations ? 10 : 0) +
+      (u.is_complete_experiences ? 10 : 0) +
+      (u.is_complete_soft_skills ? 10 : 0) +
+      (u.is_complete_behavioral ? 10 : 0)
+    )
+  })
+
+  const calculateProfileScore = (profile: any, profilePoints: any):any => {
+    let total = 0
+    let achieved = 0
+
+    for (const key in profilePoints) {
+      const points = profilePoints[key]
+      total += points
+
+      const fieldValue = profile[key]
+      const isFilled =
+        fieldValue !== null &&
+        fieldValue !== '' &&
+        !(Array.isArray(fieldValue) && fieldValue.length === 0)
+
+      if (isFilled) {
+        achieved += points
+      }
+    }
+
+    const percentage = total > 0 ? Math.round((achieved / total) * 60) : 0
+    const isComplete = percentage + totalCompletes.value >= 100
+
+    return { percentage, isComplete }
+  }
 
   const getStates = async () => {
       loading.value = true; // marca que está carregando
@@ -142,6 +193,16 @@
   const updateCandidate = async () => {
     show.setOverlayDashboard(true)
     try {
+      const resultCalculate = calculateProfileScore(formdata.value, profilePoints)
+      formdata.value.is_complete = resultCalculate.isComplete;
+      formdata.value.completion_percentage = resultCalculate.percentage + totalCompletes.value;
+      formdata.value.completion_percentage_formatted = `${resultCalculate.percentage + totalCompletes.value}%`;
+      if(citySelected.value) {
+        formdata.value.city = citySelected.value
+      }
+      if(stateSelected.value) {
+        formdata.value.state = stateSelected.value
+      }
       const { data, error } = await useFetch(`/api/candidates/${info.user.id}`, {
         method: 'PATCH',
         body: formdata.value
@@ -165,6 +226,9 @@
       })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'Os teus dados foram atualizados', type: 'success' })
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     } catch (err) {
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar', type: 'error' })
@@ -188,6 +252,7 @@
       marital_status: data.value.marital_status,
       areas_of_interest: data.value.areas_of_interest,
       job_types: data.value.job_types,
+      salary_expectations: data.value.salary_expectations
     }
     if(info.user.image_url) {
       imagePreview.value = info.user.image_url
@@ -400,6 +465,23 @@
 
   }
 
+  const getBeharioval = async () => {
+    const params: Record<string, any> = {
+      candidate_id: info.user.id
+    }
+
+    const { data, error } = await useFetch('/api/behavioral_profiles', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+    } else {
+      console.log(data.value)
+      behavioral.value = data.value.data[0]
+    }
+  }
+
   onMounted(() => {
     if (phoneInputRef.value) {
       const nativePhoneInput = phoneInputRef.value.$el.querySelector('input')
@@ -424,12 +506,26 @@
         })
       }
     }
+
+    getBeharioval()
   })
 
   onBeforeUnmount(() => {
     phoneMaskInstance?.destroy()
     cpfMaskInstance?.destroy()
   })
+
+  const onQuestionarySubmitted = (type: string) => {
+    setTimeout(() => {
+      isLoad.value = true
+    }, 1000)
+    setTimeout(() => {
+      isLoad.value = false
+    }, 3000)
+    if(type === 'form') {
+      window.location.reload()
+    }
+  }
 </script>
 
 <template>
@@ -439,6 +535,10 @@
         <span class="text-gradient-primary font-weight-bold">Editar perfil</span>
         <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
+    </v-col>
+    <LayoutButtonBack />
+    <v-col v-if="!info.user.is_complete" cols="12" class="bg-error mt-4 pa-2">
+      <p class="text-center">Conclua o seu perfil para candidatar-se as vagas!</p>
     </v-col>
   </v-row>
 
@@ -592,6 +692,14 @@
                     class="mb-2"
                   ></v-select>
 
+                  <v-text-field
+                    v-model="formdata.salary_expectations"
+                    label="Pretensão salarial"
+                    density="compact"
+                    hide-details
+                    class="mb-2"
+                  />
+
                   <v-select
                     v-model="stateSelected"
                     label="Estado"
@@ -653,9 +761,10 @@
                     :items="areasOfInterestList"
                     label="Áreas de interesse"
                     density="compact"
+                    multiple
+                    chips
                     hide-details
                     class="mb-2"
-                    required
                   />
 
                   <v-select
@@ -663,9 +772,10 @@
                     :items="jobTypesList"
                     label="Tipos de vagas que procura"
                     density="compact"
+                    multiple
+                    chips
                     hide-details
                     class="mb-2"
-                    required
                   />
 
                   <v-text-field
@@ -768,7 +878,7 @@
       </v-col>
 
       <v-col cols="12" class="border mt-4">
-        <PerfilUserBehavioral />
+        <PerfilUserBehavioral :behavioral="behavioral" :load="isLoad" @submitted="onQuestionarySubmitted" />
       </v-col>
 
       <v-col cols="12" class="border mt-4">

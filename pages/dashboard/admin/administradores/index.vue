@@ -95,6 +95,7 @@
         <span class="text-caption">Confira todos os administradores.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Botão criar -->

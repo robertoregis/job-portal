@@ -36,6 +36,13 @@
     'Doutorado',
   ]
   const days_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const undergraduateAreasList = [
+    'Administrativa', 'Corporativa', 'Financeira', 'Comercial',
+    'Marketing', 'Recursos Humanos', 'Operacional', 'Logística',
+    'Tecnologia da Informação', 'Jurídica', 'Compras', 'Suprimentos',
+    'Departamento Pessoal', 'Fiscal'
+  ]
+
   const jobsEditList = ref<any[]>([])
   const getJobsEdit = async () => {
     const params: Record<string, any> = {
@@ -68,13 +75,6 @@
       job.value.benefits = benefitsArray
     } else {
       job.value.benefits = []
-    }
-    let undergraduate_areasArray: any = job.value.undergraduate_areas_simple
-    if (job.value.undergraduate_areas_simple) {
-      undergraduate_areasArray = undergraduate_areasArray.split(',').map((b: any) => b.trim()).filter((b: any) => b.length > 0);
-      job.value.undergraduate_areas = undergraduate_areasArray
-    } else {
-      job.value.undergraduate_areas = []
     }
     let knowledgeArray: any = job.value.knowledge_simple
     if (job.value.knowledge_simple) {
@@ -129,6 +129,7 @@
         <span class="text-caption">Esqueceu algo, edite a sua vaga</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row v-if="jobsEditList.length > 0">
     <v-col cols="12">
@@ -213,6 +214,17 @@
               class="mb-3"
             />
 
+            <v-select
+              v-model="job.undergraduate_areas"
+              :items="undergraduateAreasList"
+              label="Áreas de graduação"
+              multiple
+              chips
+              density="compact"
+              hide-details
+              class="mb-3"
+            />
+
             <v-textarea
               v-model="job.description"
               label="Descrição da vaga"
@@ -239,16 +251,6 @@
               v-model="job.knowledge_simple"
               label="Conhecimentos"
               placeholder="Ex: Planilhas, Informática, Design..."
-              auto-grow
-              density="compact"
-              hide-details
-              class="mb-3"
-            />
-
-            <v-textarea
-              v-model="job.undergraduate_areas_simple"
-              label="Áreas de graduação"
-              placeholder="Ex: Engenharia, Robôtica..."
               auto-grow
               density="compact"
               hide-details

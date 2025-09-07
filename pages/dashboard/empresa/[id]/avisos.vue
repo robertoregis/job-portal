@@ -70,6 +70,7 @@
         <span class="text-caption">Confira todos os teus avisos.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <v-row no-gutters class="mt-5">

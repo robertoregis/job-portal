@@ -27,6 +27,22 @@
   const motive_recusation = ref<string>('');
   const motive_edit = ref<string>('');
 
+  const sendMail = async (companyName: string, companyEmail: string, jobName: string, result: string) => {
+    const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
+      method: 'POST',
+      body: {
+        to: [`${companyName} <${companyEmail}>`],
+        subject: 'Parabéns, a sua vaga foi editada',
+        template: 'template_edit_job_success',
+        variables: {
+          name_company: companyName,
+          job_name: jobName,
+          result: result,
+        }
+      }
+    })
+  }
+
   const approveEdit = async () => {
     show.setOverlayDashboard(true)
     const { data, error } = await useFetch(`/api/jobs/${job.value.id}`, {
@@ -54,6 +70,7 @@
       profile_id: data.value.profile_id,
       type: 'info',
     })
+    sendMail(jobEdit.value.name_company, jobEdit.value.email, jobEdit.value.title, "aprovado")
     createLog({
       title: `Aprovou a edição da vaga: ${job.value.title}`,
       profile_id: info.profile.id,
@@ -101,7 +118,7 @@
         type: 'rejected_job_edit'
       })
 
-      router.push(`/dashboard/admin/edicoes-de-vagas`)
+      router.push(`/dashboard/admin/edicao-de-vagas`)
       notify({ title: 'Parabéns!', text: 'A edição foi recusada', type: 'success' })
 
     } catch (err) {
@@ -146,6 +163,7 @@
         <span class="text-caption">Confira todos os pedidos para editar vagas.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Lista de empresas -->

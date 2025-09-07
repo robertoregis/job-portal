@@ -29,10 +29,15 @@ export default defineEventHandler(async (event) => {
   if (method === 'PUT' || method === 'PATCH') {
     const body = await readBody(event)
 
-    // Converte todas strings vazias do body para null
-    const updateData = Object.fromEntries(
-      Object.entries(body).map(([key, val]) => [key, emptyStringToNull(val)])
-    )
+    let { level, course, institution, period, notes } = body
+    // Converte strings vazias em null
+    level = emptyStringToNull(level)
+    period = emptyStringToNull(period)
+    notes = emptyStringToNull(notes)
+    course = emptyStringToNull(course)
+    institution = emptyStringToNull(institution)
+
+    const updateData = { level, course, institution, period, notes }
 
     const { data, error } = await supabase
       .from('educations')
@@ -49,6 +54,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    const body = await readBody(event) // funciona mesmo no DELETE
+    const { candidate_id, candidate_is_complete_educations, candidate_completion_percentage } = body
+
     const { error } = await supabase
       .from('educations')
       .delete()
@@ -56,6 +64,30 @@ export default defineEventHandler(async (event) => {
 
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
+    }
+
+    if (candidate_is_complete_educations) {
+      // Verifica se ainda existe alguma education para esse candidato
+      const { data: remaining, error: remainingError } = await supabase
+        .from('educations')
+        .select('id')
+        .eq('candidate_id', candidate_id)
+
+      // Se não tiver mais nenhuma education, diminui 10%
+      if (!remaining || remaining.length === 0) {
+        const current = Number(candidate_completion_percentage ?? 0)
+        const newPct = Math.max(0, current - 10) // nunca menor que 0
+
+        await supabase
+          .from('candidates')
+          .update({
+            is_complete_educations: false,
+            completion_percentage: newPct,
+            completion_percentage_formatted: `${newPct}%`,
+            is_complete: newPct >= 100
+          })
+          .eq('id', candidate_id)
+      }
     }
 
     return { success: true }

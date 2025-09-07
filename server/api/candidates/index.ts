@@ -66,7 +66,9 @@ export default defineEventHandler(async (event) => {
       city: emptyStringToNull(city),
       about: emptyStringToNull(about),
       image_url: null,
-      image_id: null
+      image_id: null,
+      completion_percentage: 5,
+      completion_percentage_formatted: `5%`
       // outros campos que desejar aqui
     }
 

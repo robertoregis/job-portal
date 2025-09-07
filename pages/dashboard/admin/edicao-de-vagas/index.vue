@@ -74,6 +74,7 @@
         <span class="text-caption">Confira todos os pedidos para editar vagas.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Lista de empresas -->

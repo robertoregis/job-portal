@@ -13,6 +13,7 @@
   const info: any = useInfo();
   const { notify } = useNotification();
   const candidate = ref<any>({})
+  const candidature = ref<any>({})
   const experiencesList = ref<any[]>([])
   const languagesList = ref<any[]>([])
   const educationsList = ref<any[]>([])
@@ -26,10 +27,6 @@
 
     const [year, month, day] = parts
     return `${day}/${month}/${year}`
-  }
-
-  const navigation = () => {
-    router.back()
   }
 
   const getDataCandidate = async (candidateId: string) => {
@@ -56,58 +53,36 @@
     }
   }
 
-  const downloadPDF = async () => {
-    show.setOverlayDashboard(true)
-    try {
-      const res = await fetch(`/api/generate/pdf/${candidate.value.id}`);
-      if (!res.ok) {
-        show.setOverlayDashboard(false)
-        notify({ title: 'Erro', text: 'Ocorreu um erro ao gerar relatório', type: 'error' })
-        return
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `relatorio-${name_formated(candidate.value.name)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      createLog({
-        title: `Gerou relatório do candidato: ${candidate.value.name}`,
-        profile_id: info.profile.id,
-        type: 'report_candidate'
+  const getCandidate = async () => {
+    const { data, error } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
+      method: 'GET',
+    })
+    if (error.value) {
+      console.error('Erro ao buscar candidato:', error.value)
+    } else {
+      candidate.value = data.value
+      useHead({
+        title: `${candidate.value.name} - Conect One RH`,
+        meta: [
+          {
+              name: 'description',
+              content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
+          }
+        ]
       })
-      window.URL.revokeObjectURL(url);
-      show.setOverlayDashboard(false)
-      notify({ title: 'Parabéns!', text: 'Relatório gerado com sucesso', type: 'success' })
-    } catch (error) {
-      console.error(error);
-      show.setOverlayDashboard(false)
-      notify({ title: 'Erro', text: 'Ocorreu um erro ao gerar relatório', type: 'error' })
+      loading.value = false;
+      getDataCandidate(candidate.value.id)
     }
-  };
+  }
 
-  
-  const { data, error, pending } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
+  const { data, error, pending } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
     method: 'GET'
   })
 
   if (error.value) {
   } else {
-    candidate.value = data.value
-    useHead({
-      title: `${candidate.value.name} - Conect One RH`,
-      meta: [
-        {
-            name: 'description',
-            content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
-        }
-      ]
-    })
-    getDataCandidate(candidate.value.id)
+    candidature.value = data.value
+    getCandidate()
   }
 </script>
 
@@ -115,25 +90,16 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="text-gradient-primary font-weight-bold">{{ candidate.name }}</span>
+        <span v-if="candidate" class="text-gradient-primary font-weight-bold">{{ candidate.name }}</span>
         <span class="text-caption">Detalhes do candidato selecionado nesta candidatura</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
-  <v-row no-gutters class="mt-5">
-    <v-col cols="12">
-      <div class="d-flex">
-        <v-btn
-          @click="navigation"
-          text="Voltar"
-          variant="flat"
-          class="bg-gradient-nav"
-        ></v-btn>
-      </div>
-    </v-col>
-
-    <v-col cols="12" class="border mt-4">
+  <v-row v-if="candidate" no-gutters class="mt-5">
+    <!-- Dados do Candidato -->
+    <v-col cols="12" class="border">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
@@ -145,25 +111,20 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12">
-              <v-btn class="bg-gradient-primary" prepend-icon="mdi-download" @click="downloadPDF">
-                Gerar relatório
-              </v-btn>
+              <v-chip color="primary" variant="outlined">
+                <v-icon icon="mdi-account-circle-outline" start></v-icon>
+                {{ candidate.is_employed ? 'Está empregado' : 'Está desempregado' }}
+              </v-chip>
             </v-col>
-            <v-col cols="12 mt-2">
-              <div class="d-flex">
-                <v-chip
-                  color="primary"
-                  variant="outlined"
-                >
-                  <v-icon icon="mdi-account-circle-outline" start></v-icon>
-                  {{ candidate.is_employed ? 'Está empregado' : 'Está desempregado' }}
-                </v-chip>
-              </div>
-            </v-col>
+
             <v-col cols="12">
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
                 <span class="text-body-2 ml-2">{{ candidate.name }}</span>
+              </div>
+              <div class="d-flex align-center my-1">
+                <span class="text-subtitle-2 font-weight-bold">CPF:</span>
+                <span class="text-body-2 ml-2">{{ candidate.cpf }}</span>
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Data de nascimento:</span>
@@ -175,7 +136,7 @@
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">Endereço:</span>
-                <span class="text-body-2 ml-2">{{ candidate.address }}</span>
+                <span class="text-body-2 ml-2">{{ candidate.address || `${candidate.city || ''} - ${candidate.state || ''}` }}</span>
               </div>
               <div class="d-flex align-center my-1">
                 <span class="text-subtitle-2 font-weight-bold">E-mail:</span>
@@ -185,15 +146,14 @@
                 <span class="text-subtitle-2 font-weight-bold">Telefone:</span>
                 <span class="text-body-2 ml-2">{{ candidate.phone }}</span>
               </div>
+
               <div v-if="candidate.site || candidate.instagram || candidate.linkedin" class="d-flex align-center my-1" style="gap: 12px;">
                 <v-btn v-if="candidate.site" icon :href="candidate.site" target="_blank" aria-label="Site" density="comfortable">
                   <v-icon>mdi-web</v-icon>
                 </v-btn>
-
                 <v-btn v-if="candidate.instagram" icon :href="candidate.instagram" target="_blank" aria-label="Instagram" density="comfortable">
                   <v-icon color="#E1306C">mdi-instagram</v-icon>
                 </v-btn>
-
                 <v-btn v-if="candidate.linkedin" icon :href="candidate.linkedin" target="_blank" aria-label="LinkedIn" density="comfortable">
                   <v-icon color="#0A66C2">mdi-linkedin</v-icon>
                 </v-btn>
@@ -204,11 +164,12 @@
       </v-card>
     </v-col>
 
+    <!-- Currículo -->
     <v-col cols="12" class="border mt-4">
       <v-card>
         <v-card-text>
           <v-row no-gutters>
-            <v-col cols="12" class="d-flex">
+            <v-col cols="12">
               <a
                 v-if="candidate.curriculum_url"
                 :href="candidate.curriculum_url"
@@ -216,7 +177,7 @@
                 rel="noopener noreferrer"
                 class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
               >
-                <Icon name="mdi:file-link" />
+                <v-icon>mdi-file-link</v-icon>
                 <span class="ml-2">Ver currículo atual</span>
               </a>
               <span v-else class="font-weight-bold">Não tem currículo no momento!</span>
@@ -226,6 +187,7 @@
       </v-card>
     </v-col>
 
+    <!-- Sobre o candidato e informações adicionais -->
     <v-col cols="12" class="border mt-4">
       <v-card>
         <v-card-text class="pa-0">
@@ -233,16 +195,25 @@
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Sobre ele</v-list-item-title>
-                <span class="text-body-2">
-                  {{ candidate.about }}
-                </span>
+                <span class="text-body-2">{{ candidate.about || 'Não informado' }}</span>
               </v-list-item-content>
             </v-list-item>
+
             <v-divider></v-divider>
+
+            <v-list-item class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Pretensão salarial</v-list-item-title>
+                <span class="text-body-2">{{ candidate.salary_expectations || 'Não informado' }}</span>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider></v-divider>
+
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Áreas de interesse</v-list-item-title>
-                <div v-if="candidate.areas_of_interest.length > 0" class="d-flex flex-wrap">
+                <div v-if="candidate.areas_of_interest?.length" class="d-flex flex-wrap">
                   <v-chip
                     v-for="(area, idx) in candidate.areas_of_interest"
                     :key="idx"
@@ -256,76 +227,89 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
+
             <v-divider></v-divider>
+
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Tipos de vagas que procuro</v-list-item-title>
-                <div v-if="candidate.job_types.length > 0" class="d-flex flex-wrap">
+                <div v-if="candidate.job_types?.length" class="d-flex flex-wrap">
                   <v-chip
-                    v-for="(area, idx) in candidate.job_types"
+                    v-for="(type, idx) in candidate.job_types"
                     :key="idx"
                     class="mr-2 my-1 d-flex align-center"
                     label
                     color="language"
                     variant="flat"
                   >
-                    <span>{{ area }}</span>
+                    <span>{{ type }}</span>
                   </v-chip>
                 </div>
               </v-list-item-content>
             </v-list-item>
+
+            <!-- Experiências -->
+            <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Experiências profissionais</v-list-item-title>
                 <div class="d-flex flex-column mt-2">
-                  <div v-for="(experience, index) in experiencesList" :key="experience.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                  <div v-for="(experience, index) in experiencesList" :key="experience.id || index" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
                     <span class="text-caption font-weight-bold">{{ experience.position }}</span>
                     <div class="d-flex align-center">
                       <span class="text-body-2 mr-2">{{ experience.company_name }}</span>
-                      <span v-if="experience.start_date || experience.end_date" class="text-small-2 bg-grey-darken-2 px-2 rounded-xl">{{ getFormatDate(experience.start_date) }} - {{ getFormatDate(experience.end_date) }}</span>
+                      <span v-if="experience.start_date || experience.end_date" class="text-small-2 bg-grey-darken-2 px-2 rounded-xl">
+                        {{ getFormatDate(experience.start_date) }} - {{ getFormatDate(experience.end_date) }}
+                      </span>
                     </div>
                     <p v-if="experience.description" class="pa-1 mt-1">{{ experience.description }}</p>
                   </div>
                 </div>
               </v-list-item-content>
             </v-list-item>
+
+            <!-- Escolaridade -->
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Escolaridade</v-list-item-title>
                 <div class="d-flex flex-column mt-2">
-                  <div v-for="(education, index) in educationsList" :key="education.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                  <div v-for="(education, index) in educationsList" :key="education.id || index" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
                     <span class="text-caption font-weight-bold">{{ education.course }}</span>
                     <span class="text-body-2">{{ education.level }}</span>
                   </div>
                 </div>
               </v-list-item-content>
             </v-list-item>
+
+            <!-- Idiomas -->
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Idiomas</v-list-item-title>
                 <div class="d-flex flex-wrap">
                   <v-chip
-                    v-for="(candidate, idx) in languagesList"
-                    :key="idx"
+                    v-for="(language, idx) in languagesList"
+                    :key="language.id || idx"
                     class="mr-2 my-1 d-flex align-center"
                     label
                     color="language"
                     variant="flat"
                   >
-                    <span>{{ candidate.name }}</span>
-                    <span class="ml-1 text-caption">({{ candidate.level.toLowerCase() }})</span>
+                    <span>{{ language.name }}</span>
+                    <span class="ml-1 text-caption">({{ language.level?.toLowerCase() }})</span>
                   </v-chip>
                 </div>
               </v-list-item-content>
             </v-list-item>
+
+            <!-- Soft Skills -->
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Soft Skills</v-list-item-title>
                 <div class="d-flex flex-column mt-2">
-                  <div v-for="(softSkill, index) in softSkillsList" :key="softSkill.id" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
+                  <div v-for="(softSkill, index) in softSkillsList" :key="softSkill.id || index" class="border-sm px-2 py-1 rounded d-flex mb-1 flex-column">
                     <span class="text-caption font-weight-bold">{{ softSkill.name }}</span>
                     <span class="text-body-2">{{ softSkill.level }}</span>
                   </div>

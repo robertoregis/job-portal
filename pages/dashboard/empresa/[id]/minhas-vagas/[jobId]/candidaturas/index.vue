@@ -20,19 +20,34 @@
   const { createNotice } = useNotice();
   const route = useRoute();
   const router = useRouter()
-
-  const candidaturaStatusOptions = [
-    { name: 'Enviada', icon: 'mdi-send' },
-    { name: 'Em análise', icon: 'mdi-magnify' },
-    { name: 'Em entrevista', icon: 'mdi-account-question' },
-    { name: 'Avaliação final', icon: 'mdi-progress-clock' },
-    { name: 'Aprovado', icon: 'mdi-check-circle' },
-    { name: 'Rejeitado', icon: 'mdi-close-circle' },
-    { name: 'Arquivada', icon: 'mdi-archive' },
-    { name: 'Desistiu', icon: 'mdi-close-box-outline' },
+  const job = ref<any>({})
+  const statuses = [
+    { code: 1, title: 'Desclassificado', icon: 'mdi-close-circle', count: 1 },
+    { code: 2, title: 'Análise de Currículo', icon: 'mdi-magnify', count: 9 },
+    { code: 3, title: 'Análise Comportamental', icon: 'mdi-account-search', count: 6 },
+    { code: 4, title: 'Entrevita de Expectativa', icon: 'mdi-account-question', count: 3 },
+    { code: 5, title: 'Pré-Selecionados', icon: 'mdi-progress-clock', count: 0 },
+    { code: 6, title: 'Contratados', icon: 'mdi-check-circle', count: 8 }
   ]
+
+  let idCounter = 1
+  const candidaturesForTest: any[] = []
+
+  statuses.forEach(status => {
+    for (let i = 0; i < status.count; i++) {
+      candidaturesForTest.push({
+        id: idCounter++,
+        candidate_name: `Candidato ${idCounter}`,
+        title: `Vaga ${Math.ceil(Math.random() * 5)}`,
+        code_status: status.code,
+        status: status.title,
+        icon_status: status.icon
+      })
+    }
+  })
+
   const page = ref(1)
-  const pageSize = ref(10)
+  const pageSize = ref(500)
   const totalPages = ref(1)
   const selectedStatus = ref<string | null>(null)
   const selectedIconStatus = ref<string>('')
@@ -43,22 +58,15 @@
     rejected: 0
   })
 
-  const getFormatDate = (date: string) => {
-    if (!date) return ''
-    const parts = date.split('-') // ["yyyy", "mm", "dd"]
-    if (parts.length !== 3) return date
-
-    const [year, month, day] = parts
-    return `${day}/${month}/${year}`
-  }
-
-  const onStatusSelect = (selected: string | null) => {
-    if (!selected) {
-      selectedIconStatus.value = ''
-      return
+  const getJob = async () => {
+    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+      method: 'GET',
+    })
+    if (error.value) {
+      console.error('Erro ao buscar vaga:', error.value)
+    } else {
+      job.value = data.value
     }
-    const result = candidaturaStatusOptions.find(option => option.name === selected)
-    selectedIconStatus.value = result ? result.icon : ''
   }
 
   const getCandidatures = async () => {
@@ -103,19 +111,18 @@
       console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
+      getJob()
     }
   }
 
-  const navigation = (id: number) => {
-    router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${route.params.jobId}/candidaturas/${id}`)
+  const navigation = (candidatureId: number, candidateId: string) => {
+    router.push(`/dashboard/empresa/${info.user.id}/candidaturas/${candidatureId}/candidatos/${candidateId}`)
   }
 
   const { data: candidatures, error, refresh, pending } = await useFetch('/api/candidatures', {
     method: 'GET',
     params: {
       job_id: route.params.jobId,
-      page: page.value.toString(),
-      pageSize: pageSize.value.toString()
     }
   })
           
@@ -135,112 +142,78 @@
         <span class="text-caption">Confira os candidatos inscritos nesta vaga</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
-  <!-- Filtros -->
-  <v-row v-if="info.user.is_approved" no-gutters class="mt-5">
+  <v-row no-gutters class="mt-4">
     <v-col cols="12">
-      <div class="d-flex flex-wrap">
-        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
-          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas</div>
-          <div class="text-h4 font-weight-bold">{{ counts.total }}</div>
-        </v-card>
-        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
-          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas aprovadas</div>
-          <div class="text-h4 font-weight-bold">{{ counts.approved }}</div>
-        </v-card>
-        <v-card class="pa-2 text-center d-flex flex-column justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 80px">
-          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas rejeitadas</div>
-          <div class="text-h4 font-weight-bold">{{ counts.rejected }}</div>
-        </v-card>
+      <div class="d-flex">
+        <h2 class="text-subtitle-1 font-weight-bold">{{ job.title }}</h2>
       </div>
     </v-col>
-    <v-col cols="12" md="4" class="mt-4">
-      <v-select
-        v-model="selectedStatus"
-        :items="candidaturaStatusOptions"
-        item-title="name"
-        item-value="name"
-        label="Filtrar por status"
-        clearable
-        variant="outlined"
-        hide-details
-        class="mb-2"
-        dense
-        @update:modelValue="onStatusSelect"
-      />
+    <v-col cols="12 mt-2">
+      <div class="d-flex flex-wrap">
+        <v-card class="pa-2 text-center d-flex justify-center align-center mr-3 bg-gradient-primary" elevation="2" width="160" style="min-height: 40px">
+          <div class="text-subtitle-1" style="line-height: 1.2;">Candidaturas</div>
+          <div class="text-h4 font-weight-bold ml-3">{{ counts.total }}</div>
+        </v-card>
+      </div>
     </v-col>
   </v-row>
 
   <!-- Lista de candidaturas -->
   <v-row v-if="info.user.is_approved" no-gutters class="mt-4">
-    <v-col v-if="selectedStatus" cols="12" class="mb-2">
-      <div class="d-flex align-center">
-        <v-chip
-          v-if="selectedStatus"
-          class="bg-gradient-status"
-          variant="flat"
-        >
-          <v-icon :icon="selectedIconStatus" start></v-icon>
-          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
-        </v-chip>
-      </div>
-    </v-col>
     <v-col cols="12">
-      <v-card>
-        <v-card-text class="pa-0">
-          <v-list>
-            <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Candidaturas</v-list-subheader>
-
-            <v-list-item
-              v-for="item in candidaturesList"
-              :key="item.id"
-              style="min-height: unset"
-            >
-              <v-card class="pa-2 border" elevation="2" ripple hover @click="navigation(item.id)">
-                <div class="d-flex justify-space-between align-start mb-2">
-                  <div>
-                    <div class="text-subtitle-1 font-weight-bold">{{ item.candidate_name }}</div>
-                    <div class="text-subtitle-2 font-weight-medium">{{ item.title }}</div>
-                    <div class="text-caption  text-grey">Status: {{ item.status }}</div>
-                  </div>
-
-                  <div class="text-caption text-grey-darken-1">{{ item.created_at_formatted }}</div>
-                </div>
-                <div class="d-flex flex-wrap gap-3 mb-2">
-                  <v-chip
-                    small
-                    color="orange"
-                    text-color="white"
-                    variant="tonal"
-                    class="mb-1 mr-1"
-                  >
-                    <v-icon left size="16">mdi-account-heart</v-icon>
-                    {{ item.candidate_marital_status || 'Estado civil não informado' }}
-                  </v-chip>
-
-                  <v-chip
-                    small
-                    color="teal"
-                    text-color="white"
-                    variant="tonal"
-                    class="mb-1 mr-1"
-                  >
-                    <v-icon left size="16">mdi-cake</v-icon>
-                    {{ item.candidate_birth_date ? getFormatDate(item.candidate_birth_date) : 'Data de nascimento não informada' }}
-                  </v-chip>
-                </div>
-              </v-card>
-            </v-list-item>
-
-            <v-list-item v-if="candidaturesList.length === 0">
-              <v-list-item-title class="text-body-2">Nenhuma candidatura encontrada.</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-      </v-card>
+      <v-row>
+        <v-col
+          v-for="status in statuses"
+          :key="status.code"
+          cols="12"
+          sm="6"
+          lg="4"
+        >
+          <v-card>
+            <v-card-title class="text-subtitle-1 font-weight-bold text-gradient-primary custom-subtitle-and-title">
+              {{ status.title }}
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text class="pa-0">
+              <v-list style="min-height: 100px; max-height: 300px; overflow-y: auto;">
+                <v-list-item
+                  v-for="item in candidaturesList.filter((c: any) => c.code_status === status.code)"
+                  :key="item.id"
+                  style="min-height: unset"
+                >
+                  <v-card class="pa-2 border bg-card" elevation="2" ripple hover @click="navigation(item.id, item.candidate_id)">
+                    <div class="d-flex justify-space-between align-start mb-1">
+                      <div class="text-subtitle-1 font-weight-medium">{{ item.candidate_name }}</div>
+                      <v-avatar size="30">
+                        <v-img
+                          alt=""
+                          :src="`${item.candidate_image_url ? item.candidate_image_url : 'https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/blank-profile-picture-973460_640.png'}`"
+                        ></v-img>
+                      </v-avatar>
+                    </div>
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-center">
+                        <span class="text-caption">Pretensão:</span>
+                        <span class="text-caption ml-2">{{ item.candidate_salary_expectations }}</span>
+                      </div>
+                      <div class="d-flex align-center mt-1">
+                        <span class="text-caption">Endereço:</span>
+                        <span class="text-caption ml-2">{{ item.candidate_address }}</span>
+                      </div>
+                    </div>
+                  </v-card>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-col>
-    <v-col>
+
+    <v-col cols="12">
       <v-pagination
         v-if="totalPages > 1"
         v-model="page"

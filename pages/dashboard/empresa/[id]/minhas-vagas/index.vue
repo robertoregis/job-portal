@@ -22,22 +22,16 @@
 
   // Filtros
   const jobStatusOptions = [
-    { name: 'Aberta para inscrição', icon: 'mdi-briefcase-plus' },
-    { name: 'Inscrições encerradas', icon: 'mdi-briefcase-remove' },
-    { name: 'Em processo seletivo', icon: 'mdi-briefcase-search' },
-    { name: 'Encerramento próximo', icon: 'mdi-briefcase-check' },
+    { name: 'Aberta', icon: 'mdi-briefcase-plus' },
     { name: 'Encerrada', icon: 'mdi-briefcase-off' },
-    { name: 'Pausada', icon: 'mdi-pause-circle' },
-    { name: 'Cancelada', icon: 'mdi-cancel' },
   ]
-  const selectedStatus = ref<string | null>(null)
-  const selectedIconStatus = ref<string>('')
+  const selectedStatus = ref<string | null>('Aberta')
+  const selectedIconStatus = ref<string>('mdi-briefcase-plus')
   const onStatusSelect = (selected: any) => {
     const result = jobStatusOptions.find(option => option.name === selected)
     selectedIconStatus.value = result?.icon || ''
   }
 
-  const ativaOptions = ['Sim', 'Não']
   const selectedActive = ref<string | null>(null)
 
   // Resetar página ao mudar filtro
@@ -93,7 +87,8 @@
     params: {
       company_id: info.user.id,
       page: page.value.toString(),
-      pageSize: pageSize.value.toString()
+      pageSize: pageSize.value.toString(),
+      status: selectedStatus.value
     }
   })
 
@@ -114,6 +109,7 @@
         <span class="text-caption">Confira todas as tuas vagas.</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
 
   <!-- Filtros -->
@@ -133,24 +129,11 @@
         @update:modelValue="onStatusSelect"
       />
     </v-col>
-
-    <v-col cols="12" md="4">
-      <v-select
-        v-model="selectedActive"
-        :items="ativaOptions"
-        label="Filtrar por ativa?"
-        clearable
-        variant="outlined"
-        hide-details
-        class="mb-2"
-        dense
-      />
-    </v-col>
   </v-row>
 
   <!-- Chips com filtros selecionados -->
   <v-row no-gutters>
-    <v-col v-if="selectedStatus || selectedActive" cols="12">
+    <v-col v-if="selectedStatus" cols="12">
       <div class="d-flex align-center">
         <v-chip
           v-if="selectedStatus"
@@ -160,18 +143,13 @@
           <v-icon :icon="selectedIconStatus" start></v-icon>
           Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
         </v-chip>
-
-        <v-chip v-if="selectedActive" class="ma-2" :color="selectedActive === 'Sim' ? 'success' : 'error'" variant="flat">
-          <v-icon :icon="selectedActive === 'Sim' ? 'mdi-power' : 'mdi-power-off'" start></v-icon>
-          {{ selectedActive === 'Sim' ? 'Só ativas' : 'Só desativadas' }}
-        </v-chip>
       </div>
     </v-col>
   </v-row>
 
   <!-- Botão criar -->
   <v-row no-gutters>
-    <v-col cols="12" :class="selectedStatus || selectedActive ? 'mt-4' : ''">
+    <v-col cols="12" :class="selectedStatus? 'mt-4' : ''">
       <div class="d-flex">
         <v-btn v-if="info.user.is_approved" text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/empresa/${info.user.id}/vagas/criar`)" />
         <span v-else class="bg-warning py-1 px-2 mt-1">Para criar vaga a sua conta precisa está aprovada</span>

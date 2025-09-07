@@ -44,7 +44,7 @@
     legal_name: '',
     representative_name: '',
     representative_cpf: '',
-    representative_email: '',
+    //representative_email: '',
     site: null,
     instagram: null,
     linkedin: null
@@ -72,7 +72,7 @@
       legal_name: '',
       representative_name: '',
       representative_cpf: '',
-      representative_email: '',
+      //representative_email: '',
       site: null,
       linkedin: null,
       instagram: null
@@ -193,7 +193,7 @@
       state: data.value.state,
       city: data.value.city,
       representative_name: data.value.representative_name,
-      representative_email: data.value.representative_email,
+      //representative_email: data.value.representative_email,
       representative_cpf: data.value.representative_cpf,
     }
     await getStates()
@@ -361,6 +361,7 @@
         <span class="text-caption">Aqui você edita os teus dados</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border pa-2">
@@ -483,13 +484,14 @@
                     class="mb-2"
                   />
 
-                  <v-text-field
+                  <!--<v-text-field
                     v-model="formdata.representative_email"
                     label="E-mail do representante"
                     density="compact"
+                    readonly
                     hide-details
                     class="mb-2"
-                  />
+                  />-->
 
                   <v-text-field
                     v-model="formdata.representative_name"

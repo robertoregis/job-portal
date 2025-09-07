@@ -48,7 +48,10 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    return data
+    return {
+      ...data,
+      address: `${data.city || ''} - ${data.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
+    }
   }
 
 
@@ -57,9 +60,11 @@ export default defineEventHandler(async (event) => {
     const updateData: any = {}
 
     const fields = ['name', 'email', 'cpf', 
-      'states', 'city', 'marital_status', 'phone', 
+      'states', 'city', 'state', 'marital_status', 'phone', 
       'about', 'birth_date', 'is_employed', 'job_types', 
-      'areas_of_interest', 'instagram', 'site', 'linkedin', 'code_confirmation', 'is_confirmation'
+      'areas_of_interest', 'instagram', 'site', 'linkedin',
+      'code_confirmation', 'is_confirmation', 'salary_expectations',
+      'is_complete', 'completion_percentage', 'completion_percentage_formatted'
     ] // campos que podem ser atualizados
     for (const field of fields) {
       if (field in body) {

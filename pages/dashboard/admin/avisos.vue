@@ -72,6 +72,7 @@
         <span class="text-caption">Saiba o que está acontecendo</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border">

@@ -98,7 +98,9 @@
               company_name: experience.company_name,
               candidate_id: info.user.id,
               order: order,
-              experience_group_id: experienceGroup.value.id
+              experience_group_id: experienceGroup.value.id,
+              candidate_is_complete_experiences: info.user.is_complete_experiences,
+              candidate_completion_percentage: info.user.completion_percentage
           }
       })
       if (error.value) {
@@ -147,6 +149,9 @@
         notify({ title: 'Parabéns!', text: 'Você atualizou as suas experiências', type: 'success' })
         dialogExperience.value = false;
         getExperiences()
+      }
+      if(!info.user.is_complete_experiences) {
+        window.location.reload()
       }
     }, 500)
     

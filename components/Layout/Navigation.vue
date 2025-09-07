@@ -1,90 +1,32 @@
 <script setup lang="ts">
-import { useInfo } from '@/stores/info'
-import { useShow } from '@/stores/show'
-import { useNotice } from '@/composables/useNotice';
-const { notify } = useNotification()
-const authentication: any = useInfo()
-const router = useRouter()
-const show = useShow()
-const { createLog } = useNotice();
+  import { useInfo } from '@/stores/info'
+  import { useShow } from '@/stores/show'
+  import { useNotice } from '@/composables/useNotice';
+  const { notify } = useNotification()
+  const authentication: any = useInfo()
+  const router = useRouter()
+  const show = useShow()
+  const { createLog } = useNotice();
+  const info: any = useInfo();
 
-const profilePoints = {
-  name: 15,
-  cpf: 10,
-  phone: 10,
-  email: 10,
-  about: 20,
-  birth_date: 10,
-  marital_status: 5,
-  state: 5,
-  city: 5,
-  image_id: 10,
-}
-
-const profilePointsCompany = {
-  name: 15,
-  cnpj: 15,
-  representative_name: 10,
-  representative_email: 15,
-  representative_cpf: 15,
-  email: 10,
-  state: 5,
-  city: 5,
-  image_id: 10,
-}
-
-const value = ref(0)
-
-const calculateProfileScore = (profile: any, profilePoints: any) => {
-  let total = 0
-
-  for (const key in profilePoints) {
-    const fieldValue = profile[key]
-    const points = profilePoints[key]
-
-    const isFilled =
-      fieldValue !== null &&
-      fieldValue !== '' &&
-      !(Array.isArray(fieldValue) && fieldValue.length === 0)
-    if (isFilled) {
-      total += points
-    }
+  const logout = async () => {
+    show.setOverlayDashboard(true)
+    setTimeout(async () => {
+      createLog({
+        title: `Deslogou`,
+        profile_id: authentication.profile.id,
+        type: 'logout'
+      })
+      router.push('/')
+      show.setOverlayDashboard(false)
+      const supabase = useNuxtApp().$supabase
+      await supabase.auth.signOut()
+      authentication.setUser({})
+      authentication.setProfile({})
+      localStorage.removeItem('user')
+    }, 1000)
   }
 
-  const interval = setInterval(() => {
-    if (value.value < total) {
-      value.value += 2
-    } else {
-      clearInterval(interval)
-    }
-  }, 100)
-}
-
-const logout = async () => {
-  show.setOverlayDashboard(true)
-  setTimeout(async () => {
-    createLog({
-      title: `Deslogou`,
-      profile_id: authentication.profile.id,
-      type: 'logout'
-    })
-    router.push('/')
-    show.setOverlayDashboard(false)
-    const supabase = useNuxtApp().$supabase
-    await supabase.auth.signOut()
-    authentication.setUser({})
-    authentication.setProfile({})
-    localStorage.removeItem('user')
-  }, 1000)
-}
-
-onMounted(() => {
-  if (authentication.user?.type === 'candidate') {
-    calculateProfileScore(authentication.user, profilePoints)
-  } else if (authentication.user?.type === 'company') {
-    calculateProfileScore(authentication.user, profilePointsCompany)
-  }
-})
 </script>
 
 <template>
@@ -161,15 +103,17 @@ onMounted(() => {
       <v-col cols="12">
         <div class="d-flex flex-column align-center">
           <v-progress-circular
-            :model-value="value"
+            @click="router.push(`/dashboard/candidato/${info.user.id}/meu-perfil/editar`)"
+            :model-value="info.user.completion_percentage_formatted"
             :rotate="360"
-            :size="40"
+            :size="46"
             :width="5"
             color="white"
+            class="cursor-pointer"
           >
-            <span class="text-caption">{{ value }}</span>
+            <span class="text-caption">{{ info.user.completion_percentage_formatted }}</span>
           </v-progress-circular>
-          <span class="mt-1 text-caption">Seu progresso...</span>
+          <span class="mt-1 text-caption">{{ info.user.completion_percentage >= 100 ? 'O seu perfil tá completo' : 'Seu progresso...' }}</span>
           <v-btn
             @click="logout"
             color="white"
@@ -249,16 +193,6 @@ onMounted(() => {
 
       <v-col cols="12">
         <div class="d-flex flex-column align-center">
-          <v-progress-circular
-            :model-value="value"
-            :rotate="360"
-            :size="40"
-            :width="5"
-            color="white"
-          >
-            <span class="text-caption">{{ value }}</span>
-          </v-progress-circular>
-          <span class="mt-1 text-caption">Seu progresso...</span>
           <v-btn
             @click="logout"
             color="white"
@@ -328,9 +262,21 @@ onMounted(() => {
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/vagas`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-briefcase</v-icon>
+              <span>Vagas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
             <NuxtLink :to="`/dashboard/admin/edicao-de-vagas`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-briefcase-edit</v-icon>
               <span>Edição de vagas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/questionarios`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-clipboard-text</v-icon>
+              <span>Questionários</span>
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">

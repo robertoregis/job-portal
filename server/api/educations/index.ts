@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { course, institution, level, period, notes, candidate_id } = body
+    let { course, institution, level, period, notes, candidate_id, candidate_is_complete_educations, candidate_completion_percentage } = body
 
     if (!candidate_id) {
       throw createError({ statusCode: 400, statusMessage: 'candidate_id is required' })
@@ -49,6 +49,21 @@ export default defineEventHandler(async (event) => {
 
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
+    }
+
+    if (!candidate_is_complete_educations) {
+      const current = Number(candidate_completion_percentage ?? 0)
+      const newPct = Math.min(100, current + 10)
+
+      const { error: candidateError } = await supabase
+        .from('candidates')
+        .update({
+          is_complete_educations: true,
+          completion_percentage: newPct,
+          completion_percentage_formatted: `${newPct}%`,
+          is_complete: newPct >= 100
+        })
+        .eq('id', candidate_id) // sem .select(), sem .single()
     }
 
     return data

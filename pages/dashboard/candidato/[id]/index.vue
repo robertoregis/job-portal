@@ -129,6 +129,10 @@
       </v-row>
     </v-col>
 
+    <v-col v-if="!info.user.is_complete" cols="12" class="bg-error mt-4 pa-2">
+      <p class="text-center">Conclua o seu perfil para candidatar-se as vagas!</p>
+    </v-col>
+
     <v-col cols="12" class="mt-4 border">
       <v-card>
         <v-card-text class="pa-0">

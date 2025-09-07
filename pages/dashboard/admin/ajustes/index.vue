@@ -69,6 +69,7 @@
         <span class="text-caption">Configure o seu sistema</span>
       </div>
     </v-col>
+    <LayoutButtonBack />
   </v-row>
   <v-row no-gutters class="mt-5">
     <v-col cols="12" class="border mt-4">

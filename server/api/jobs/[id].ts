@@ -80,6 +80,17 @@ export default defineEventHandler(async (event) => {
           updateData[field] = emptyStringToNull(body[field])
         }
       }
+      let statusChangedToClosed;
+      if(updateData.status && updateData.status === 'Encerrada') {
+        updateData.is_closed = true;
+        updateData.is_active = false;
+        statusChangedToClosed = true;
+      } else {
+        updateData.is_closed = false;
+        updateData.is_active = true;
+        statusChangedToClosed = false;
+      }
+      
 
       const { data: job, error } = await supabase
         .from('jobs')
@@ -101,6 +112,38 @@ export default defineEventHandler(async (event) => {
 
       if (companyError) {
         throw createError({ statusCode: 500, statusMessage: companyError.message })
+      }
+
+      if (statusChangedToClosed) {
+        // 1) Notice para a empresa
+        await supabase.from('notices').insert([{
+          profile_id: company?.profile_id,
+          title: 'Vaga encerrada',
+          description: `A vaga "${job.title}" foi encerrada.`,
+          type: 'job',
+          subtitle: 'Vaga', 
+          is_master: false,
+        }]);
+
+        // 2) Notices para todos os candidatos que se candidataram
+        const { data: candidatures } = await supabase
+          .from('candidatures')
+          .select('candidate_id')
+          .eq('job_id', job.id);
+
+        if (candidatures?.length) {
+          const noticesForCandidates = candidatures.map(c => ({
+            profile_id: c.candidate_id,  // aqui usamos profile_id = candidate_id
+            title: 'Vaga encerrada',
+            description: `A vaga "${job.title}" para a qual você se candidatou foi encerrada.`,
+            type: 'job',
+            subtitle: 'Vaga', 
+            is_master: false,
+          }));
+
+          // Insere em batch
+          await supabase.from('notices').insert(noticesForCandidates);
+        }
       }
 
       return {

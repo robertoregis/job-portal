@@ -62,7 +62,9 @@
                 level: softSkill.value.level,
                 name: softSkill.value.name,
                 notes: softSkill.value.notes,
-                candidate_id: info.user.id
+                candidate_id: info.user.id,
+                candidate_is_complete_soft_skills: info.user.is_complete_soft_skills,
+                candidate_completion_percentage: info.user.completion_percentage
             }
         })
 
@@ -79,7 +81,9 @@
         notify({ title: 'Parabéns!', text: 'A soft skill foi criada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
-        
+        if(!info.user.is_complete_soft_skills) {
+            window.location.reload()
+        }
     }
 
     const getSoftSkills = async () => {
@@ -123,7 +127,12 @@
     const removeSoftSkill = async (id: string) => {
         show.setOverlayDashboard(true)
         const { data, error } = await useFetch(`/api/soft_skills/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            body: {
+                candidate_id: info.user.id,
+                candidate_is_complete_soft_skills: info.user.is_complete_soft_skills,
+                candidate_completion_percentage: info.user.completion_percentage
+            }
         })
 
         show.setOverlayDashboard(false)
@@ -138,6 +147,9 @@
         })
         notify({ title: 'Parabéns!', text: 'A soft skill foi removida com sucesso', type: 'success' })
         getSoftSkills()
+        if(softsList.value.length === 0) {
+            window.location.reload()
+        }
     }
 
     const { data: softSkills, error, refresh, pending } = await useFetch('/api/soft_skills', {

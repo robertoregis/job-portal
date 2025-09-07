@@ -38,6 +38,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             white: '#FFFFFF',
             navigation: '#546E7A',
             edit: '#cecac5ff',
+            card: '#f0f0f0ff',
           },
         },
       },
