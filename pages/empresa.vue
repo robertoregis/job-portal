@@ -9,6 +9,7 @@
   const { createLog } = useNotice();
   const info: any = useInfo();
   const show = useShow();
+  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   useHead({
     title: `Empresa - Conect One RH`,
     meta: [
@@ -77,7 +78,7 @@
     const { data, error } = await useFetch('/api/emails/send', {
       method: 'POST',
       body: {
-        to: [`Conect One RH <roberttoregiss@gmail.com>`],
+        to: [`Conect One RH <${emailOfficial}>`],
         subject: 'Chegou um email de contato',
         template: 'template_contact_company',
         variables: {

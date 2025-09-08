@@ -18,25 +18,25 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: totalError.message })
   }
 
-  // Candidaturas aprovadas
+  // Candidaturas contratadas
   const { count: approvedCount, error: approvedError } = await supabase
     .from('candidatures')
     .select('id', { count: 'exact', head: true })
     .eq('candidate_id', candidate_id)
     .eq('is_active', true)
-    .eq('status', 'Aprovada')
+    .eq('status', 'Contratados')
 
   if (approvedError) {
     throw createError({ statusCode: 500, statusMessage: approvedError.message })
   }
 
-  // Candidaturas rejeitadas
+  // Candidaturas desclassificadas
   const { count: rejectedCount, error: rejectedError } = await supabase
     .from('candidatures')
     .select('id', { count: 'exact', head: true })
     .eq('candidate_id', candidate_id)
     .eq('is_active', true)
-    .eq('status', 'Rejeitada')
+    .eq('status', 'Desclassificado')
 
   if (rejectedError) {
     throw createError({ statusCode: 500, statusMessage: rejectedError.message })

@@ -44,7 +44,7 @@
       const { data: dataSend, error: errorSend } = await useFetch('/api/emails/send', {
         method: 'POST',
         body: {
-          to: [`${info.user.name} <${config.value.company_email}>`],
+          to: [`${config.value.company_name} <${config.value.company_email}>`],
           subject: 'Seu email de contato foi enviado',
           template: 'email_contact_confirmation_template',
           variables: {

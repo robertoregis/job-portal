@@ -39,7 +39,7 @@
       })
 
       if (error.value) {
-        console.error('Erro ao atualizar a configuração da empresa:', error.value)
+        //console.error('Erro ao atualizar a configuração da empresa:', error.value)
         return
       }
       show.setOverlayDashboard(false)

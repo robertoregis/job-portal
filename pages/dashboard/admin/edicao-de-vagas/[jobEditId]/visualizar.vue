@@ -51,7 +51,6 @@
     })
 
     if (error.value) {
-      console.error('Erro ao atualizar vaga:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
       return
@@ -100,7 +99,7 @@
       })
 
       if (error.value) {
-        console.error('Erro ao recusar a edição:', error.value)
+        //console.error('Erro ao recusar a edição:', error.value)
         notify({ title: 'Erro', text: 'Aconteceu um erro ao recusar a edição', type: 'error' })
         return
       }
@@ -129,7 +128,6 @@
     }
   }
 
-
   const getJobs = async () => {
     const { data, error } = await useFetch('/api/jobs_edit', {
       method: 'GET',
@@ -145,7 +143,7 @@
   })
 
   if (error.value) {
-    console.log(error.value)
+    //console.log(error.value)
   } else {
     jobEditId.value = data.value.id
     jobEdit.value = data.value.job_data;

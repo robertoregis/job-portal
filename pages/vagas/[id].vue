@@ -105,7 +105,7 @@
   } else {
     job.value = data.value
     useHead({
-      title: `${job.value.job} - Conect One RH`,
+      title: `${job.value.title} - Conect One RH`,
       meta: [
         {
             name: 'description',
@@ -162,7 +162,7 @@
                       <div class="d-flex align-center">
                         <v-icon class="mr-2">mdi-calendar</v-icon>
                         <div class="d-flex align-center">
-                          <span class="text-body-2 font-weight-bold">Data de abertura:</span>
+                          <span class="text-body-2 font-weight-bold">Data de publicação:</span>
                           <span class="text-body-2 ml-1">{{ job.created_at_formatted }}</span>
                         </div>
                       </div>

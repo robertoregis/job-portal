@@ -86,7 +86,6 @@
 
     if (error.value) {
     } else {
-      console.log(data.value)
       behavioral.value = data.value.data[0]
       if (Object.keys(behavioral.value).length > 0) {
         getResultBeharioval()

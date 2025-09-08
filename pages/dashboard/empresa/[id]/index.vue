@@ -19,7 +19,6 @@
   const counts = ref<any>({
     total: 0,
     open: 0,
-    closedSignup: 0,
     ended: 0
   })
 
@@ -35,7 +34,7 @@
     if (error.value) {
       console.error('Erro ao buscar counts:', error.value)
     } else {
-      counts.value = data.value || { total: 0, open: 0, closedSignup: 0, ended: 0 }
+      counts.value = data.value || { total: 0, open: 0, ended: 0 }
       getNotices()
     }
   }
@@ -101,19 +100,8 @@
             elevation="2"
             style="min-height: 120px;"
           >
-            <div class="text-h6" style="line-height: 1.2;">Vagas abertas para inscrição</div>
+            <div class="text-h6" style="line-height: 1.2;">Vagas abertas</div>
             <div class="text-h3 font-weight-bold">{{ counts.open }}</div>
-          </v-card>
-        </v-col>
-
-        <v-col cols="12" sm="6" md="4">
-          <v-card
-            class="pa-2 text-center d-flex flex-column justify-center align-center border border-secondary"
-            elevation="2"
-            style="min-height: 120px;"
-          >
-            <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Vagas inscrições encerradas</div>
-            <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.closedSignup }}</div>
           </v-card>
         </v-col>
 

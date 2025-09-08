@@ -39,7 +39,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar avisos:', error.value)
+      //console.error('Erro ao carregar avisos:', error.value)
     } else {
       noticesList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1

@@ -118,7 +118,7 @@
         subtitle: 'Vaga',
         profile_id: info.profile.id,
         type: 'info',
-        is_master: true
+        is_master: false
       })
       createNotice({
         title: 'Vaga criada',

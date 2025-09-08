@@ -23,14 +23,19 @@ export default defineEventHandler(async (event) => {
       .order('created_at', { ascending: false })
       .range(from, to)
 
-    if (profile_id) {
-      query = query.eq('profile_id', profile_id as string)
-    }
-
-    if(is_master) {
-      query = query.eq('is_master', is_master)
+    if (is_master === 'true' || is_master === true) {
+      // pega masters OU não-masters com o mesmo profile_id
+      if (profile_id) {
+        query = query.or(`is_master.eq.true,and(is_master.eq.false,profile_id.eq.${profile_id})`)
+      } else {
+        // se não veio profile_id, pega só os masters
+        query = query.eq('is_master', true)
+      }
     } else {
-      query = query.eq('is_master', false)
+      // não é master → só filtra pelo profile_id, se vier
+      if (profile_id) {
+        query = query.eq('profile_id', profile_id as string)
+      }
     }
 
     const { data, error, count } = await query

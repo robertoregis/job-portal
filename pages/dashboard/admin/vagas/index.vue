@@ -68,8 +68,6 @@
     }
   }
 
-
-
   const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
     method: 'GET',
     params: {
@@ -80,7 +78,7 @@
   })
 
   if (error.value) {
-    console.error('Erro ao carregar jobs:', error.value)
+    //console.error('Erro ao carregar jobs:', error.value)
   } else {
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1

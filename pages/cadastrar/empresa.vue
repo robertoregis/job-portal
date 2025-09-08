@@ -86,7 +86,6 @@
     const { data, error } = await useFetch(`/api/profiles/${id}`, {
       method: 'GET'
     })
-
     const profile = data.value
     info.setProfile(data.value)
 
@@ -166,12 +165,6 @@
 
 <template>
   <div>
-    <!--<v-sheet width="100%" class="bg-gradient-primary py-1">
-      <div class="d-flex justify-center">
-        <h2 class="text-h6 font-weight-bold">Cadastrar</h2>
-      </div>
-    </v-sheet>-->
-
     <v-sheet width="100%" class="mt-4">
       <v-container v-if="!loading">
         <v-row>

@@ -38,8 +38,7 @@
                 Acreditamos que cada oportunidade é uma chance de transformar carreiras e impulsionar negócios.
               </p>
               <p class="text-subtitle-1 mt-2 mb-0">
-                Somos uma equipe cheia de energia, apaixonada por inovação e comprometida com resultados. 
-                Com tecnologia de ponta e soluções pensadas para simplificar processos de recrutamento, oferecemos uma experiência única para candidatos e empresas.
+                Somos uma equipe cheia de energia, apaixonada por inovação e comprometida com resultados. Com tecnologia de ponta e soluções pensadas para simplificar não apenas o processo de recrutamento mas tudo o que envolve o RH, oferecemos uma experiência única para candidatos e empresas.
               </p>
               <p class="text-subtitle-1 mt-2 mb-0">
                 Na Conect One RH, cada conexão importa. Transformamos dados em decisões estratégicas, processos em experiências humanas e oportunidades em sucesso real.

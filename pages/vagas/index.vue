@@ -123,15 +123,15 @@
                   <v-select
                     v-model="selectedData"
                     :items="dateCreated"
-                    label="Data de criação"
+                    label="Data de publicação"
                     clearable
                     dense
                     variant="outlined"
                     hide-details
-                    style="max-width: 200px"
+                    style="max-width: 220px"
                     class="w-100 my-1 mr-2"
                   />
-                  <v-select
+                  <!--<v-select
                     v-model="selectedState"
                     :items="states"
                     label="Estado"
@@ -141,7 +141,7 @@
                     hide-details
                     style="max-width: 200px"
                     class="w-100 my-1 mr-2"
-                  />
+                  />-->
                 </div>
               </v-col>
             </v-row>

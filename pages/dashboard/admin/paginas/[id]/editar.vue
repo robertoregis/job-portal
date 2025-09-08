@@ -32,7 +32,6 @@
       }
     })
     if (error.value) {
-      console.log(error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao editar a página', type: 'error' })
     } else {

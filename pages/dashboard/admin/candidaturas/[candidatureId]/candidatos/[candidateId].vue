@@ -101,7 +101,7 @@
       method: 'GET',
     })
     if (error.value) {
-      console.error('Erro ao buscar candidato:', error.value)
+      //console.error('Erro ao buscar candidato:', error.value)
     } else {
       candidate.value = data.value
       useHead({
@@ -132,7 +132,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao atualizar candidatura:', error.value)
+      //console.error('Erro ao atualizar candidatura:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a candidatura', type: 'error' })
       return
@@ -162,7 +162,7 @@
     })
     show.setOverlayDashboard(false)
     if (error.value) {
-      console.log(error.value)
+      //console.log(error.value)
       const message = error.value.data?.statusMessage || 'Erro ao criar parecer'
       notify({ title: '', text: message, type: 'error' })
       return
@@ -253,7 +253,6 @@
 
     if (error.value) {
     } else {
-      console.log(data.value)
       behavioral.value = data.value.data[0]
       if (Object.keys(behavioral.value).length > 0) {
         getResultBeharioval()

@@ -55,7 +55,6 @@
       method: 'GET',
       params
     })
-    console.log(data)
     if (error.value) {
       console.error('Erro ao carregar os pedidos de edição:', error.value)
     } else {
@@ -95,7 +94,6 @@
     })
 
     if (error.value) {
-      console.error('Erro ao atualizar vaga:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
       return

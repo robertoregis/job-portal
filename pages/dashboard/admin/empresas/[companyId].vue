@@ -23,7 +23,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao atualizar empresa:', error.value)
+      //console.error('Erro ao atualizar empresa:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a empresa', type: 'error' })
       return

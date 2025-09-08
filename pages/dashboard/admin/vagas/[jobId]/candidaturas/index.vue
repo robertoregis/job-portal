@@ -42,30 +42,12 @@
     rejected: 0
   })
 
-  const getFormatDate = (date: string) => {
-    if (!date) return ''
-    const parts = date.split('-') // ["yyyy", "mm", "dd"]
-    if (parts.length !== 3) return date
-
-    const [year, month, day] = parts
-    return `${day}/${month}/${year}`
-  }
-
-  const onStatusSelect = (selected: string | null) => {
-    if (!selected) {
-      selectedIconStatus.value = ''
-      return
-    }
-    const result = candidaturaStatusOptions.find(option => option.name === selected)
-    selectedIconStatus.value = result ? result.icon : ''
-  }
-
   const getJob = async () => {
     const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
       method: 'GET',
     })
     if (error.value) {
-      console.error('Erro ao buscar vaga:', error.value)
+      //console.error('Erro ao buscar vaga:', error.value)
     } else {
       job.value = data.value
     }
@@ -76,9 +58,6 @@
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }
-
-    if (selectedStatus.value) params.status = selectedStatus.value
-
     // Filtro por empresa (se houver)
     if (info.user.id) {
       params.job_id = route.params.jobId
@@ -215,7 +194,7 @@
       </v-row>
     </v-col>
 
-    <v-col cols="12">
+    <!--<v-col cols="12">
       <v-pagination
         v-if="totalPages > 1"
         v-model="page"
@@ -225,7 +204,7 @@
         class="my-4"
         rounded
       />
-    </v-col>
+    </v-col>-->
   </v-row>
 </template>
 
