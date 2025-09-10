@@ -35,7 +35,7 @@ export function useNotice() {
     type: string,
     is_master?: boolean
   }) => {
-    const { data, error } = await useFetch('/api/logs', {
+    const { data, error } = await useFetch('/api/app-logs', {
       method: 'POST',
       body: {
         title: log.title || null,

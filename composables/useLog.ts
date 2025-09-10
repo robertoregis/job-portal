@@ -7,7 +7,7 @@ export function useLog() {
     profile_id: string, 
     type: string 
   }) => {
-    const { data, error } = await useFetch('/api/logs', {
+    const { data, error } = await useFetch('/api/app-logs', {
       method: 'POST',
       body: {
         title: log.title || null,

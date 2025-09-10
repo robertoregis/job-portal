@@ -53,9 +53,13 @@ export default defineEventHandler(async (event) => {
   let browser;
   try {
     if (process.env.VERCEL) {
+      const executablePath = await chromium.executablePath;
+      if (!executablePath) {
+        throw new Error("Chromium não encontrado no ambiente Vercel");
+      }
       browser = await puppeteer.launch({
-        args: [...chromium.args],
-        executablePath: await chromium.executablePath,
+        args: chromium.args,
+        executablePath,
         headless: chromium.headless,
       });
     } else {
