@@ -1,4 +1,4 @@
-import chromium from "chrome-aws-lambda";
+import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 import { defineEventHandler } from "h3";
 import supabase from "@/server/utils/supabase";
@@ -53,14 +53,12 @@ export default defineEventHandler(async (event) => {
   let browser;
   try {
     if (process.env.VERCEL) {
-      const executablePath = await chromium.executablePath;
-      if (!executablePath) {
-        throw new Error("Chromium não encontrado no ambiente Vercel");
-      }
+      const executablePath = await chromium.executablePath();
+
       browser = await puppeteer.launch({
         args: chromium.args,
         executablePath,
-        headless: chromium.headless,
+        headless: true, // forçado no Vercel
       });
     } else {
       const puppeteerLocal = await import("puppeteer");
