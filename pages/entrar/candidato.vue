@@ -108,10 +108,8 @@
   }
 
   const submit = handleSubmit(async (values) => {
-    //alert(JSON.stringify(values, null, 2))
     show.setOverlayDashboard(true)
     const supabase = useNuxtApp().$supabase
-
     const { data, error } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password
@@ -170,7 +168,6 @@
     }
     
     show.setOverlayDashboard(true);
-
     const supabase = useNuxtApp().$supabase;
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(emailResetPassword.value, {
@@ -178,7 +175,6 @@
     });
 
     show.setOverlayDashboard(false);
-    console.log(data)
     if (error) {
       notify({ title: '', text: 'Erro ao enviar o email de redefinição.', type: 'error' });
     } else {
@@ -187,7 +183,6 @@
       notify({ title: '', text: 'Email de redefinição enviado! Verifique sua caixa de entrada.', type: 'success' });
     }
   };
-
 
 </script>
 

@@ -19,9 +19,7 @@
   const pageSize = ref(10)
   const totalPages = ref(1)
   const companiesList = ref<any[]>([])
-
   // Filtros
-
   const approveOptions = ['Sim', 'Não']
   const selectedApproved = ref<string | null>(null)
 
@@ -68,8 +66,6 @@
       totalPages.value = data.value?.totalPages || 1
     }
   }
-
-
 
   const { data: companies, error, refresh, pending } = await useFetch('/api/companies', {
     method: 'GET',

@@ -95,10 +95,10 @@
 
   })
 
-  onMounted(async () => {
+  /*onMounted(async () => {
     //const supabase = useNuxtApp().$supabase
     //await supabase.auth.signOut()
-  })
+  })*/
 
   const navigation = (id: number) => {
     router.push(`/cadastrar/empresa`)
@@ -145,7 +145,6 @@
     }
     
     show.setOverlayDashboard(true);
-
     const supabase = useNuxtApp().$supabase;
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(emailResetPassword.value, {
@@ -153,7 +152,6 @@
     });
 
     show.setOverlayDashboard(false);
-    console.log(data)
     if (error) {
       notify({ title: '', text: 'Erro ao enviar o email de redefinição.', type: 'error' });
     } else {

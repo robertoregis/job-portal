@@ -28,7 +28,6 @@
       method: 'GET',
       params
     })
-    console.log(data)
     if (error.value) {
       console.error('Erro ao carregar os pedidos de edição:', error.value)
     } else {
@@ -42,7 +41,6 @@
       params: { job_id: job.value.id }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value.total = data.value?.total || 0
       getJobsEdit()

@@ -58,7 +58,7 @@
       method: 'GET',
     })
     if (error.value) {
-      console.error('Erro ao buscar candidato:', error.value)
+      //console.error('Erro ao buscar candidato:', error.value)
     } else {
       candidate.value = data.value
       useHead({

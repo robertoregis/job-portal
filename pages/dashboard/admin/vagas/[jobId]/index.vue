@@ -40,7 +40,7 @@
       params
     })
     if (error.value) {
-      console.error('Erro ao carregar os pedidos de edição:', error.value)
+      //console.error('Erro ao carregar os pedidos de edição:', error.value)
     } else {
       jobsEditList.value = data.value?.data || []
     }
@@ -52,7 +52,7 @@
       params: { job_id: job.value.id }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
+      //console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value.total = data.value?.total || 0
       getJobsEdit()
@@ -70,7 +70,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao atualizar vaga:', error.value)
+      //console.error('Erro ao atualizar vaga:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
       return

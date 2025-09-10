@@ -22,21 +22,10 @@ export default defineEventHandler(async (event) => {
     .from('jobs')
     .select('id', { count: 'exact', head: true })
     .eq('company_id', company_id)
-    .eq('status', 'Aberta para inscrição')
+    .eq('status', 'Aberta')
 
   if (openError) {
     throw createError({ statusCode: 500, statusMessage: openError.message })
-  }
-
-  // Vagas com inscrições encerradas
-  const { count: closedSignupCount, error: closedSignupError } = await supabase
-    .from('jobs')
-    .select('id', { count: 'exact', head: true })
-    .eq('company_id', company_id)
-    .eq('status', 'Inscrições encerradas')
-
-  if (closedSignupError) {
-    throw createError({ statusCode: 500, statusMessage: closedSignupError.message })
   }
 
   // Vagas encerradas
@@ -53,7 +42,6 @@ export default defineEventHandler(async (event) => {
   return {
     total: totalCount || 0,
     open: openCount || 0,
-    closedSignup: closedSignupCount || 0,
     ended: endedCount || 0
   }
 })

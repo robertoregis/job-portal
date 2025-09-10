@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useField, useForm } from 'vee-validate';
-  import { useInfo } from '#imports';
+  import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show'
   definePageMeta({
     layout: 'clean'
@@ -43,7 +43,6 @@
       }
     },
   })
-
 
   const passwordConfirm = useField<string>('passwordConfirm')
   const password = useField<string>('password')

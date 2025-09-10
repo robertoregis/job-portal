@@ -111,7 +111,7 @@
             elevation="2"
             style="min-height: 120px;"
           >
-            <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas aprovadas</div>
+            <div class="text-gradient-primary text-h6" style="line-height: 1.2;">Candidaturas contratadas</div>
             <div class="text-gradient-primary text-h3 font-weight-bold">{{ counts.approved }}</div>
           </v-card>
         </v-col>
@@ -122,7 +122,7 @@
             elevation="2"
             style="min-height: 120px;"
           >
-            <div class="text-h6" style="line-height: 1.2;">Candidaturas rejeitadas</div>
+            <div class="text-h6" style="line-height: 1.2;">Candidaturas desclassificadas</div>
             <div class="text-h3 font-weight-bold">{{ counts.rejected }}</div>
           </v-card>
         </v-col>

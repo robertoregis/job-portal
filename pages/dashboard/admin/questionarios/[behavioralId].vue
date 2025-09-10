@@ -44,7 +44,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao avaliar questionário:', error.value)
+      //console.error('Erro ao avaliar questionário:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao avaliar questionário', type: 'error' })
       return
@@ -56,7 +56,7 @@
       description: `O seu questionário acabou de ser avaliado. Confira no seu perfil`,
       subtitle: 'Candidato',
       profile_id: behavioral.value.id_profile_candidate,
-      is_master: true,
+      is_master: false,
       type: 'info'
     })
     createLog({

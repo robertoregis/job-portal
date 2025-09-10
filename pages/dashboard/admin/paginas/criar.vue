@@ -44,6 +44,7 @@
         description: `Parabéns, você acabou de criar a página: ${page.value.title}`,
         subtitle: 'Página',
         profile_id: info.profile.id,
+        is_master: true,
         type: 'info'
       })
       createLog({

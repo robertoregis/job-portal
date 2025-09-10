@@ -37,8 +37,6 @@
     city: null,
   })
   const imagePreview = ref<any>(null)
-
-  const typeDate = ref<string>('')
   
   watch(stateSelected, async (newState, oldState) => {
     if (newState) {
@@ -113,7 +111,6 @@
     return `${day}/${month}/${year}`
   })
   const openDate = (type: string) => {
-    //typeDate.value =  type;
     pickerVisible.value = true;
   }
 

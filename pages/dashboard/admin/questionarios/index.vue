@@ -48,8 +48,6 @@
     }
   }
 
-
-
   const { data: behaviorals, error, refresh, pending } = await useFetch('/api/behavioral_profiles', {
     method: 'GET',
     params: {
@@ -61,7 +59,6 @@
 
   if (error.value) {
   } else {
-    console.log(behaviorals.value)
     behavioralsList.value = behaviorals.value?.data || []
     totalPages.value = behaviorals.value?.totalPages || 1
   }

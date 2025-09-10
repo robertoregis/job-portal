@@ -140,9 +140,9 @@
 
           states.value = data.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
       } catch (err) {
-          console.error('Erro ao buscar estados:', err);
+        //console.error('Erro ao buscar estados:', err);
       } finally {
-          loading.value = false; // termina o loading
+        loading.value = false; // termina o loading
       }
   };
   const getCities = async (state: any) => {
@@ -153,14 +153,14 @@
           return;
       }
       try {
-          const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedState.sigla}/distritos`);
+        const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedState.sigla}/distritos`);
 
-          if (!res.ok) {
+        if (!res.ok) {
           throw new Error(`Erro na requisição: ${res.status} ${res.statusText}`);
-          }
+        }
 
-          const data = await res.json();
-          cities.value = data.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+        const data = await res.json();
+        cities.value = data.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
       } catch (err) {
         console.error('Erro inesperado ao buscar cidades:', err);
       }
@@ -384,10 +384,8 @@
     }
 
     show.setOverlayDashboard(true)
-
     const formData = new FormData()
     formData.append('file', filePDF.value)
-
     // Aqui você manda o candidate_id e o type correto (candidate ou candidature)
     // Exemplo usando candidate_id para candidato
     const url = `/api/archives?candidate_id=${info.user.id}&type=candidate`

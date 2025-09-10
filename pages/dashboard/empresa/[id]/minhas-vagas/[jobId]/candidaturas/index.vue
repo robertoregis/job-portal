@@ -108,7 +108,6 @@
       params: { job_id: route.params.jobId }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
       getJob()

@@ -35,7 +35,6 @@
       pageSize: pageSize.value.toString(),
     }
 
-
     const { data, error } = await useFetch('/api/jobs_edit', {
       method: 'GET',
       params
@@ -47,8 +46,6 @@
       totalPages.value = data.value?.totalPages || 1
     }
   }
-
-
 
   const { data: companies, error, refresh, pending } = await useFetch('/api/jobs_edit', {
     method: 'GET',

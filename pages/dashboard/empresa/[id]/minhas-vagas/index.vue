@@ -80,8 +80,6 @@
     }
   }
 
-
-
   const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
     method: 'GET',
     params: {
