@@ -40,7 +40,6 @@
         dialogSoftSkill.value = true
     }
     ////
-
     const changeSoftSkill = () => {
         if (!softSkill.value.name) {
             notify({ title: 'Erro', text: 'Selecione o nome da soft skill', type: 'error' })

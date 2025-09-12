@@ -7,8 +7,8 @@
     title: `Dashboard - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Acompanhe suas vagas e estatísticas de contratação na Conect One RH.'
+        name: 'description',
+        content: 'Acompanhe suas vagas e estatísticas de contratação na Conect One RH.'
       }
     ]
   })
@@ -32,7 +32,7 @@
       params: { company_id: info.user.id }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
+      //console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value = data.value || { total: 0, open: 0, ended: 0 }
       getNotices()
@@ -45,7 +45,6 @@
       pageSize: 3
     }
 
-    // Filtro por empresa (se houver)
     if (info.profile.id) {
       params.profile_id = info.profile.id
     }

@@ -33,8 +33,8 @@
       title: `${company.value.name} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Confira as informações da sua empresa.'
+          name: 'description',
+          content: 'Confira as informações da sua empresa.'
         }
       ]
     })

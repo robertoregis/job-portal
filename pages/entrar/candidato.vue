@@ -16,15 +16,14 @@
     title: `Entrar - Candidato - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
+        name: 'description',
+        content: 'Cadastre-se gratuitamente na Conect One RH e conecte-se com empresas ou candidatos de forma simples e rápida.'
       }
     ]
   })
   const route = useRoute();
   const router = useRouter();
   const showPassword = ref(false)
-  const showPasswordConfirm = ref(false)
   const emailResetPassword = ref<any>(null)
   const dialogResetPassword = ref<boolean>(false)
   const token = ref<any>(null)
@@ -42,7 +41,6 @@
 
   const email = useField<string>('email')
   const password = useField<string>('password')
-
   const goCandidate = async (profile: any) => {
     const { data: dataCandidate, error: errorCandidate } = await useFetch(`/api/candidates`, {
         method: 'GET',
@@ -188,7 +186,6 @@
 
 <template>
   <div>
-
     <v-sheet width="100%" class="mt-4">
       <v-container v-if="!loading">
         <v-row>
@@ -277,18 +274,17 @@
     <!-- AÇÕES -->
     <v-card-text class="d-flex flex-column px-4 pb-4 pt-2">
       <form @submit.prevent="resetPassword">
+        <v-text-field
+          v-model="emailResetPassword"
+          label="E-mail"
+          type="email"
+          density="comfortable"
+        />
 
-              <v-text-field
-                v-model="emailResetPassword"
-                label="E-mail"
-                type="email"
-                density="comfortable"
-              />
-
-              <v-btn class="me-4" type="submit">
-                Redefinir
-              </v-btn>
-            </form>
+        <v-btn class="me-4" type="submit">
+          Redefinir
+        </v-btn>
+      </form>
     </v-card-text>
   </v-card>
   </v-dialog>

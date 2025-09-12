@@ -62,12 +62,10 @@
     const params: Record<string, any> = {
       behavioral_profiles_id: behavioral.value.id
     }
-
     const { data, error } = await useFetch('/api/result_behavioral', {
       method: 'GET',
       params
     })
-
     if (data.value?.data?.length) {
       const res = data.value.data[0]
       result_behavioral.value = res
@@ -78,12 +76,10 @@
     const params: Record<string, any> = {
       candidate_id: info.user.id
     }
-
     const { data, error } = await useFetch('/api/behavioral_profiles', {
       method: 'GET',
       params
     })
-
     if (error.value) {
     } else {
       behavioral.value = data.value.data[0]
@@ -104,8 +100,8 @@
       title: `${candidate.value.name} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Confira suas informações, experiências e qualificações profissionais.'
+          name: 'description',
+          content: 'Confira suas informações, experiências e qualificações profissionais.'
         }
       ]
     })
@@ -215,16 +211,17 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12" class="d-flex">
-              <a
-                v-if="candidate.curriculum_url"
-                :href="candidate.curriculum_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
-              >
-                <Icon name="mdi:file-link" />
-                <span class="ml-2">Ver currículo atual</span>
-              </a>
+              <div  v-if="candidate.curriculum_url">
+                <a
+                  :href="candidate.curriculum_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
+                >
+                  <Icon name="mdi:file-link" />
+                  <span class="ml-2">Ver currículo atual</span>
+                </a>
+              </div>
               <span v-else class="font-weight-bold">Não tem currículo no momento!</span>
             </v-col>
           </v-row>
@@ -288,7 +285,7 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-            <v-divider v-if="result_behavioral && result_behavioral.id"></v-divider>
+            <v-divider></v-divider>
              <v-list-item v-if="result_behavioral && result_behavioral.id" class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Perfil comportamental</v-list-item-title>
@@ -325,6 +322,30 @@
                       </div>
                     </div>
                   </div>
+                </div>
+              </v-list-item-content>
+              <v-list-item-content>
+                <div class="d-flex flex-column">
+                  <div class="pa-2 bg-grey-lighten-5 mb-3">
+                    <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_one_title }}</h3>
+                    <p>{{ result_behavioral.field_one_description }}</p>
+                  </div>
+                  <div class="pa-2 bg-grey-lighten-5">
+                    <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_two_title }}</h3>
+                    <p>{{ result_behavioral.field_two_description }}</p>
+                  </div>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item v-else class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Perfil comportamental</v-list-item-title>
+                <div class="d-flex mb-2 mt-2">
+                  <template v-if="behavioral">
+                    <span class="font-weight-bold text-body-2 text-error" v-if="behavioral.is_redo">É preciso refazer e mandar outro print do resultado</span>
+                    <span class="font-weight-bold text-body-2 text-error" v-else>Já foi respondido e aguarda por avaliação</span>
+                  </template>
+                  <span v-else>Ainda não foi respondido</span>
                 </div>
               </v-list-item-content>
             </v-list-item>
@@ -395,48 +416,48 @@
 </template>
 
 <style lang="scss" scoped>
-/* Seu estilo opcional aqui */
-.chart {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  /* Seu estilo opcional aqui */
+  .chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.chart-item h2 {
-  margin: 0 0 5px 0;
-  font-size: 13px;
-}
+  .chart-item h2 {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+  }
 
-.bar-bg {
-  width: 300px;
-  height: 30px;
-  background-color: #d4d2d2;
-  border-radius: 15px;
-  overflow: hidden;
-}
+  .bar-bg {
+    width: 300px;
+    height: 30px;
+    background-color: #d4d2d2;
+    border-radius: 15px;
+    overflow: hidden;
+  }
 
-.bar-fill {
-  height: 100%;
-  border-radius: 15px 0 0 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  transition: width 0.5s ease;
-  font-size: 12px;
-}
+  .bar-fill {
+    height: 100%;
+    border-radius: 15px 0 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: width 0.5s ease;
+    font-size: 12px;
+  }
 
-.bar-fill-1 {
-  background-color: #4caf50;
-}
-.bar-fill-2 {
-  background-color: #2155c4;
-}
-.bar-fill-3 {
-  background-color: #cc2525;
-}
-.bar-fill-4 {
-  background-color: #dbb434;
-}
+  .bar-fill-1 {
+    background-color: #4caf50;
+  }
+  .bar-fill-2 {
+    background-color: #2155c4;
+  }
+  .bar-fill-3 {
+    background-color: #cc2525;
+  }
+  .bar-fill-4 {
+    background-color: #dbb434;
+  }
 </style>

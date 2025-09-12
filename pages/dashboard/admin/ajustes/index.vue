@@ -12,8 +12,8 @@
     title: `Ajustes - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Configure serviços, benefícios e gerencie sua senha.'
+        name: 'description',
+        content: 'Configure serviços, benefícios e gerencie sua senha.'
       }
     ]
   })

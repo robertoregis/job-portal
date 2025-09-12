@@ -26,15 +26,15 @@
 </script>
 <template>
   <v-app class="d-flex flex-column fill-height">
+    <LayoutTop />
+    <LayoutMenu />
 
-  <LayoutTop />
-  <LayoutMenu />
+    <slot/>
 
-  <slot/>
-
-  <LayoutFooter />
+    <LayoutFooter />
     <GlobalSnackbar />
     <GlobalOverlay />
+    <LayoutButtonWhats />
   </v-app>
 </template>
 

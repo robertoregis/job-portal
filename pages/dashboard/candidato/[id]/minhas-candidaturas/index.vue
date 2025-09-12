@@ -7,8 +7,8 @@
     title: `Minhas candidaturas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Gerencie todas as vagas para as quais você se candidatou.'
+        name: 'description',
+        content: 'Gerencie todas as vagas para as quais você se candidatou.'
       }
     ]
   })

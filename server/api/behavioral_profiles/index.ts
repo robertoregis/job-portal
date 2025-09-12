@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { candidate_id, is_response, page, pageSize } = getQuery(event)
+    const { candidate_id, is_response, page, pageSize, is_redo } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
     const size = pageSize ? parseInt(pageSize as string, 10) : 10
@@ -25,6 +25,9 @@ export default defineEventHandler(async (event) => {
     }
     if (is_response) {
       query = query.eq('is_response', false)
+    }
+    if (is_redo) {
+      query = query.eq('is_redo', false)
     }
 
     const { data, error, count } = await query
@@ -53,14 +56,10 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'candidate_id is required' })
     }
 
-    if (!formdata || typeof formdata !== 'object') {
-      throw createError({ statusCode: 400, statusMessage: 'formdata is required' })
-    }
-
     // Verifica se já existe um registro para este candidato
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from('behavioral_profiles')
-      .select('id')
+      .select('*')
       .eq('candidate_id', candidate_id)
       .single()
 
@@ -70,7 +69,7 @@ export default defineEventHandler(async (event) => {
       // Atualiza o registro existente
       const { data, error } = await supabase
         .from('behavioral_profiles')
-        .update(formdata)
+        .update({ is_redo: false }) // aqui você pode atualizar os campos que vieram no body
         .eq('candidate_id', candidate_id)
         .select()
         .single()
@@ -97,6 +96,7 @@ export default defineEventHandler(async (event) => {
       result = data
     }
 
+    // Atualiza o candidato, se necessário
     if (!candidate_is_complete_behavioral) {
       const current = Number(candidate_completion_percentage ?? 0)
       const newPct = Math.min(100, current + 10)
@@ -109,7 +109,7 @@ export default defineEventHandler(async (event) => {
           completion_percentage_formatted: `${newPct}%`,
           is_complete: newPct >= 100
         })
-        .eq('id', candidate_id) // sem .select(), sem .single()
+        .eq('id', candidate_id)
     }
 
     return result

@@ -2,7 +2,6 @@
   import { useShow } from '@/stores/show';
   import { useInfo } from '@/stores/info';
   import { useNotice } from '@/composables/useNotice';
-  import { name_formated } from '@/composables/textFunctions';
   definePageMeta({
     layout: 'dashboard'
   })
@@ -19,6 +18,8 @@
   const educationsList = ref<any[]>([])
   const softSkillsList = ref<any[]>([])
   const loading = ref<boolean>(true)
+  const result_behavioral = ref<any>({})
+  const behavioral = ref<any>({})
 
   const getFormatDate = (date: string) => {
     if (!date) return ''
@@ -65,13 +66,56 @@
         title: `${candidate.value.name} - Conect One RH`,
         meta: [
           {
-              name: 'description',
-              content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
+            name: 'description',
+            content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
           }
         ]
       })
       loading.value = false;
+      getBeharioval()
       getDataCandidate(candidate.value.id)
+    }
+  }
+
+  const MAX_WIDTH = 300
+
+  const getWidth = (val: string | number) => {
+    let num = typeof val === 'number' ? val : parseInt(val.toString().replace('%', ''), 10)
+    return Math.round((num / 100) * MAX_WIDTH)
+  }
+
+  const getResultBeharioval = async () => {
+    const params: Record<string, any> = {
+      behavioral_profiles_id: behavioral.value.id
+    }
+
+    const { data, error } = await useFetch('/api/result_behavioral', {
+      method: 'GET',
+      params
+    })
+
+    if (data.value?.data?.length) {
+      const res = data.value.data[0]
+      result_behavioral.value = res
+    }
+  }
+
+  const getBeharioval = async () => {
+    const params: Record<string, any> = {
+      candidate_id: candidate.value.id
+    }
+
+    const { data, error } = await useFetch('/api/behavioral_profiles', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+    } else {
+      behavioral.value = data.value.data[0]
+      if (Object.keys(behavioral.value).length > 0) {
+        getResultBeharioval()
+      }
     }
   }
 
@@ -229,7 +273,6 @@
             </v-list-item>
 
             <v-divider></v-divider>
-
             <v-list-item class="mt-2" style="min-height: unset">
               <v-list-item-content>
                 <v-list-item-title class="text-subtitle-1 font-weight-bold">Tipos de vagas que procuro</v-list-item-title>
@@ -247,7 +290,58 @@
                 </div>
               </v-list-item-content>
             </v-list-item>
-
+            <v-divider v-if="result_behavioral && result_behavioral.id"></v-divider>
+             <v-list-item v-if="result_behavioral && result_behavioral.id" class="mt-2" style="min-height: unset">
+              <v-list-item-content>
+                <v-list-item-title class="text-subtitle-1 font-weight-bold">Perfil comportamental</v-list-item-title>
+                <div class="chart mb-2">
+                  <div class="chart-item">
+                    <h2>Dominância</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-1" :style="{ width: getWidth(result_behavioral.dominance) + 'px' }">
+                        {{ result_behavioral.dominance_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Influência</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-2" :style="{ width: getWidth(result_behavioral.influence) + 'px' }">
+                        {{ result_behavioral.influence_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Estabilidade</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-3" :style="{ width: getWidth(result_behavioral.steadiness) + 'px' }">
+                        {{ result_behavioral.steadiness_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <h2>Conformidade</h2>
+                    <div class="bar-bg">
+                      <div class="bar-fill bar-fill-4" :style="{ width: getWidth(result_behavioral.conscientiousness) + 'px' }">
+                        {{ result_behavioral.conscientiousness_formatted }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <div class="d-flex flex-column">
+                <div class="pa-2 bg-grey-lighten-5 mb-3">
+                  <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_one_title }}</h3>
+                  <p>{{ result_behavioral.field_one_description }}</p>
+                </div>
+                <div class="pa-2 bg-grey-lighten-5">
+                  <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_two_title }}</h3>
+                  <p>{{ result_behavioral.field_two_description }}</p>
+                </div>
+              </div>
+            </v-list-item>
             <!-- Experiências -->
             <v-divider></v-divider>
             <v-list-item class="mt-2" style="min-height: unset">

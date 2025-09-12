@@ -8,8 +8,8 @@
     title: `Editar perfil - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Atualize e personalize seu perfil para destacar suas habilidades.'
+        name: 'description',
+        content: 'Atualize e personalize seu perfil para destacar suas habilidades.'
       }
     ]
   })
@@ -212,13 +212,6 @@
         console.error('Erro ao atualizar candidato:', error.value)
         return
       }
-      /*createNotice({
-        title: 'Novo Aviso',
-        description: 'Descrição do aviso',
-        subtitle: 'Destaque',
-        profile_id: info.profile.id,
-        type: 'Info'
-      })*/
       createLog({
         title: `Atualizou o perfil`,
         profile_id: info.profile.id,
@@ -467,15 +460,12 @@
     const params: Record<string, any> = {
       candidate_id: info.user.id
     }
-
     const { data, error } = await useFetch('/api/behavioral_profiles', {
       method: 'GET',
       params
     })
-
     if (error.value) {
     } else {
-      console.log(data.value)
       behavioral.value = data.value.data[0]
     }
   }

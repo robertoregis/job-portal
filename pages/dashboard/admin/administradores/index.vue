@@ -10,8 +10,8 @@
     title: `Administradores - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Conheça todos os administradores do sistema.'
+        name: 'description',
+        content: 'Conheça todos os administradores do sistema.'
       }
     ]
   })

@@ -7,8 +7,8 @@
     title: `Dashboard - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Veja suas candidaturas e acompanhe seu progresso na Conect One RH.'
+        name: 'description',
+        content: 'Veja suas candidaturas e acompanhe seu progresso na Conect One RH.'
       }
     ]
   })
@@ -32,7 +32,7 @@
       params: { candidate_id: info.user.id }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
+      //console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
       getNotices()
@@ -56,7 +56,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar candidaturas:', error.value)
+      //console.error('Erro ao carregar candidaturas:', error.value)
     } else {
       noticesList.value = data.value?.data || []
     }

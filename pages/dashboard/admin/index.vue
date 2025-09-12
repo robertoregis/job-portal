@@ -7,8 +7,8 @@
     title: `Dashboard - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Acompanhe estatísticas e informações gerais sobre vagas, empresas e candidatos.'
+        name: 'description',
+        content: 'Acompanhe estatísticas e informações gerais sobre vagas, empresas e candidatos.'
       }
     ]
   })
@@ -53,7 +53,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar os avisos:', error.value)
+      //console.error('Erro ao carregar os avisos:', error.value)
     } else {
       noticesList.value = data.value?.data || []
     }

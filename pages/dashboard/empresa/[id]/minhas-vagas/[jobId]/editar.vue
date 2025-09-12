@@ -10,8 +10,8 @@
     title: `Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'A Conect One RH conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
+        name: 'description',
+        content: 'A Conect One RH conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
       }
     ]
   })
@@ -56,7 +56,7 @@
       params
     })
     if (error.value) {
-      console.error('Erro ao carregar os pedidos de edição:', error.value)
+      //console.error('Erro ao carregar os pedidos de edição:', error.value)
     } else {
       jobsEditList.value = data.value?.data || []
     }

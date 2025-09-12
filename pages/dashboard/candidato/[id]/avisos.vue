@@ -7,8 +7,8 @@
     title: `Avisos - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Confira avisos e comunicados importantes para candidatos.'
+        name: 'description',
+        content: 'Confira avisos e comunicados importantes para candidatos.'
       }
     ]
   })

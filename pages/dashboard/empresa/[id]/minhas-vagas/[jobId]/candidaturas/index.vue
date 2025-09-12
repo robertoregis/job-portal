@@ -50,7 +50,6 @@
   const pageSize = ref(500)
   const totalPages = ref(1)
   const selectedStatus = ref<string | null>(null)
-  const selectedIconStatus = ref<string>('')
   const candidaturesList = ref<any[]>([])
   const counts = ref<any>({
     total: 0,
@@ -63,7 +62,7 @@
       method: 'GET',
     })
     if (error.value) {
-      console.error('Erro ao buscar vaga:', error.value)
+      //console.error('Erro ao buscar vaga:', error.value)
     } else {
       job.value = data.value
     }
@@ -77,7 +76,6 @@
 
     if (selectedStatus.value) params.status = selectedStatus.value
 
-    // Filtro por empresa (se houver)
     if (info.user.id) {
       params.job_id = route.params.jobId
     }

@@ -22,8 +22,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         connect: {
           dark: false,
           colors: {
-            primary: '#C724F2',
-            secondary: '#C724F2',
+            primary: '#391a4f',
+            secondary: '#391a4f',
             titleDark: '#0f0f0fff',
             titleLight: '#464343ff',
             title: '#201f1fff',

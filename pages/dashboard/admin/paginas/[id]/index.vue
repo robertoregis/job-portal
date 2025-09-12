@@ -62,8 +62,8 @@
       title: `${page.value.title} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Visualize a página e ative para que fique visível no site.'
+          name: 'description',
+          content: 'Visualize a página e ative para que fique visível no site.'
         }
       ]
     })

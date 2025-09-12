@@ -8,8 +8,8 @@
     title: `Questionários - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Veja todos os questionários dos candidatos que precisam de avaliação'
+        name: 'description',
+        content: 'Veja todos os questionários dos candidatos que precisam de avaliação'
       }
     ]
   })
@@ -33,7 +33,8 @@
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      is_response: false
+      is_response: false,
+      is_redo: false
     }
 
     const { data, error } = await useFetch('/api/behavioral_profiles', {
@@ -53,7 +54,8 @@
     params: {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      is_response: false
+      is_response: false,
+      is_redo: false
     }
   })
 
