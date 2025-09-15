@@ -108,8 +108,8 @@
         title: `${candidate.value.name} - Conect One RH`,
         meta: [
           {
-              name: 'description',
-              content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
+            name: 'description',
+            content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
           }
         ]
       })
@@ -168,7 +168,7 @@
       return
     }
     createLog({
-      title: `Criou a parecer`,
+      title: `Criou o parecer`,
       profile_id: info.profile.id,
       type: 'create_feedback'
     })
@@ -229,12 +229,10 @@
     const params: Record<string, any> = {
       behavioral_profiles_id: behavioral.value.id
     }
-
     const { data, error } = await useFetch('/api/result_behavioral', {
       method: 'GET',
       params
     })
-
     if (data.value?.data?.length) {
       const res = data.value.data[0]
       result_behavioral.value = res
@@ -245,12 +243,10 @@
     const params: Record<string, any> = {
       candidate_id: candidate.value.id
     }
-
     const { data, error } = await useFetch('/api/behavioral_profiles', {
       method: 'GET',
       params
     })
-
     if (error.value) {
     } else {
       behavioral.value = data.value.data[0]
@@ -366,17 +362,18 @@
       <v-card>
         <v-card-text>
           <v-row no-gutters>
-            <v-col cols="12">
-              <a
-                v-if="candidate.curriculum_url"
-                :href="candidate.curriculum_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
-              >
-                <v-icon>mdi-file-link</v-icon>
-                <span class="ml-2">Ver currículo atual</span>
-              </a>
+            <v-col cols="12" class="d-flex">
+              <div  v-if="candidate.curriculum_url">
+                <a
+                  :href="candidate.curriculum_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-decoration-none text-subtitle-1 d-flex align-center bg-primary py-1 px-4 rounded-xl"
+                >
+                  <Icon name="mdi:file-link" />
+                  <span class="ml-2">Ver currículo atual</span>
+                </a>
+              </div>
               <span v-else class="font-weight-bold">Não tem currículo no momento!</span>
             </v-col>
           </v-row>
@@ -483,6 +480,18 @@
                   </div>
                 </div>
               </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <div class="d-flex flex-column">
+                <div class="pa-2 bg-grey-lighten-5 mb-3">
+                  <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_one_title }}</h3>
+                  <p>{{ result_behavioral.field_one_description }}</p>
+                </div>
+                <div class="pa-2 bg-grey-lighten-5">
+                  <h3 class="mb-1 text-subtitle-2 font-weight-bold">{{ result_behavioral.field_two_title }}</h3>
+                  <p>{{ result_behavioral.field_two_description }}</p>
+                </div>
+              </div>
             </v-list-item>
             <!-- Experiências -->
             <v-divider></v-divider>

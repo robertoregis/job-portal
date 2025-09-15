@@ -11,8 +11,8 @@
     title: `Criar administrador - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Crie novos administradores para te ajudar com a Conect One RH.'
+        name: 'description',
+        content: 'Crie novos administradores para te ajudar com a Conect One RH.'
       }
     ]
   })

@@ -13,8 +13,8 @@
     title: `Editar perfil - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Atualize seus dados e informações de contato.'
+        name: 'description',
+        content: 'Atualize seus dados e informações de contato.'
       }
     ]
   })
@@ -131,13 +131,6 @@
         console.error('Erro ao atualizar candidato:', error.value)
         return
       }
-      /*createNotice({
-        title: 'Novo Aviso',
-        description: 'Descrição do aviso',
-        subtitle: 'Destaque',
-        profile_id: info.profile.id,
-        type: 'Info'
-      })*/
       createLog({
         title: `Atualizou o perfil`,
         profile_id: info.profile.id,

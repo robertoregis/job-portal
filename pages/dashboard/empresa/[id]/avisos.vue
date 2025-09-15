@@ -30,7 +30,7 @@
 
     // Filtro por empresa (se houver)
     if (info.profile.id) {
-      params.candidate_id = info.profile.id
+      params.profile_id = info.profile.id
     }
 
     const { data, error } = await useFetch('/api/notices', {
@@ -39,7 +39,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar avisos:', error.value)
+      //console.error('Erro ao carregar avisos:', error.value)
     } else {
       noticesList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1

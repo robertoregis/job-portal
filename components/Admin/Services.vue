@@ -79,12 +79,10 @@
             method: 'GET',
             params: {}
         })
-
         if (error.value) {
             console.error('Erro ao carregar o serviço:', error.value)
             return null
         }
-
         servicesList.value = data.value
     }
 

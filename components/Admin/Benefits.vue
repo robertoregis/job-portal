@@ -81,12 +81,10 @@
                 candidate_id: info.user.id
             }
         })
-
         if (error.value) {
             console.error('Erro ao carregar o benefício:', error.value)
             return null
         }
-
         benefitsList.value = data.value
     }
 

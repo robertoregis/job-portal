@@ -13,8 +13,8 @@
     title: `Redefinir Senha - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Redefina sua senha e recupere o acesso à sua conta na Conect One RH.'
+        name: 'description',
+        content: 'Redefina sua senha e recupere o acesso à sua conta na Conect One RH.'
       }
     ]
   })
@@ -46,14 +46,6 @@
 
   const passwordConfirm = useField<string>('passwordConfirm')
   const password = useField<string>('password')
-
-  /*onBeforeMount(() => {
-    if(info.user && info.user.id) {
-      router.push('/')
-    } else {
-      loading.value = false;
-    }
-  })*/
 
   const updateUser = handleSubmit(async (values) => {
     show.setOverlayDashboard(true);
@@ -91,7 +83,6 @@
       // token faltando: não pode continuar
     }
   })
-
 
 </script>
 <template>

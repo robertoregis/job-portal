@@ -12,8 +12,8 @@
     title: `Ajustes - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Configure preferências e altere sua senha.'
+        name: 'description',
+        content: 'Configure preferências e altere sua senha.'
       }
     ]
   })

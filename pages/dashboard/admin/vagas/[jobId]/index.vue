@@ -101,8 +101,8 @@
       title: `${job.value.title} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Veja detalhes e gerencie as candidaturas para esta vaga.'
+          name: 'description',
+          content: 'Veja detalhes e gerencie as candidaturas para esta vaga.'
         }
       ]
     })

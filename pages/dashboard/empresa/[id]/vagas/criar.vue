@@ -11,8 +11,8 @@
     title: `Criar vaga - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Publique uma nova vaga e encontre os candidatos ideais.'
+        name: 'description',
+        content: 'Publique uma nova vaga e encontre os candidatos ideais.'
       }
     ]
   })
@@ -103,7 +103,7 @@
       }
     })
     if (error.value) {
-      console.error('Erro ao criar vaga:', error.value)
+      //console.error('Erro ao criar vaga:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao criar a vaga', type: 'error' })
     } else {

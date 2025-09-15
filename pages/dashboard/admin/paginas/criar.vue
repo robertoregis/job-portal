@@ -11,8 +11,8 @@
     title: `Criar página - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Crie novas páginas para o site da Conect One RH.'
+        name: 'description',
+        content: 'Crie novas páginas para o site da Conect One RH.'
       }
     ]
   })

@@ -32,8 +32,8 @@
       title: `${admin.value.name} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Confira suas informações de administrador.'
+          name: 'description',
+          content: 'Confira suas informações de administrador.'
         }
       ]
     })

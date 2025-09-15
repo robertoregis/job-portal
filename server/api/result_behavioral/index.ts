@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   // ---------------------- POST ----------------------
   if (method === 'POST') {
     const body = await readBody(event)
-    const { formdata, behavioral_profiles_id } = body
+    const { formdata, behavioral_profiles_id, candidate_id, print_result_id, print_result_url } = body
 
     if (!behavioral_profiles_id) {
       throw createError({ statusCode: 400, statusMessage: 'behavioral_profiles_id is required' })
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Insere um novo registro
-    const insertData = { behavioral_profiles_id, ...formdata }
+    const insertData = { behavioral_profiles_id, candidate_id, print_result_id, print_result_url, ...formdata }
 
     const { data, error } = await supabase
       .from('result_behavioral')

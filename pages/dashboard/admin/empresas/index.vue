@@ -8,8 +8,8 @@
     title: `Empresas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Veja todas as empresas cadastradas e gerencie aprovações.'
+        name: 'description',
+        content: 'Veja todas as empresas cadastradas e gerencie aprovações.'
       }
     ]
   })
@@ -50,11 +50,9 @@
       params.is_approved = false
     }
 
-    // Filtro por empresa (se houver)
     if (info.user.id) {
       params.company_id = info.user.id
     }
-
     const { data, error } = await useFetch('/api/companies', {
       method: 'GET',
       params

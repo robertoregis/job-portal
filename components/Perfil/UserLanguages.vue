@@ -50,7 +50,7 @@
         }
 
         createLanguage()
-        }
+    }
 
 
     const createLanguage = async () => {
@@ -77,7 +77,6 @@
         notify({ title: 'Parabéns!', text: 'O idioma foi criada com sucesso', type: 'success' })
         getLanguages()
         clearLanguage()
-        
     }
 
     const getLanguages = async () => {

@@ -59,8 +59,8 @@
       title: `${company.value.name} - Conect One RH`,
       meta: [
         {
-            name: 'description',
-            content: 'Analise e aprove ou recuse o cadastro desta empresa.'
+          name: 'description',
+          content: 'Analise e aprove ou recuse o cadastro desta empresa.'
         }
       ]
     })

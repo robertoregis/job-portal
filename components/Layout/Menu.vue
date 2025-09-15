@@ -16,7 +16,6 @@
   const { notify } = useNotification();
 
   const showPassword = ref(false)
-  const showPasswordConfirm = ref(false)
 
   const { handleSubmit, handleReset, values } = useForm<FormSchema>({
     validationSchema: {
@@ -38,41 +37,10 @@
     router.push(`/cadastrar/${type}`)
   }
 
-  const navigationDashboard = () => {
-    let dashboardType = ''
-
-    switch (info.user.type) {
-      case 'candidate':
-        dashboardType = 'candidato'
-        break
-      case 'company':
-        dashboardType = 'empresa'
-        break
-      case 'admin':
-        dashboardType = 'admin'
-        break
-      default:
-        dashboardType = '' // ou alguma rota padrão, se quiser
-    }
-    show.setMenu(false)
-    if (dashboardType && info.user.id) {
-      if(dashboardType === 'admin') {
-        router.push(`/dashboard/${dashboardType}`)
-      } else {
-        router.push(`/dashboard/${dashboardType}/${info.user.id}`)
-      }
-    } else {
-      // opcional: lidar com usuário inválido
-      console.error('Tipo de usuário desconhecido ou ID não definido')
-    }
-  }
-
-
   const getProfile = async (id: string) => {
     const { data, error } = await useFetch(`/api/profiles/${id}`, {
       method: 'GET'
     })
-
     const profile = data.value
     info.setProfile(data.value)
 
@@ -82,7 +50,7 @@
       })
 
       if (errorAdmin.value) {
-        console.error('Erro ao carregar admin:', errorAdmin.value)
+        //console.error('Erro ao carregar admin:', errorAdmin.value)
         return
       }
 

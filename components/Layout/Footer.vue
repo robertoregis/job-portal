@@ -58,11 +58,11 @@
             <!-- BLOCO DE REDES SOCIAIS - Vai pra baixo em telas pequenas -->
             <v-col
               cols="12" md="6"
-              class="d-flex justify-center justify-md-start"
+              class=""
               order="2"
               order-md="1"
             >
-              <div>
+              <div class="d-flex align-center justify-center justify-md-start">
                 <NuxtLink to="https://www.instagram.com/conectonerh/?igsh=MXY2ZHdkZTNoenhsbg%3D%3D#" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-instagram" size="large" />
                 </NuxtLink>
@@ -72,6 +72,10 @@
                 <NuxtLink to="/" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-linkedin" size="large" />
                 </NuxtLink>
+              </div>
+              <div class="d-flex align-center justify-center justify-md-start mt-2">
+                <span class="font-weight-bold mr-2 text-body-2">Whatsapp:</span>
+                <span class="text-body-2">+55 48 9162-1132</span>
               </div>
             </v-col>
           </v-row>

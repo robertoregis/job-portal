@@ -17,15 +17,13 @@
   const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   const dialog = ref<boolean>(false)
   const declineReason = ref<string>('')
-  const valid = ref(false);
-  const formRef = ref(null);
   const router = useRouter();
 
   const sendMail = async () => {
     const { data, error } = await useFetch('/api/emails/send', {
       method: 'POST',
       body: {
-        to: [`${info.user.name} <${config.value.company_email}>`],
+        to: [`${config.value.company_name} <${config.value.company_email}>`],
         subject: 'Chegou um email de contato',
         template: 'contact_email_candidate_template',
         variables: {
@@ -44,7 +42,7 @@
       const { data: dataSend, error: errorSend } = await useFetch('/api/emails/send', {
         method: 'POST',
         body: {
-          to: [`${config.value.company_name} <${config.value.company_email}>`],
+          to: [`${info.user.name} <${info.user.email}>`],
           subject: 'Seu email de contato foi enviado',
           template: 'email_contact_confirmation_template',
           variables: {
@@ -85,8 +83,8 @@
         title: `${job.value.title} - Conect One RH`,
         meta: [
           {
-              name: 'description',
-              content: 'Veja detalhes da sua candidatura e acompanhe seu status.'
+            name: 'description',
+            content: 'Veja detalhes da sua candidatura e acompanhe seu status.'
           }
         ]
       })
@@ -120,7 +118,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao declinar candidatura:', error.value)
+      //console.error('Erro ao declinar candidatura:', error.value)
       show.setOverlayDashboard(false)
       notify({ title: 'Erro', text: 'Aconteceu um erro ao declinar a candidatura', type: 'error' })
       return
@@ -138,6 +136,11 @@
           decline_reason: declineReason.value
         }
       }
+    })
+    createLog({
+      title: `Declinou da vaga ${candidature.value.job_title}`,
+      profile_id: info.profile.id,
+      type: 'decline_candidature'
     })
     show.setOverlayDashboard(false)
     notify({ title: 'Sucesso', text: 'A sua candidatura foi declinada!', type: 'success' })

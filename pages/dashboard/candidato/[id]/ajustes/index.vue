@@ -12,8 +12,8 @@
     title: `Ajustes - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Configure sua conta e altere sua senha.'
+        name: 'description',
+        content: 'Configure sua conta e altere sua senha.'
       }
     ]
   })
@@ -24,7 +24,7 @@
   const showPasswordConfirm = ref(false)
 
   definePageMeta({
-    layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
+    layout: 'dashboard'
   })
 
   const { handleSubmit, handleReset, values } = useForm<FormSchema>({

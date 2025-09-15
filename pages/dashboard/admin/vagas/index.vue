@@ -8,8 +8,8 @@
     title: `Vagas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Gerencie todas as vagas publicadas na Conect One RH.'
+        name: 'description',
+        content: 'Gerencie todas as vagas publicadas na Conect One RH.'
       }
     ]
   })
@@ -61,7 +61,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar vagas:', error.value)
+      //console.error('Erro ao carregar vagas:', error.value)
     } else {
       jobsList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1

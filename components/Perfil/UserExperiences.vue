@@ -91,16 +91,16 @@
       const { data, error } = await useFetch('/api/experiences', {
           method: 'POST',
           body: {
-              position: experience.position,
-              start_date: experience.start_date,
-              end_date: experience.end_date,
-              description: experience.description,
-              company_name: experience.company_name,
-              candidate_id: info.user.id,
-              order: order,
-              experience_group_id: experienceGroup.value.id,
-              candidate_is_complete_experiences: info.user.is_complete_experiences,
-              candidate_completion_percentage: info.user.completion_percentage
+            position: experience.position,
+            start_date: experience.start_date,
+            end_date: experience.end_date,
+            description: experience.description,
+            company_name: experience.company_name,
+            candidate_id: info.user.id,
+            order: order,
+            experience_group_id: experienceGroup.value.id,
+            candidate_is_complete_experiences: info.user.is_complete_experiences,
+            candidate_completion_percentage: info.user.completion_percentage
           }
       })
       if (error.value) {

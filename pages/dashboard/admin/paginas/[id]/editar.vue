@@ -7,8 +7,8 @@
     title: `Editar página - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Edite as páginas criadas ao seu modo.'
+        name: 'description',
+        content: 'Edite as páginas criadas ao seu modo.'
       }
     ]
   })
@@ -36,9 +36,9 @@
       notify({ title: 'Erro', text: 'Aconteceu um erro ao editar a página', type: 'error' })
     } else {
       createLog({
-        title: `Criou a página`,
+        title: `Editou a página`,
         profile_id: info.profile.id,
-        type: 'create_page'
+        type: 'edit_page'
       })
       show.setOverlayDashboard(false)
       notify({ title: 'Parabéns!', text: 'A página foi editada com sucesso', type: 'success' })

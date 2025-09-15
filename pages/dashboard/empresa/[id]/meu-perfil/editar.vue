@@ -9,8 +9,8 @@
     title: `Editar perfil - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Atualize as informações e dados da sua empresa.'
+        name: 'description',
+        content: 'Atualize as informações e dados da sua empresa.'
       }
     ]
   })
@@ -22,7 +22,7 @@
   let cnpjMaskInstance: any = null
 
   definePageMeta({
-    layout: 'dashboard' // ou outro nome, conforme os arquivos em layouts/
+    layout: 'dashboard'
   })
   const info: any = useInfo();
   const show = useShow();

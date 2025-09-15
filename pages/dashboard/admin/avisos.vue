@@ -7,8 +7,8 @@
     title: `Avisos - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Publique e gerencie avisos para empresas e candidatos.'
+        name: 'description',
+        content: 'Publique e gerencie avisos para empresas e candidatos.'
       }
     ]
   })
@@ -25,12 +25,13 @@
   const getNotices = async () => {
     const params: Record<string, any> = {
       page: page.value.toString(),
-      pageSize: pageSize.value.toString()
+      pageSize: pageSize.value.toString(),
+      is_master: true,
     }
 
     // Filtro por empresa (se houver)
     if (info.profile.id) {
-      params.candidate_id = info.profile.id
+      params.profile_id = info.profile.id
     }
 
     const { data, error } = await useFetch('/api/notices', {

@@ -10,8 +10,8 @@
     title: `Visualizar a edição - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Veja todos os pedidos para edição das vagas e aprove ou recuse.'
+        name: 'description',
+        content: 'Veja todos os pedidos para edição das vagas e aprove ou recuse.'
       }
     ]
   })
@@ -121,20 +121,10 @@
       notify({ title: 'Parabéns!', text: 'A edição foi recusada', type: 'success' })
 
     } catch (err) {
-      console.error('Erro inesperado:', err)
+      //console.error('Erro inesperado:', err)
       notify({ title: 'Erro', text: 'Aconteceu um erro inesperado', type: 'error' })
     } finally {
       show.setOverlayDashboard(false)
-    }
-  }
-
-  const getJobs = async () => {
-    const { data, error } = await useFetch('/api/jobs_edit', {
-      method: 'GET',
-    })
-
-    if (error.value) {
-    } else {
     }
   }
 

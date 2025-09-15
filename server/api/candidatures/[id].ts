@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, statusMessage: 'Candidature not found' })
     }
 
-    // Buscar dados do candidato
+    // Buscar candidato
     const { data: candidate, error: candidateError } = await supabase
       .from('candidates')
       .select('id, name, image_url, email')
@@ -35,6 +35,17 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 500, statusMessage: candidateError.message })
     }
 
+    // Buscar vaga (job)
+    const { data: job, error: jobError } = await supabase
+      .from('jobs')
+      .select('id, title')
+      .eq('id', candidature.job_id)
+      .single()
+
+    if (jobError) {
+      throw createError({ statusCode: 500, statusMessage: jobError.message })
+    }
+
     return {
       ...candidature,
       created_at_formatted: candidature.created_at
@@ -43,7 +54,10 @@ export default defineEventHandler(async (event) => {
       candidate_name: candidate?.name || null,
       candidate_image_url: candidate?.image_url || null,
       candidate_email: candidate?.email || null,
-      address: `${candidature?.city || ''} - ${candidature?.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
+      job_title: job?.title || null,
+      address: `${candidature?.city || ''} - ${candidature?.state || ''}`
+        .trim()
+        .replace(/^-\s*|\s*-\s*$/g, '')
     }
   }
 

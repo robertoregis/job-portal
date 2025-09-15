@@ -8,8 +8,8 @@
     title: `Edição de vagas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Veja todos os pedidos para edição das vagas e aprove ou recuse.'
+        name: 'description',
+        content: 'Veja todos os pedidos para edição das vagas e aprove ou recuse.'
       }
     ]
   })

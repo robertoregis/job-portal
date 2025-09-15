@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
         </head>
         <body>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h1 style="margin:0; font-size: 26px;">Relatório do Candidato</h1>
+            <h1 style="margin:0; font-size: 20px;">Parecer profissional do candidato</h1>
             <img src="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/logo-simbolo.png" alt="Logo" style="width:60px;">
           </div>
 
@@ -100,27 +100,29 @@ export default defineEventHandler(async (event) => {
           <div class="section">
             <h3 class="font-b">Informações Pessoais</h3>
             
-            <div style="display: flex; gap: 20px; margin-bottom: 2px;">
+            <div style="display: flex; gap: 20px; margin-bottom: 4px;">
               <div class="font-c"><strong>Email:</strong> ${candidate.email || ''}</div>
               <div class="font-c"><strong>Telefone:</strong> ${candidate.phone || ''}</div>
             </div>
             
-            <div style="display: flex; gap: 20px; margin-bottom: 2px;">
-              <div class="font-c"><strong>CPF:</strong> ${candidate.cof || ''}</div>
+            <div style="display: flex; gap: 20px; margin-bottom: 4px;">
+              <div class="font-c"><strong>CPF:</strong> ${candidate.cpf || ''}</div>
               <div class="font-c"><strong>Estado cívil:</strong> ${candidate.marital_status || ''}</div>
             </div>
             
-            <div style="display: flex; gap: 20px;">
+            <div style="display: flex; gap: 20px; margin-bottom: 4px;">
               <div class="font-c"><strong>Endereço:</strong> ${candidate.city || ''} - ${candidate.state || ''}</div>
               <div class="font-c"><strong>Data de Nascimento:</strong> ${candidate.birth_date || ''}</div>
+            </div>
+
+            <div style="display: flex; gap: 20px;">
+              <div class="font-c"><strong>Pretensão salarial:</strong> ${candidate.salary_expectations || ''}</div>
             </div>
           </div>
 
           <div class="section">
             <h3 class="font-b">Sobre</h3>
             <div class="font-c">${candidate.about || ''}</div>
-            <h3 class="font-b">Pretensão salarial</h3>
-            <div class="font-c">${candidate.salary_expectations || ''}</div>
           </div>
 
           <div class="section">
@@ -142,28 +144,30 @@ export default defineEventHandler(async (event) => {
             </ul>
           </div>
 
-          <div class="section">
-            <h3 class="font-b">Escolaridade</h3>
-            <ul style="padding-left: 0;">
-              ${(educations || []).map((e: any) => `
-                <li style="display: flex; flex-direction: column; margin-bottom: 6px;">
-                  <span class="font-c" style="font-weight: 700; margin-right: 5px;">${e.course}</span>
-                  <span class="font-d">${e.level}</span>
-                </li>
-              `).join("")}
-            </ul>
-          </div>
+          <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+              <h3 class="font-b" style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 8px;">Escolaridade</h3>
+              <ul style="padding-left: 0;">
+                ${(educations || []).map((e: any) => `
+                  <li style="display: flex; flex-direction: column; margin-bottom: 6px;">
+                    <span class="font-c" style="font-weight: 700; margin-right: 5px;">${e.course}</span>
+                    <span class="font-d">${e.level}</span>
+                  </li>
+                `).join("")}
+              </ul>
+            </div>
 
-          <div class="section">
-            <h3 class="font-b">Soft Skills</h3>
-            <ul class="font-c" style="padding-left: 0;">
-              ${(soft_skills || []).map((s: any) => `
-                <li style="display: flex; flex-direction: column; margin-bottom: 6px;">
-                  <span class="font-c" style="font-weight: 700; margin-right: 5px;">${s.name}</span>
-                  <span class="font-d">${s.level}</span>
-                </li>
-              `).join("")}
-            </ul>
+            <div style="flex: 1;">
+              <h3 class="font-b" style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 8px;">Soft Skills</h3>
+              <ul class="font-c" style="padding-left: 0;">
+                ${(soft_skills || []).map((s: any) => `
+                  <li style="display: flex; flex-direction: column; margin-bottom: 6px;">
+                    <span class="font-c" style="font-weight: 700; margin-right: 5px;">${s.name}</span>
+                    <span class="font-d">${s.level}</span>
+                  </li>
+                `).join("")}
+              </ul>
+            </div>
           </div>
 
           <div class="section">
@@ -182,7 +186,7 @@ export default defineEventHandler(async (event) => {
             <h3 class="font-b">Áreas de Interesse</h3>
             <ul class="font-c" style="padding-left: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px;">
               ${(candidate.areas_of_interest || []).map((e:any) => `
-                <li style="display: flex; margin-bottom: 6px;">${e}</li>
+                <li style="display: flex; margin-bottom: 6px; background: #ddddddff; padding: 3px;">${e}</li>
               `).join("")}
             </ul>
           </div>
@@ -191,14 +195,14 @@ export default defineEventHandler(async (event) => {
             <h3 class="font-b">Tipos de vagas que procuro</h3>
             <ul class="font-c" style="padding-left: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px;">
               ${(candidate.job_types || []).map((e:any) => `
-                <li style="display: flex; margin-bottom: 6px;">${e}</li>
+                <li style="display: flex; margin-bottom: 6px; background: #ddddddff; padding: 3px;">${e}</li>
               `).join("")}
             </ul>
           </div>
 
           <div class="section">
-            <h3 class="font-b">Parecer</h3>
-            <div class="font-c" style="padding: 2px; background: #fcf9f9ff;">
+            <h3 class="font-b">Análise de entrevista</h3>
+            <div class="font-c">
               ${feedback.content}
             </div>
           </div>

@@ -10,8 +10,8 @@
     title: `Páginas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Gerencie todas as páginas do site e controle sua exibição.'
+        name: 'description',
+        content: 'Gerencie todas as páginas do site e controle sua exibição.'
       }
     ]
   })
@@ -38,11 +38,6 @@
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
-    }
-
-    // Filtro por empresa (se houver)
-    if (info.user.id) {
-      params.page_id = info.user.id
     }
 
     const { data, error } = await useFetch('/api/pages', {

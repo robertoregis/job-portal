@@ -111,9 +111,9 @@
           type: 'info',
         })
         createLog({
-            title: `Cadastrou a conta`,
-            profile_id: info.profile.id,
-            type: 'register'
+          title: `Cadastrou a conta`,
+          profile_id: info.profile.id,
+          type: 'register'
         })
         notify({ title: '', text: 'Cadastro feito com sucesso', type: 'success' })
         show.setOverlayDashboard(false)
@@ -132,7 +132,6 @@
           type: 'candidate'
         }
       })
-
       // Tratamento de erros
       if (error.value) {
         if (error.value.statusMessage?.includes('already been registered')) {

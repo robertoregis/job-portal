@@ -8,8 +8,8 @@
     title: `Minhas vagas - Conect One RH`,
     meta: [
       {
-          name: 'description',
-          content: 'Gerencie todas as vagas da sua empresa publicadas na Conect One RH.'
+        name: 'description',
+        content: 'Gerencie todas as vagas da sua empresa publicadas na Conect One RH.'
       }
     ]
   })
@@ -62,7 +62,6 @@
       params.is_active = false
     }
 
-    // Filtro por empresa (se houver)
     if (info.user.id) {
       params.company_id = info.user.id
     }
@@ -73,7 +72,7 @@
     })
 
     if (error.value) {
-      console.error('Erro ao carregar vagas:', error.value)
+      //console.error('Erro ao carregar vagas:', error.value)
     } else {
       jobsList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1
@@ -91,7 +90,7 @@
   })
 
   if (error.value) {
-    console.error('Erro ao carregar jobs:', error.value)
+    //console.error('Erro ao carregar jobs:', error.value)
   } else {
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1

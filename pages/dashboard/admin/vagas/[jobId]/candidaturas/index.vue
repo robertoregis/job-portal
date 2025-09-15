@@ -34,7 +34,6 @@
   const pageSize = ref(500)
   const totalPages = ref(1)
   const selectedStatus = ref<string | null>(null)
-  const selectedIconStatus = ref<string>('')
   const candidaturesList = ref<any[]>([])
   const counts = ref<any>({
     total: 0,
@@ -89,7 +88,7 @@
       params: { job_id: route.params.jobId }
     })
     if (error.value) {
-      console.error('Erro ao buscar counts:', error.value)
+      //console.error('Erro ao buscar counts:', error.value)
     } else {
       counts.value = data.value || { total: 0, approved: 0, rejected: 0 }
       getJob()
