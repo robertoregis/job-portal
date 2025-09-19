@@ -119,8 +119,6 @@
         behavioral_profiles_id: route.params.behavioralId,
         candidate_id: behavioral.value.id_candidate,
         formdata: formdata.value,
-        print_result_id: behavioral.value.print_result_id,
-        print_result_url: behavioral.value.print_result_url
       }
     })
 
@@ -131,7 +129,7 @@
       return
     }
 
-    behavioral.value = data.value
+    //behavioral.value = data.value
     createNotice({
       title: `O seu questionário foi avaliado`,
       description: `O seu questionário acabou de ser avaliado. Confira no seu perfil`,
@@ -148,44 +146,6 @@
     show.setOverlayDashboard(false)
     notify({ title: 'Parabéns!', text: `Avaliação feita com sucesso`, type: 'success' })
     router.push(`/dashboard/admin/questionarios`)
-  }
-
-  const redo = async () => {
-    show.setOverlayDashboard(true)
-    try {
-      const { data, error } = await useFetch(`/api/behavioral_profiles/${behavioral.value.id}`, {
-        method: 'PATCH',
-        body: {
-          formdata: {
-            is_redo: true
-          }
-        }
-      })
-
-      if (error.value) {
-        //console.error('Erro ao mandar refazer imagem do questionário:', error.value)
-        return
-      }
-      createNotice({
-        title: `Refaça a imagem do resultado`,
-        description: `A imagem do seu resultado do seu questionário não é válida `,
-        subtitle: 'Candidato',
-        profile_id: behavioral.value.id_profile_candidate,
-        is_master: false,
-        type: 'info'
-      })
-      createLog({
-        title: `Mandou refazer a imagem do resultado do questionário do candidato: ${behavioral.value.name_candidate}`,
-        profile_id: info.profile.id,
-        type: 'redo_behavioral'
-      })
-      show.setOverlayDashboard(false)
-      notify({ title: 'Parabéns!', text: 'Foi enviado para o candidado refazer', type: 'success' })
-      router.push(`/dashboard/admin/questionarios`)
-    } catch (err) {
-      show.setOverlayDashboard(false)
-      notify({ title: 'Erro', text: 'Aconteceu um erro', type: 'error' })
-    }
   }
 
   const { data, error, pending } = await useFetch(`/api/behavioral_profiles/${route.params.behavioralId}`, {
@@ -233,23 +193,34 @@
             <v-col cols="12" class="mt-2">
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
-                <span class="text-body-2 ml-2">{{ behavioral.name_candidate }}</span>
+                <span class="text-h6 ml-2">{{ behavioral.name_candidate }}</span>
               </div>
             </v-col>
 
-            <v-col cols="12" class="mb-3">
-              <p class="font-weight-bold mb-2">Print do resultado:</p>
-              <div class="d-flex">
-                <div>
-                  <img :src="behavioral.print_result_url" alt="" style="max-width: 600px">
-                </div>
-              </div>
-              <v-btn @click="redo" color="error" class="mt-2">Refazer o print</v-btn>
+            <v-col cols="12" v-for="(question, index) in questions" :key="index" class="mb-3">
+              <p class="font-medium mb-1"><span class="font-weight-bold">{{ index + 1 }}</span>.</p>
+              <v-radio-group
+                v-if="question.type === 'radio'"
+                v-model="behavioral.answers[question.id].response.value"
+                :inline="true"
+                readonly
+              >
+                <v-radio
+                  v-for="(opt, i) in question.options"
+                  :key="opt.id"
+                  :label="`${String.fromCharCode(97 + i)}. ${opt.value}`"
+                  :value="opt.value"
+                  class="text-body-2"
+                />
+              </v-radio-group>
+
             </v-col>
           </v-row>
         </v-card-text>
       </v-card>
     </v-col>
+
+    {{ behavioral }}
 
     <v-col cols="12" class="border mt-4">
       <v-card flat class="pa-4">
@@ -258,6 +229,23 @@
           <h3 class="text-subtitle-1 font-weight-bold text-gradient-primary">Fazer avaliação</h3>
         </div>
         <v-row>
+          <v-col cols="12">
+            <div class="d-flex flex-column">
+              <h2 class="mb-2">Resultado</h2>
+              <div class="d-flex flex-row flex-wrap">
+              <div
+                v-for="(count, letter) in behavioral.counts"
+                :key="letter"
+                class="pa-2 mr-2 text-center border rounded"
+                style="min-width: 50px;"
+              >
+                <div class="font-weight-bold text-h6">{{ letter }}</div>
+                <div>{{ count }}</div>
+              </div>
+            </div>
+
+            </div>
+          </v-col>
           <v-col cols="12">
             <v-text-field
               v-model="formdata.dominance"

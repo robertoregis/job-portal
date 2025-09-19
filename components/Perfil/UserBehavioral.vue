@@ -2,7 +2,8 @@
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   import { useNotice } from '@/composables/useNotice';
-  const { createLog } = useNotice();
+  import { questions } from '@/composables/behavioral';
+  const { createLog, createNotice } = useNotice();
   const { notify } = useNotification();
   const info: any = useInfo();
   const show = useShow();
@@ -23,6 +24,71 @@
   const result_behavioral = ref<any>({})
   const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
 
+  const formData = ref<any>({
+    number_1: null,
+    number_2: null,
+    number_3: null,
+    number_4: null,
+    number_5: null,
+    number_6: null,
+    number_7: null,
+    number_8: null,
+    number_9: null,
+    number_10: null,
+    number_11: null,
+    number_12: null,
+    number_13: null,
+    number_14: null,
+    number_15: null,
+    number_16: null,
+    number_17: null,
+    number_18: null,
+    number_19: null,
+    number_20: null,
+    number_21: null,
+    number_22: null,
+    number_23: null,
+    number_24: null,
+    number_25: null,
+    number_26: null,
+  });
+
+  watch(
+    () => props.load, // getter
+    (newValue, oldValue) => {
+      if (newValue === true) {
+        formData.value = {
+          number_1: null,
+          number_2: null,
+          number_3: null,
+          number_4: null,
+          number_5: null,
+          number_6: null,
+          number_7: null,
+          number_8: null,
+          number_9: null,
+          number_10: null,
+          number_11: null,
+          number_12: null,
+          number_13: null,
+          number_14: null,
+          number_15: null,
+          number_16: null,
+          number_17: null,
+          number_18: null,
+          number_19: null,
+          number_20: null,
+          number_21: null,
+          number_22: null,
+          number_23: null,
+          number_24: null,
+          number_25: null,
+          number_26: null,
+        }
+      }
+    }
+  )
+
   const sendMail = async () => {
     const { data, error } = await useFetch('/api/emails/send', {
       method: 'POST',
@@ -39,11 +105,19 @@
 
   // Enviar respostas
   const submitForm = async () => {
+    const payload = Object.values(formData.value) // transforma em array
+    const unanswered = payload.filter((item: any) => item === null)
+    const count = unanswered.length
+    if (count > 0) {
+      notify({ title: 'Erro', text: `Você ainda não respondeu ${count} pergunta(s).`, type: 'error' })
+      return
+    }
     try {
       show.setOverlayDashboard(true)
       const { data, error } = await useFetch('/api/behavioral_profiles', {
           method: 'POST',
           body: {
+            formdata: formData.value,
             candidate_id: info.user.id,
             candidate_is_complete_behavioral: info.user.is_complete_behavioral,
             candidate_completion_percentage: info.user.completion_percentage
@@ -55,7 +129,23 @@
         notify({ title: 'Erro', text: 'Erro ao responder questionário', type: 'error' })
         return
       }
-      uploadImage(data.value.id)
+      show.setOverlayDashboard(false)
+      createLog({
+        title: `Respondeu o questionáro do perfil comportamental`,
+        profile_id: info.profile.id,
+        type: 'response_behavioral_profiles'
+      })
+      createNotice({
+        title: 'Questionário respondido',
+        description: `O candidato ${info.user.name} respondeu o questionário do perfil comportamental`,
+        subtitle: 'Perfil comportamental',
+        profile_id: info.profile.id,
+        type: 'info',
+        is_master: true
+      })
+      sendMail()
+      notify({ title: 'Parabéns!', text: 'O questionário foi respondido', type: 'success' })
+      close("form")
     } catch(error) {
       console.log(error)
       notify({ title: 'Erro', text: 'Erro ao responder questionário', type: 'error' })
@@ -101,69 +191,6 @@
     },
     { immediate: true } // roda imediatamente caso já tenha valor
   )
-
-  const imagePreview = ref<any>(null)
-
-  const file = ref<File | null>(null)
-  const fileInput: any = ref(null)
-  const triggerFileInput = () => {
-    fileInput.value?.click()
-  }
-
-  const previewImage = () => {
-    if (!file.value) {
-      imagePreview.value = null
-      return
-    }
-    const selectedFile = file.value
-
-    if (selectedFile instanceof File) {
-      imagePreview.value = URL.createObjectURL(selectedFile)
-    } else if (Array.isArray(selectedFile)) {
-      imagePreview.value = selectedFile.length > 0 ? URL.createObjectURL(selectedFile[0]) : null
-    }
-  }
-
-  const uploadImage = async (behavioralId: string) => {
-    if (!file.value) {
-      notify({ title: 'Erro', text: 'Selecione uma imagem', type: 'error' })
-      show.setOverlayDashboard(false)
-      return
-    }
-
-    const formDataTy = new FormData()
-    formDataTy.append('file', file.value)
-    const url = `/api/images/behavioral?behavioral_profiles_id=${behavioralId}`
-
-    const { data: imageData, error: imageError }: any = await useFetch(url, {
-      method: 'POST',
-      body: formDataTy
-    })
-
-    if (imageError.value) {
-      //console.log(imageError.value)
-      notify({ title: 'Erro', text: 'Erro ao enviar imagem', type: 'error' })
-    } else {
-      createLog({
-        title: `Respondeu o questionáro do perfil comportamental`,
-        profile_id: info.profile.id,
-        type: 'response_behavioral_profiles'
-      })
-      sendMail()
-      setTimeout(() => {
-        createLog({
-          title: `Anexou o print do resultado do perfil comportamental`,
-          profile_id: info.profile.id,
-          type: 'register_photo_behavioral'
-        })
-        notify({ title: 'Parabéns!', text: 'O questionário foi respondido', type: 'success' })
-        close("form")
-      }, 1000)
-    }
-    setTimeout(() => {
-      show.setOverlayDashboard(false)
-    }, 1000)
-  }
 
 </script>
 
@@ -241,40 +268,62 @@
           </p>
 
           <p class="text-body-2 mb-4">
-            Visite este link <a href="https://www.mrcoach.com.br/teste-perfil-comportamental-disc.php">https://www.mrcoach.com.br/teste-perfil-comportamental-disc.php</a> e faça o teste. É simples de fazer.
+            O tempo estimado é de <strong class="text-success">5 minutos</strong>.  
+            <br>
+            <span class="text-error font-weight-bold">
+              Caso saia antes de concluir, será necessário reiniciar o questionário.
+            </span>
           </p>
-          <p class="text-body-2 mb-4">
-            Depois que fizer, tire print do resultado (exemplo do print na imagem a seguir) e o anexe aqui em baixo.
-          </p>
-          <div class="mb-4">
-            <img src="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/resultado.png" alt="" style="max-width: 400px">
-          </div>
 
           <v-divider></v-divider>
 
-          <div class="d-flex flex-column mt-4">
-            <div v-if="file" class="d-flex align-center mb-2">
-              <div class="pa-1 shadow border-md">
-                <img :src="imagePreview" alt="" style="max-width: 100px; max-height: 50px;">
-              </div>
-              <span class="ml-2 text-caption">{{ file.name }}</span>
-            </div>
-            <v-file-input
-              ref="fileInput"
-              accept="image/*"
-              v-model="file"
-              style="display: none"
-              @change="previewImage"
-            ></v-file-input>
-            <div class="d-flex">
-              <v-btn @click="triggerFileInput" class="bg-orange-darken-3">{{ file ? 'Trocar resultado' : 'Anexar resultado' }}</v-btn>
-            </div>
-            <span class="mt-4 text-caption font-weight-bold">Depois de enviado, se o print estiver válido, mandaremos o resultado.</span>
-            <div class="d-flex mt-1">
-              <v-btn @click="submitForm" class="bg-gradient-primary">Enviar</v-btn>
-            </div>
-          </div>
+          <h2 class="mt-1 mb-1 text-h6 font-weight-bold">Selecione o adjetivo que melhor descreve você!</h2>
         </div>
+
+        <v-form ref="formRef" v-model="valid">
+          <div v-for="(question, index) in questions" :key="index" class="mb-1">
+            <!--<p class="font-medium mb-2">{{ index + 1 }}. {{ question.text }}</p>-->
+            <p class="font-medium mb-1">{{ index + 1 }}. {{ question.title }}</p>
+
+            <!-- Texto 
+            <v-text-field
+              v-if="question.type === 'text'"
+              v-model="answers[question.id]"
+              :label="question.placeholder"
+              variant="outlined"
+              clearable
+            />-->
+
+            <!-- Múltipla escolha (checkbox)
+            <v-checkbox
+              v-else-if="question.type === 'checkbox'"
+              v-for="opt in question.options"
+              :key="opt"
+              v-model="answers[question.id]"
+              :label="opt"
+              :value="opt"
+              hide-details
+            /> -->
+
+            <!-- Escolha única (radio) -->
+            <v-radio-group
+              v-if="question.type === 'radio'"
+              v-model="formData[question.id]"
+              :inline="true"
+            >
+              <v-radio
+                v-for="opt in question.options"
+                :key="opt.id"
+                :label="opt.value"
+                :value="{ 
+                  index: index + 1, 
+                  title: 'Selecione o adjetivo que melhor descreve você!', 
+                  response: opt   // aqui vai o objeto inteiro
+                }"
+              />
+            </v-radio-group>
+          </div>
+        </v-form>
       </v-card-text>
     </v-card>
   </v-dialog>

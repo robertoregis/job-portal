@@ -55,7 +55,12 @@ export default defineEventHandler(async (event) => {
     if (!candidate_id) {
       throw createError({ statusCode: 400, statusMessage: 'candidate_id is required' })
     }
-
+    const payload = Object.values(formdata)
+    const counts = payload.reduce((acc: any, item: any) => {
+      const id = item.response.id;
+      acc[id] = (acc[id] || 0) + 1;
+      return acc;
+    }, {});
     // Verifica se já existe um registro para este candidato
     const { data: existing, error: existingError } = await supabase
       .from('behavioral_profiles')
@@ -81,7 +86,7 @@ export default defineEventHandler(async (event) => {
       result = data
     } else {
       // Insere um novo registro
-      const insertData = { candidate_id, ...formdata }
+      const insertData = { candidate_id, answers: formdata, counts: counts }
 
       const { data, error } = await supabase
         .from('behavioral_profiles')

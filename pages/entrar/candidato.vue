@@ -79,8 +79,8 @@
         return
       }
 
-      const admin = dataAdmin.value
-      info.setUser({ ...dataAdmin.value[0], type: 'admin' })
+      const admin = dataAdmin.value.data
+      info.setUser({ ...dataAdmin.value.data[0], type: 'admin' })
       show.setOverlayDashboard(false)
       createLog({
         title: `Logou`,
