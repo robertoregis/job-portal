@@ -62,7 +62,7 @@
     <v-container class="py-3">
       <div class="d-flex justify-space-between align-center">
         <div class="img-logo">
-          <img src="/logo-text.png" alt="logo com símbolo da Conect One RH" style="max-width: 100%;"></img>
+          <img src="/logo-text-3.png" alt="logo com símbolo da Conect One RH" style="max-width: 100%;"></img>
         </div>
 
         <v-spacer></v-spacer>

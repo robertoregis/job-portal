@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
       if (profile_id) {
         query = query.eq('profile_id', profile_id as string)
       }
+      query = query.eq('is_master', false)
     }
 
     const { data, error, count } = await query

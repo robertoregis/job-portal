@@ -21,7 +21,9 @@ export default defineEventHandler(async (event) => {
         profile_id
       ),
       print_result_url,
-      print_result_id
+      print_result_id,
+      answers,
+      counts
     `)
     .eq('id', id)
     .single()
@@ -38,6 +40,8 @@ export default defineEventHandler(async (event) => {
       id_candidate: data.candidates?.id ?? null,
       id_profile_candidate: data.candidates?.profile_id ?? null,
       print_result_url: data.print_result_url,
+      answers: data.answers,
+      counts: data.counts
     }
   }
 
