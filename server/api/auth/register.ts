@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
       let representative_email = email;
       const { data: company, error: companyError } = await supabase
         .from('companies')
-        .insert([{ name, email, representative_email, profile_id: profile.id, code_confirmation: token }])
+        .insert([{ name, email, representative_email, profile_id: profile.id, code_confirmation: token, status: 'Esperando' }])
         .select()
         .single()  // pegamos o company criado para usar o id
 
@@ -90,7 +90,16 @@ export default defineEventHandler(async (event) => {
   else if (type === 'candidate') {
     const { error: candidateError } = await supabase
       .from('candidates')
-      .insert([{ name, email, profile_id: profile.id, code_confirmation: token }])
+      .insert([
+        { 
+          name, 
+          email, 
+          profile_id: profile.id, 
+          code_confirmation: token,
+          completion_percentage: 5,
+          completion_percentage_formatted: `5%`
+        }
+      ])
 
     if (candidateError) {
       throw createError({ statusCode: 500, statusMessage: candidateError.message })

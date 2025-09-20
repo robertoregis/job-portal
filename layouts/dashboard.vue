@@ -44,7 +44,7 @@
 
   const { data, error }: any = await useFetch('/api/notices/todaycount', {
       method: 'GET',
-      params: { profile_id: info.user.profile_id, is_master: true }
+      params: { profile_id: info.user.profile_id, is_master: info.profile.type === 'admin' ? true : false }
     })
     if (error.value) {
     } else {
