@@ -52,8 +52,8 @@
         return
       }
 
-      const candidate = dataCandidate.value
-      info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+      const candidate = dataCandidate.value.data[0]
+      info.setUser({ ...dataCandidate.value.data[0], type: 'candidate' })
       show.setOverlayDashboard(false)
       createLog({
         title: `Logou`,
@@ -79,7 +79,7 @@
         return
       }
 
-      const admin = dataAdmin.value.data
+      const admin = dataAdmin.value.data[0]
       info.setUser({ ...dataAdmin.value.data[0], type: 'admin' })
       show.setOverlayDashboard(false)
       createLog({
