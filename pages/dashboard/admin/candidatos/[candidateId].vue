@@ -184,6 +184,33 @@
     getBeharioval()
     getDataCandidate(candidate.value.id)
   }
+
+  const formatSocialUrl = (value: string, type: string) => {
+    if (!value) return null;
+
+    let user = value.trim();
+
+    // Se já for link completo, devolve direto
+    if (user.startsWith("http")) {
+      return user;
+    }
+
+    // Remove @ se tiver
+    if (user.startsWith("@")) {
+      user = user.slice(1);
+    }
+
+    // Define base por tipo
+    const bases: any = {
+      instagram: "https://instagram.com/",
+      linkedin: "https://linkedin.com/in/",
+      facebook: "https://facebook.com/",
+      tiktok: "https://tiktok.com/@",
+      twitter: "https://twitter.com/",
+    };
+
+    return bases[type] ? bases[type] + user : user;
+  };
 </script>
 
 <template>
@@ -251,10 +278,11 @@
                 <v-btn v-if="candidate.site" icon :href="candidate.site" target="_blank" aria-label="Site" density="comfortable">
                   <v-icon>mdi-web</v-icon>
                 </v-btn>
-                <v-btn v-if="candidate.instagram" icon :href="candidate.instagram" target="_blank" aria-label="Instagram" density="comfortable">
+                <v-btn v-if="candidate.instagram" icon :href="formatSocialUrl(candidate.instagram, 'instagram')" target="_blank" aria-label="Instagram" density="comfortable">
                   <v-icon color="#E1306C">mdi-instagram</v-icon>
                 </v-btn>
-                <v-btn v-if="candidate.linkedin" icon :href="candidate.linkedin" target="_blank" aria-label="LinkedIn" density="comfortable">
+
+                <v-btn v-if="candidate.linkedin" icon :href="formatSocialUrl(candidate.linkedin, 'linkedin')" target="_blank" aria-label="LinkedIn" density="comfortable">
                   <v-icon color="#0A66C2">mdi-linkedin</v-icon>
                 </v-btn>
               </div>

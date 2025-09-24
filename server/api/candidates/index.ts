@@ -50,8 +50,8 @@ export default defineEventHandler(async (event) => {
 
     const formattedData = data.map((candidate: any) => ({
       ...candidate,
-      created_at_formatted: candidate.created_at ? formatDateTimestamp(candidate.created_at, 3) : null,
-      updated_at_formatted: candidate.updated_at ? formatDateTimestamp(candidate.updated_at, 3) : null,
+      created_at_formatted: candidate.created_at ? formatDateTimestamp(candidate.created_at, 1) : null,
+      updated_at_formatted: candidate.updated_at ? formatDateTimestamp(candidate.updated_at, 1) : null,
       address: `${candidate.city || ''} - ${candidate.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }))
 

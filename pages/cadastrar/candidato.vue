@@ -98,8 +98,8 @@
       }
 
       setTimeout(() => {
-        const candidate = dataCandidate.value[0]
-        info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+        const candidate = dataCandidate.value.data[0]
+        info.setUser({ ...dataCandidate.value.data[0], type: 'candidate' })
         sendMail(values.name, info.user.email)
         //localStorage.setItem('user', JSON.stringify(candidate))
         createNotice({

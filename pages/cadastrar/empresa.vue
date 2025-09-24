@@ -100,7 +100,7 @@
       }
 
       setTimeout(() => {
-        const company = dataCompany.value.data
+        const company = dataCompany.value.data[0]
         info.setUser({ ...dataCompany.value.data[0], type: 'company' })
         sendMail(values.name, info.user.email)
         createNotice({

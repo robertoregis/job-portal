@@ -38,8 +38,8 @@ const getProfile = async (id: string) => {
       return
     }
 
-    candidate.value = dataCandidate.value
-    info.setUser({ ...dataCandidate.value[0], type: 'candidate' })
+    candidate.value = dataCandidate.value.data[0]
+    info.setUser({ ...dataCandidate.value.data[0], type: 'candidate' })
 
   } else if (data.value.type === 'company') {
     const { data: dataCompany, error: errorCompany } = await useFetch(`/api/companies`, {
@@ -53,7 +53,7 @@ const getProfile = async (id: string) => {
       return
     }
 
-    company.value = dataCompany.value.data
+    company.value = dataCompany.value.data[0]
     info.setUser({ ...dataCompany.value.data[0], type: 'company' })
 
   } else if (data.value.type === 'admin') {
@@ -69,7 +69,7 @@ const getProfile = async (id: string) => {
       return
     }
 
-    admin.value = dataAdmin.value.data
+    admin.value = dataAdmin.value.data[0]
     info.setUser({ ...dataAdmin.value.data[0], type: 'admin' })
   }
 

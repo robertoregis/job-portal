@@ -234,19 +234,7 @@
 
   if (error.value) {
   } else {
-    formdata.value = {
-      name: data.value.name,
-      phone: data.value.phone,
-      birth_date: data.value.birth_date,
-      cpf: data.value.cpf,
-      state: data.value.state,
-      city: data.value.city,
-      about: data.value.about,
-      marital_status: data.value.marital_status,
-      areas_of_interest: data.value.areas_of_interest,
-      job_types: data.value.job_types,
-      salary_expectations: data.value.salary_expectations
-    }
+    formdata.value = data.value
     if(info.user.image_url) {
       imagePreview.value = info.user.image_url
     }
