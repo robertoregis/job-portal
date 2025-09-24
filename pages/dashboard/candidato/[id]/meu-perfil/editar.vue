@@ -769,7 +769,7 @@
                   <v-text-field
                     v-model="formdata.site"
                     :counter="10"
-                    label="Site"
+                    label="Site (link)"
                     density="compact"
                     hide-details
                     class="mb-2"
@@ -778,7 +778,7 @@
                   <v-text-field
                     v-model="formdata.linkedin"
                     :counter="10"
-                    label="Linkedin"
+                    label="Linkedin (link)"
                     density="compact"
                     hide-details
                     class="mb-2"
@@ -787,7 +787,7 @@
                   <v-text-field
                     v-model="formdata.instagram"
                     :counter="10"
-                    label="Instagram"
+                    label="Instagram (link)"
                     density="compact"
                     hide-details
                     class="mb-2"

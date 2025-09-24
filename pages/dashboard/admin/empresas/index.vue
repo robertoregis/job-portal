@@ -26,11 +26,11 @@
   // Resetar página ao mudar filtro
   watch([selectedApproved], () => {
     page.value = 1
-    getJobs()
+    getCompanies()
   })
 
   watch(page, () => {
-    getJobs()
+    getCompanies()
   })
 
   // Navegação
@@ -38,7 +38,7 @@
     router.push(`/dashboard/admin/empresas/${id}`)
   }
 
-  const getJobs = async () => {
+  const getCompanies = async () => {
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
