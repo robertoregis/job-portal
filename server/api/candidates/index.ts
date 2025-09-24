@@ -9,18 +9,43 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id } = getQuery(event)
-    if (!profile_id) {
-      throw createError({ statusCode: 400, statusMessage: 'profile_id is required' })
+    const query = getQuery(event)
+
+    const profile_id = query.profile_id as string | undefined
+    const page = query.page as string | undefined
+    const pageSize = query.pageSize as string | undefined
+    const is_complete = query.is_complete as string | undefined
+
+    const pageNumber = page ? parseInt(page, 10) : 1
+    const size = pageSize ? parseInt(pageSize, 10) : 10
+    const from = (pageNumber - 1) * size
+    const to = from + size - 1
+
+    let queryBuilder = supabase
+      .from('candidates')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    // filtro profile_id opcional
+    if (profile_id) {
+      queryBuilder = queryBuilder.eq('profile_id', profile_id)
     }
 
-    const { data, error } = await supabase
-      .from('candidates')
-      .select('*')
-      .eq('profile_id', profile_id)
+    if (is_complete !== undefined) {
+      const completeBool = is_complete === 'true'
+      queryBuilder = queryBuilder.eq('is_complete', completeBool)
+    }
 
-    if (error) {
-      throw createError({ statusCode: 500, statusMessage: error.message })
+    const { data, error, count } = await queryBuilder
+
+    // contar total sem filtros
+    const { count: totalCount, error: totalError } = await supabase
+      .from('candidates')
+      .select('*', { count: 'exact', head: true }) // head evita trazer os dados, só conta
+
+    if (error || totalError) {
+      throw createError({ statusCode: 500, statusMessage: error?.message || totalError?.message })
     }
 
     const formattedData = data.map((candidate: any) => ({
@@ -30,7 +55,14 @@ export default defineEventHandler(async (event) => {
       address: `${candidate.city || ''} - ${candidate.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }))
 
-    return formattedData
+    return {
+      data: formattedData,
+      count,        // total com filtros
+      totalCount,   // total geral sem filtros
+      page: pageNumber,
+      pageSize: size,
+      totalPages: Math.ceil((count ?? 0) / size)
+    }
   }
 
   if (method === 'POST') {

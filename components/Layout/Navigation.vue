@@ -250,6 +250,12 @@
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/admin/candidatos`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-account-multiple</v-icon>
+              <span>Candidatos</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
             <NuxtLink :to="`/dashboard/admin/empresas`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-clipboard-list</v-icon>
               <span>Empresas</span>

@@ -29,20 +29,6 @@
   const loading = ref<boolean>(true)
   const result_behavioral = ref<any>({})
   const behavioral = ref<any>({})
-  const candidaturaStatusOptions = [
-    { code: 1, name: 'Desclassificado', icon: 'mdi-close-circle' },
-    { code: 2, name: 'Análise de Currículo', icon: 'mdi-magnify' },
-    { code: 3, name: 'Análise Comportamental', icon: 'mdi-account-search' },
-    { code: 4, name: 'Entrevita de Expectativa', icon: 'mdi-account-question' },
-    { code: 5, name: 'Pré-Selecionados', icon: 'mdi-progress-clock' },
-    { code: 6, name: 'Contratados', icon: 'mdi-check-circle' }
-  ]
-
-  const onStatusSelect = (selected: any) => {
-    candidature.value.status = selected.name
-    candidature.value.icon_status = selected.icon
-    candidature.value.code_status = selected.code
-  }
 
   const getFormatDate = (date: string) => {
     if (!date) return ''
@@ -96,88 +82,9 @@
     }
   }
 
-  const getCandidate = async () => {
-    const { data, error } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
-      method: 'GET',
-    })
-    if (error.value) {
-      //console.error('Erro ao buscar candidato:', error.value)
-    } else {
-      candidate.value = data.value
-      useHead({
-        title: `${candidate.value.name} - Conect One RH`,
-        meta: [
-          {
-            name: 'description',
-            content: 'Acesse o perfil completo deste candidato e avalie sua experiência.'
-          }
-        ]
-      })
-      loading.value = false;
-      getFeedbacks()
-      getBeharioval()
-      getDataCandidate(candidate.value.id)
-    }
-  }
-
-  const updateCandidaturesStatus = async () => {
-    show.setOverlayDashboard(true)
-    const { data, error } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
-      method: 'PATCH',
-      body: {
-        status: candidature.value.status,
-        icon_status: candidature.value.icon_status,
-        code_status: candidature.value.code_status
-      }
-    })
-
-    if (error.value) {
-      //console.error('Erro ao atualizar candidatura:', error.value)
-      show.setOverlayDashboard(false)
-      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a candidatura', type: 'error' })
-      return
-    }
-    createLog({
-      title: `Atualizou a candidatura`,
-      profile_id: info.profile.id,
-      type: 'update_candidature'
-    })
-    show.setOverlayDashboard(false)
-    notify({ title: 'Parabéns!', text: 'A candidatura foi atualizada com sucesso', type: 'success' })
-    //router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
-  }
-
   watch(page, () => {
     getFeedbacks()
   })
-
-  const createFeedback = async () => {
-    show.setOverlayDashboard(true)
-    const { data, error } = await useFetch('/api/feedbacks', {
-        method: 'POST',
-        body: {
-          content: content.value,
-          candidature_id: candidature.value.id
-        }
-    })
-    show.setOverlayDashboard(false)
-    if (error.value) {
-      //console.log(error.value)
-      const message = error.value.data?.statusMessage || 'Erro ao criar parecer'
-      notify({ title: '', text: message, type: 'error' })
-      return
-    }
-    createLog({
-      title: `Criou o parecer`,
-      profile_id: info.profile.id,
-      type: 'create_feedback'
-    })
-    notify({ title: 'Parabéns!', text: 'O parecer foi criado', type: 'success' })
-    getFeedbacks()
-    setTimeout(() => {
-      dialogFeedback.value = false;
-    }, 1000)
-  }
 
   const openFeedback = (feedback: any) => {
     feedbackSelected.value = feedback;
@@ -256,14 +163,26 @@
     }
   }
 
-  const { data, error, pending } = await useFetch(`/api/candidatures/${route.params.candidatureId}`, {
+  const { data, error, pending } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
     method: 'GET'
   })
 
   if (error.value) {
   } else {
-    candidature.value = data.value
-    getCandidate()
+    candidate.value = data.value
+    useHead({
+      title: `${candidate.value.name} - Conect One RH`,
+      meta: [
+        {
+          name: 'description',
+          content: 'Acesse o perfil completo deste candidato e confira os detalhes.'
+        }
+      ]
+    })
+    loading.value = false;
+    getFeedbacks()
+    getBeharioval()
+    getDataCandidate(candidate.value.id)
   }
 </script>
 
@@ -272,7 +191,7 @@
     <v-col cols="12">
       <div class="d-flex flex-column">
         <span v-if="candidate" class="text-gradient-primary font-weight-bold">{{ candidate.name }}</span>
-        <span class="text-caption">Detalhes do candidato selecionado nesta candidatura</span>
+        <span class="text-caption">Detalhes do candidato</span>
       </div>
     </v-col>
     <LayoutButtonBack />
@@ -292,18 +211,6 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12">
-              <div class="d-flex align-center">
-                <v-chip
-                  class="bg-gradient-status"
-                  variant="flat"
-                >
-                  <v-icon :icon="candidature.icon_status" start></v-icon>
-                  Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ candidature.status }}</span>
-                </v-chip>
-              </div>
-            </v-col>
-
-            <v-col cols="12" class="mt-2">
               <v-chip color="primary" variant="outlined">
                 <v-icon icon="mdi-account-circle-outline" start></v-icon>
                 {{ candidate.is_employed ? 'Está empregado' : 'Está desempregado' }}
@@ -582,34 +489,6 @@
     <v-col cols="12" class="border mt-4">
       <v-card>
         <v-card-title>
-          <h2 class="text-h6 font-weight-bold text-gradient-primary">Gerenciar status</h2>
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text>
-          <div class="d-flex flex-column align-start">
-            <v-select
-              :items="candidaturaStatusOptions"
-              :value="candidature.status"
-              item-title="name"
-              return-object
-              density="comfortable"
-              variant="outlined"
-              hide-details
-              color="primary"
-              @update:modelValue="onStatusSelect"
-              width="240"
-            />
-            <v-btn class="mt-2 bg-gradient-primary" @click="updateCandidaturesStatus">
-              Salvar
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
-
-    <v-col cols="12" class="border mt-4">
-      <v-card>
-        <v-card-title>
           <h2 class="text-h6 font-weight-bold text-gradient-primary">Pareceres</h2>
         </v-card-title>
         <v-divider></v-divider>
@@ -646,52 +525,9 @@
           </v-row>
           <span v-else>Não há parecer</span>
         </v-card-text>
-        <v-card-actions>
-            <v-btn
-              text="Adicionar"
-              class="bg-gradient-primary"
-              variant="flat"
-              @click="dialogFeedback = true"
-            />
-        </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
-  <v-dialog
-        v-model="dialogFeedback"
-        max-width="600"
-    >
-        <v-card
-            prepend-icon="mdi-file-document"
-            title="Adicionar Parecer"
-        >
-        <v-card-text>
-            <v-row dense>
-              <v-col cols="12">
-                  <RichTextEditor v-model="content" />
-              </v-col>
-            </v-row>
-        </v-card-text>
-
-        <v-divider />
-
-        <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text="Fechar"
-              color="error"
-              variant="flat"
-              @click="dialogFeedback = false"
-            />
-            <v-btn
-              text="Adicionar"
-              color="success"
-              variant="flat"
-              @click="createFeedback()"
-            />
-        </v-card-actions>
-        </v-card>
-    </v-dialog>
     <v-dialog
         v-model="dialogFeedbackShow"
         max-width="600"

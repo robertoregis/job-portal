@@ -66,10 +66,10 @@
                 <NuxtLink to="https://www.instagram.com/conectonerh/?igsh=MXY2ZHdkZTNoenhsbg%3D%3D#" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-instagram" size="large" />
                 </NuxtLink>
-                <NuxtLink to="/" target="_blank" class="no-underline mr-2">
+                <NuxtLink to="https://www.facebook.com/profile.php?id=61580972417684" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-facebook" size="large" />
                 </NuxtLink>
-                <NuxtLink to="/" target="_blank" class="no-underline mr-2">
+                <NuxtLink to="https://www.linkedin.com/in/conect-one-rh-ba25a5381/" target="_blank" class="no-underline mr-2">
                   <v-icon color="white" icon="mdi-linkedin" size="large" />
                 </NuxtLink>
               </div>
