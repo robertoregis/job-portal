@@ -61,7 +61,7 @@
         v-if="info.user.type === 'candidate' && !info.user.curriculum_url"
         hover
         ripple
-        @click="goPerfil(`/dashboard/candidato/${info.user.id}/meu-perfil`)"
+        @click="goPerfil(`/dashboard/candidato/${info.user.id}/meu-perfil/editar`)"
         class="floating-notify pa-3 d-flex align-center bg-warning"
         elevation="10"
       >

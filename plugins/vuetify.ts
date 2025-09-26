@@ -2,6 +2,10 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+// 1. IMPORTAÇÃO DO LOCALE (PT-BR)
+// Note: O Vuetify usa 'pt' para Português, que serve para o Brasil (pt-BR).
+import { pt } from 'vuetify/locale' 
+
 // 🔥 Adicione isso:
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
@@ -9,6 +13,14 @@ export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
     components,
     directives,
+    
+    // 2. ADIÇÃO DA CONFIGURAÇÃO DE LOCALE
+    locale: {
+      locale: 'pt', // Define o idioma padrão como Português
+      messages: { pt }, // Inclui as mensagens de tradução em Português
+      fallback: 'en', // Idioma de fallback (caso o Português não tenha alguma tradução)
+    },
+    
     icons: {
       defaultSet: 'mdi',
       aliases,
