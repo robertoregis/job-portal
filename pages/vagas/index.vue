@@ -147,7 +147,7 @@
             </v-row>
           </v-col>
 
-          <v-col v-if="!Object.keys(info.user || {}).length || info.user.type === 'company'" cols="12">
+          <!--<v-col v-if="!Object.keys(info.user || {}).length || info.user.type === 'company'" cols="12">
             <div class="d-flex align-center">
               <v-btn
                 class="bg-gradient-primary"
@@ -155,7 +155,7 @@
                 variant="flat"
               ></v-btn>
             </div>
-          </v-col>
+          </v-col>-->
 
           <v-col v-if="jobsList.length > 0" cols="12">
             <v-row>
