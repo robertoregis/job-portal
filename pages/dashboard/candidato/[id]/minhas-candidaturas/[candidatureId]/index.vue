@@ -88,7 +88,9 @@
           }
         ]
       })
-      getConfiguration(job.value.company_id)
+      if(job.value.company_id) {
+        getConfiguration(job.value.company_id)
+      }
     }
   }
 
@@ -132,7 +134,7 @@
         variables: {
           name_candidate: info.user.name,
           name_job: job.value.title,
-          name_company: config.value.company_name,
+          name_company: config.value && config.value.company_name ? config.value.company_name : job.value.company_name,
           decline_reason: declineReason.value
         }
       }
@@ -303,7 +305,7 @@
       </v-list>
     </v-col>
 
-    <v-col v-if="config.allow_candidate_email" cols="12" class="border rounded-lg mt-4" style="background:#fafafa;">
+    <v-col v-if="config && config.allow_candidate_email" cols="12" class="border rounded-lg mt-4" style="background:#fafafa;">
       <v-card flat>
         <v-card-text class="d-flex flex-column">
           <div class="mb-1">

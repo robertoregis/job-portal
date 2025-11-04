@@ -15,6 +15,7 @@
   const counts = ref<any>({
     total: 0
   })
+  const company_id_data = ref<any>(null)
   const jobsEditList = ref<any[]>([])
   const jobStatusOptions = [
     { name: 'Aberta', icon: 'mdi-briefcase-plus' },
@@ -85,6 +86,32 @@
     notify({ title: 'Parabéns!', text: 'A vaga foi atualizada com sucesso', type: 'success' })
   }
 
+  const connectJobAndCompany = async () => {
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+      method: 'PATCH',
+      body: {
+        company_id: company_id_data.value
+      }
+    })
+
+    if (error.value) {
+      //console.error('Erro ao atualizar vaga:', error.value)
+      show.setOverlayDashboard(false)
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao ligar com uma empresa', type: 'error' })
+      return
+    }
+    createLog({
+      title: `Fez uma ligação da vaga: ${job.value.title} com a empresa: ${job.value.company_name}`,
+      profile_id: info.profile.id,
+      type: 'connect_job'
+    })
+    job.value = data.value
+    company_id_data.value = null
+    show.setOverlayDashboard(false)
+    notify({ title: 'Parabéns!', text: 'A vaga teve uma ligação feita com sucesso', type: 'success' })
+  }
+
   const navigation = (id: number) => {
     router.push(`/dashboard/admin/vagas/${route.params.jobId}/candidaturas`)
   }
@@ -94,6 +121,7 @@
   })
 
   if (error.value) {
+    console.log(error.value)
   } else {
     job.value = data.value
     selectedStatus.value = job.value.status
@@ -165,6 +193,22 @@
         <v-col cols="12" class="px-4 pa-2">
           <div v-if="jobsEditList.length > 0" class="d-flex align-center mb-2">
             <span class="bg-warning py-1 px-2 mt-1">Existe pedido de edição pendente</span>
+          </div>
+          <div class="d-flex align-center mb-2">
+            <v-chip
+              v-if="!job.company_id" 
+              color="red-lighten-1"
+              density="compact"
+              class="font-weight-bold"
+              size="small"
+            >
+              <v-icon start size="14">mdi-alert-circle-outline</v-icon>
+              SEM VÍNCULO COM EMPRESA
+            </v-chip>
+          </div>
+          <div v-if="job.company_name" class="d-flex align-center mb-2">
+            <span class="text-subtitle-2 font-weight-bold">Empresa:</span>
+            <span class="text-body-2 ml-2">{{ job.company_name }}</span>
           </div>
           <div class="d-flex align-center mb-2">
             <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
@@ -281,8 +325,35 @@
           </v-col>
 
           <v-col cols="12">
-            <v-btn class="mt-2 bg-gradient-primary" @click="updateJobStatus">
+            <v-btn class="bg-gradient-primary" @click="updateJobStatus">
               Salvar alterações
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-col>
+
+    <!-- Para fazer ligação com alguma empresa -->
+    <v-col v-if="!job.company_id" cols="12" class="border mt-4">
+      <v-card flat class="pa-4">
+        <div class="d-flex align-center mb-4">
+          <v-icon class="mr-2 text-gradient-primary">mdi-tune</v-icon>
+          <h3 class="text-subtitle-1 font-weight-bold text-gradient-primary">Fazer ligação</h3>
+        </div>
+
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="company_id_data"
+              label="Informe o ID da empresa"
+              density="compact"
+              hide-details
+            />
+          </v-col>
+
+          <v-col cols="12">
+            <v-btn class="mt-2 bg-gradient-primary" @click="connectJobAndCompany">
+              Fazer ligação
             </v-btn>
           </v-col>
         </v-row>

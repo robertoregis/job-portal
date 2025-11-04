@@ -98,6 +98,10 @@
             </v-col>
             <v-col cols="12 mt-2">
               <div class="d-flex align-center mb-2">
+                <span class="text-subtitle-2 font-weight-bold">ID:</span>
+                <span class="text-body-2 ml-2">{{ company.id }}</span>
+              </div>
+              <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Nome:</span>
                 <span class="text-body-2 ml-2">{{ company.name }}</span>
               </div>

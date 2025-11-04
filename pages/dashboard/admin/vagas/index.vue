@@ -19,6 +19,7 @@
   const pageSize = ref(10)
   const totalPages = ref(1)
   const jobsList = ref<any[]>([])
+  const without_company = ref<boolean>(false)
 
   // Filtros
   const jobStatusOptions = [
@@ -38,6 +39,11 @@
     getJobs()
   })
 
+  watch([without_company], (newValue) => {
+    page.value = 1
+    getJobs()
+  })
+
   watch(page, () => {
     getJobs()
   })
@@ -50,7 +56,8 @@
   const getJobs = async () => {
     const params: Record<string, any> = {
       page: page.value.toString(),
-      pageSize: pageSize.value.toString()
+      pageSize: pageSize.value.toString(),
+      without_company: without_company.value
     }
 
     if (selectedStatus.value) params.status = selectedStatus.value
@@ -73,7 +80,7 @@
     params: {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      status: selectedStatus.value
+      status: selectedStatus.value,
     }
   })
 
@@ -97,6 +104,15 @@
     <LayoutButtonBack />
   </v-row>
 
+  <!-- Botão criar -->
+  <v-row no-gutters class="mt-4">
+    <v-col cols="12">
+      <div class="d-flex">
+        <v-btn text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/admin/vagas/criar`)" />
+      </div>
+    </v-col>
+  </v-row>
+
   <!-- Filtros -->
   <v-row no-gutters class="mt-4">
     <v-col cols="12" md="4" class="pr-md-2">
@@ -113,6 +129,9 @@
         dense
         @update:modelValue="onStatusSelect"
       />
+    </v-col>
+    <v-col cols="12">
+      <v-checkbox v-model="without_company" label="Sem ligação com empresas"></v-checkbox>
     </v-col>
   </v-row>
 
@@ -160,8 +179,21 @@
                 <div class="d-flex justify-space-between align-start mb-1">
                   <div>
                     <div class="text-subtitle-1 font-weight-medium">{{ job.title }}</div>
-                    <div class="text-caption text-grey-darken-1">
-                      {{ job.company_name || 'Empresa não informada' }}
+                    <div class="d-flex align-center text-caption text-grey-darken-1">
+                        <span class="mr-2">
+                            {{ job.company_name || 'Empresa não informada' }}
+                        </span>
+                        
+                        <v-chip
+                            v-if="!job.company_id" 
+                            color="red-lighten-1"
+                            density="compact"
+                            class="ml-2 font-weight-bold"
+                            size="x-small"
+                        >
+                            <v-icon start size="14">mdi-alert-circle-outline</v-icon>
+                            SEM VÍNCULO
+                        </v-chip>
                     </div>
                   </div>
                   <div class="text-caption text-grey-darken-1">
