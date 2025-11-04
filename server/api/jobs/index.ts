@@ -9,7 +9,9 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { company_id, status, is_active, page, pageSize, state, createdWithinDays, createdMoreThanDays } = getQuery(event)
+    const { company_id, status, is_active, page, pageSize,
+      state, createdWithinDays, createdMoreThanDays, without_company
+    } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
     const size = pageSize ? parseInt(pageSize as string, 10) : 10
@@ -22,6 +24,11 @@ export default defineEventHandler(async (event) => {
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to)
+
+    if (without_company === 'true') {
+        // Usa .is() para filtrar onde a coluna company_id é NULL
+        query = query.is('company_id', null)
+    }
 
     if (company_id) {
       query = query.eq('company_id', company_id as string)
@@ -63,14 +70,27 @@ export default defineEventHandler(async (event) => {
 
     // Busca imagens das empresas relacionadas
     const companyIds = [...new Set(data.map((job: any) => job.company_id))]
+      .filter(id => id !== null && id !== undefined); // <-- Adicione este filtro!
 
-    const { data: companiesData, error: companyError } = await supabase
-      .from('companies')
-      .select('id, name, image_url')
-      .in('id', companyIds)
+    // 🌟 CORREÇÃO: Declarar 'companiesData' UMA ÚNICA VEZ antes do IF/ELSE,
+    // e usar 'let' ou 'const' (dependendo se você for reatribuir)
+    let companiesData: any[] = []; 
+    // Se você souber a tipagem exata (o que é ideal), use:
+    // let companiesData: { id: string; name: string; image_url: string; }[] = []; 
+    // Mas `any[]` resolve o problema de imediato, respeitando o seu padrão.
 
-    if (companyError) {
-      throw createError({ statusCode: 500, statusMessage: companyError.message })
+    if (companyIds.length > 0) {
+        const { data: cData, error: companyError } = await supabase
+            .from('companies')
+            .select('id, name, image_url')
+            .in('id', companyIds)
+
+        if (companyError) {
+            throw createError({ statusCode: 500, statusMessage: companyError.message })
+        }
+        
+        // 2. ATRIBUIÇÃO (Sem 'var' ou 'let' na frente)
+        companiesData = cData || []; 
     }
 
     const companyMap = companiesData.reduce((acc: any, company: any) => {
@@ -85,8 +105,8 @@ export default defineEventHandler(async (event) => {
       ...job,
       created_at_formatted: job.created_at ? formatDateTimestamp(job.created_at, 3) : null,
       updated_at_formatted: job.updated_at ? formatDateTimestamp(job.updated_at, 3) : null,
-      company_image_url: companyMap[job.company_id]?.image_url || null,
-      company_name: companyMap[job.company_id]?.name || null,
+      company_image_url: companyMap[job.company_id]?.image_url || 'https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/default/blank-profile-picture-973460_640.png',
+      company_name: companyMap[job.company_id]?.name || (job.company_name || null),
       address: `${job.city || ''} - ${job.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, '')
     }))
 
@@ -98,7 +118,6 @@ export default defineEventHandler(async (event) => {
       totalPages: Math.ceil(count / size)
     }
   }
-
 
 
   if (method === 'POST') {
@@ -119,17 +138,17 @@ export default defineEventHandler(async (event) => {
       is_closed,
       benefits_simple,
       undergraduate_areas,
-      undergraduate_areas_simple,
       knowledge,
       knowledge_simple,
       state,
       city,
-      company_id
+      company_id,
+      company_name
     } = body
 
-    if (!company_id) {
+    /*if (!company_id) {
       throw createError({ statusCode: 400, statusMessage: 'company_id is required' })
-    }
+    }*/
 
     // Tratando strings vazias
     title = emptyStringToNull(title)
@@ -145,7 +164,9 @@ export default defineEventHandler(async (event) => {
     state = emptyStringToNull(state)
     city = emptyStringToNull(city)
     knowledge_simple = emptyStringToNull(knowledge_simple)
-    undergraduate_areas_simple = emptyStringToNull(undergraduate_areas_simple)
+    company_id = emptyStringToNull(company_id)
+    company_name = emptyStringToNull(company_name)
+    //undergraduate_areas_simple = emptyStringToNull(undergraduate_areas_simple)
 
     // weekdays pode ser array, não transforma
 
@@ -168,7 +189,7 @@ export default defineEventHandler(async (event) => {
         benefits,
         benefits_simple,
         undergraduate_areas,
-        undergraduate_areas_simple,
+        //undergraduate_areas_simple,
         knowledge,
         knowledge_simple,
         description,
@@ -178,7 +199,8 @@ export default defineEventHandler(async (event) => {
         is_closed,
         state,
         city,
-        company_id
+        company_id,
+        company_name
       }])
       .select()
       .single()
