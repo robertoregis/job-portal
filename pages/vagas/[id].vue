@@ -66,7 +66,6 @@
         ...candidature.value,
         candidate_id: info.user.id,
         job_id: job.value.id,
-        title: job.value.title
       }
     })
     if (error.value) {

@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { state, city, job_id, candidate_id, status, icon_status, title, code_status } = body
+    let { state, city, job_id, candidate_id, status, icon_status, code_status } = body
 
     if (!candidate_id || !job_id) {
       throw createError({ statusCode: 400, statusMessage: 'candidate_id and job_id are required' })
@@ -138,7 +138,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 409, statusMessage: 'Você já se candidatou a essa vaga' })
     }
 
-    title = emptyStringToNull(title)
     state = emptyStringToNull(state)
     city = emptyStringToNull(city)
     status = emptyStringToNull(status) || 'Análise de Currículo'
@@ -154,7 +153,6 @@ export default defineEventHandler(async (event) => {
         candidate_id,
         status,
         icon_status,
-        title,
         code_status
       }])
       .select()
