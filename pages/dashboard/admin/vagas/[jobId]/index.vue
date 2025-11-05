@@ -181,6 +181,17 @@
       </div>
     </v-col>
 
+    <v-col cols="12" class="mt-4">
+      <div class="d-flex">
+        <v-btn
+          text="Editar vaga"
+          variant="flat"
+          class="bg-gradient-primary"
+          @click="$router.push(`/dashboard/admin/vagas/${route.params.jobId}/editar`)"
+        />
+      </div>
+    </v-col>
+
     <v-col cols="12" class="border mt-4">
       <v-row no-gutters>
         <v-col cols="12" class="px-4 pa-2">
@@ -285,6 +296,16 @@
               <template v-for="(knowledge, index) in job.knowledge" :key="index">
                 <li class="text-body-2">- {{ knowledge }};</li>
               </template>
+            </ul>
+          </v-list-item-content>
+        </v-list-item>
+        <!-- Campos ocultos -->
+        <v-list-item class="mt-2 pa-3 bg-blue-grey-lighten-5" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Campos ocultos</v-list-item-title>
+            <ul>
+              <li v-if="job.is_hidden_name_company" class="text-body-2">- Nome da empresa</li>
+              <li v-if="job.is_hidden_salary" class="text-body-2">- Salário</li>
             </ul>
           </v-list-item-content>
         </v-list-item>

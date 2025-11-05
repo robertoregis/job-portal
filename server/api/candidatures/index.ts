@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const jobIds = [...new Set(data.map((c: any) => c.job_id))]
     const { data: jobsData, error: jobError } = await supabase
       .from('jobs')
-      .select('id, contract_type, salary, title')
+      .select('id, contract_type, salary, title, is_hidden_salary')
       .in('id', jobIds)
 
     if (jobError) {
@@ -70,7 +70,8 @@ export default defineEventHandler(async (event) => {
       acc[job.id] = {
         contract_type: job.contract_type,
         salary: job.salary,
-        title: job.title
+        title: job.title,
+        is_hidden_salary: job.is_hidden_salary
       }
       return acc
     }, {})
@@ -85,6 +86,7 @@ export default defineEventHandler(async (event) => {
       candidate_address: `${candidateMap[c.candidate_id]?.city || ''} - ${candidateMap[c.candidate_id]?.state || ''}`.trim().replace(/^-\s*|\s*-\s*$/g, ''),
       contract_type: jobMap[c.job_id]?.contract_type || null,
       salary: jobMap[c.job_id]?.salary || null,
+      is_hidden_salary: jobMap[c.job_id]?.is_hidden_salary || null,
       title: jobMap[c.job_id]?.title || null,
     }))
 

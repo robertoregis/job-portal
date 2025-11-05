@@ -3,47 +3,26 @@
   import { useInfo } from '@/stores/info';
   import { useShow } from '@/stores/show';
   const { notify } = useNotification();
-
   definePageMeta({
     layout: 'dashboard'
   })
   useHead({
-    title: `Criar vaga - Conect One RH`,
+    title: `Conect One RH`,
     meta: [
       {
         name: 'description',
-        content: 'Publique uma nova vaga e encontre os candidatos ideais.'
+        content: 'A Conect One RH conecta empresas e candidatos de forma prática e eficiente. Encontre oportunidades ou talentos sem sair de casa.'
       }
     ]
   })
   const info: any = useInfo();
   const show = useShow();
   const { createNotice, createLog } = useNotice();
-
+  const route = useRoute();
   const router = useRouter();
-  const job = ref<any>({
-    title: null,
-    contract_type: null,
-    work_format: null,
-    salary: null,
-    workload: null,
-    weekdays: [],
-    education_level: null,
-    benefits: null,
-    benefits_simple: null,
-    undergraduate_areas: [],
-    knowledge: null,
-    knowledge_simple: null,
-    description: null,
-    status: 'Aberta',
-    icon_status: 'mdi-briefcase-plus',
-    is_active: false,
-    is_closed: false,
-    update_fields_at: null,
-    is_hidden_name_company: false,
-    is_hidden_salary: false
-  })
-  const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
+  const job = ref<any>({})
+  const motive_edit = ref<string>('')
+  const dialogRequest = ref<boolean>(false)
   const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
   const work_formats = ['Presencial', 'Remoto', 'Híbrido']
   const educations = [
@@ -64,24 +43,7 @@
     'Departamento Pessoal', 'Fiscal', 'Segurança do Trabalho', 'Mecânica', 'Elétrica'
   ]
 
-  const sendMail = async (companyName: string, jobName: string, jobDescription: string) => {
-    const { data: dataMaster, error: errorMaster } = await useFetch('/api/emails/send', {
-      method: 'POST',
-      body: {
-        to: [`Conect One RH <${emailOfficial}>`],
-        subject: 'Uma nova vaga foi criada',
-        template: 'template_create_job',
-        variables: {
-          name_company: companyName,
-          job_name: jobName,
-          job_description: jobDescription,
-          date: formatDate(new Date(), 3)
-        }
-      }
-    })
-  }
-
-  const createJob = async () => {
+  const createRequestJob = async () => {
     show.setOverlayDashboard(true)
     let benefitsArray: any = job.value.benefits_simple
     if (job.value.benefits_simple) {
@@ -97,69 +59,33 @@
     } else {
       job.value.knowledge = []
     }
-    const { data, error } = await useFetch('/api/jobs', {
-      method: 'POST',
-      body: {
-        ...job.value,
-        company_id: info.user.id
-      }
+    const { data, error } = await useFetch(`/api/jobs/${job.value.id}`, {
+      method: 'PUT',
+      body: job.value
     })
+
     if (error.value) {
-      //console.error('Erro ao criar vaga:', error.value)
       show.setOverlayDashboard(false)
-      notify({ title: 'Erro', text: 'Aconteceu um erro ao criar a vaga', type: 'error' })
-    } else {
-      createLog({
-        title: `Criou a vaga`,
-        profile_id: info.profile.id,
-        type: 'create_job'
-      })
-      createNotice({
-        title: 'Vaga criada',
-        description: `Parabéns, você acabou de criar a vaga ${job.value.title}`,
-        subtitle: 'Vaga',
-        profile_id: info.profile.id,
-        type: 'info',
-        is_master: false
-      })
-      createNotice({
-        title: 'Vaga criada',
-        description: `A vaga "${job.value.title}" foi criada pela empresa: ${job.value.company_name}`,
-        subtitle: 'Candidatura',
-        profile_id: info.profile.id,
-        is_master: true,
-        type: 'info'
-      })
-      sendMail(info.user.name, job.value.title, job.value.description)
-      show.setOverlayDashboard(false)
-      notify({ title: 'Parabéns!', text: 'A vaga foi criada com sucesso', type: 'success' })
-      router.push(`/dashboard/empresa/${info.user.id}/minhas-vagas/${data.value.id}`)
-      resetJob()
+      notify({ title: 'Erro', text: 'Aconteceu um erro ao atualizar a vaga', type: 'error' })
+      return
     }
+    createLog({
+      title: `Atualizou a vaga: ${job.value.title}`,
+      profile_id: info.profile.id,
+      type: 'update_job'
+    })
+    notify({ title: 'Parabéns!', text: 'A vaga foi atualiza com sucesso', type: 'success' })
+    show.setOverlayDashboard(false)
+    router.push(`/dashboard/admin/vagas/${job.value.id}`)
   }
 
-  const resetJob = () => {
-    job.value = {
-      title: null,
-      contract_type: null,
-      work_format: null,
-      salary: null,
-      workload: null,
-      weekdays: [],
-      education_level: null,
-      benefits: null,
-      benefits_simple: null,
-      undergraduate_areas: null,
-      undergraduate_areas_simple: null,
-      knowledge: null,
-      knowledge_simple: null,
-      description: null,
-      status: 'Aberta para inscrição',
-      icon_status: 'mdi-briefcase-plus',
-      is_active: false,
-      is_closed: false,
-      update_fields_at: null
-    }
+  const { data, error, pending } = await useFetch(`/api/jobs/${route.params.jobId}`, {
+    method: 'GET'
+  })
+
+  if (error.value) {
+  } else {
+    job.value = data.value
   }
 </script>
 
@@ -167,21 +93,21 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="text-gradient-primary font-weight-bold">Criar vaga</span>
-        <span class="text-caption">Aumente o seu time criando uma vaga</span>
+        <span class="text-gradient-primary font-weight-bold">Editar vaga</span>
+        <span class="text-caption">Esqueceu algo, edite a vaga</span>
       </div>
     </v-col>
     <LayoutButtonBack />
   </v-row>
-  <v-row no-gutters class="mt-5">
+  <v-row class="mt-5">
     <v-col cols="12" class="border">
       <v-card>
         <v-card-title class="text-h6">
-          Criar nova vaga
+          Editar vaga
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-form @submit.prevent="createJob">
+          <v-form @submit.prevent="createRequestJob">
             <v-text-field
               v-model="job.title"
               label="Cargo"
@@ -253,9 +179,9 @@
               v-model="job.undergraduate_areas"
               :items="undergraduateAreasList"
               label="Áreas de graduação"
-              density="compact"
               multiple
               chips
+              density="compact"
               hide-details
               class="mb-3"
             />
@@ -291,6 +217,18 @@
               hide-details
               class="mb-3"
             />
+
+            <div>
+              <span class="font-weight-bold text-red-accent-4 text-caption">Campo especial:</span>
+              <v-text-field
+                v-model="job.company_name"
+                label="Nome da empresa"
+                placeholder=""
+                density="compact"
+                hide-details
+                class="mb-3"
+              />
+            </div>
 
             <v-checkbox
               v-model="job.is_hidden_name_company"

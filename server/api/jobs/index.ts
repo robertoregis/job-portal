@@ -143,7 +143,9 @@ export default defineEventHandler(async (event) => {
       state,
       city,
       company_id,
-      company_name
+      company_name,
+      is_hidden_name_company,
+      is_hidden_salary
     } = body
 
     /*if (!company_id) {
@@ -200,7 +202,9 @@ export default defineEventHandler(async (event) => {
         state,
         city,
         company_id,
-        company_name
+        company_name,
+        is_hidden_name_company,
+        is_hidden_salary
       }])
       .select()
       .single()

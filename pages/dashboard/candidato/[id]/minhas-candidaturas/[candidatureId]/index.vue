@@ -222,6 +222,10 @@
         <v-card-text>
           <v-row no-gutters>
             <v-col cols="12" class="px-4 pa-2">
+              <div v-if="!job.is_hidden_name_company" class="d-flex align-center mb-2">
+                <span class="text-subtitle-2 font-weight-bold">Empresa:</span>
+                <span class="text-body-2 ml-2">{{ job.company_name }}</span>
+              </div>
               <div class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Cargo:</span>
                 <span class="text-body-2 ml-2">{{ job.title }}</span>
@@ -234,7 +238,7 @@
                 <span class="text-subtitle-2 font-weight-bold">Formato:</span>
                 <span class="text-body-2 ml-2">{{ job.work_format }}</span>
               </div>
-              <div class="d-flex align-center mb-2">
+              <div v-if="!job.is_hidden_salary" class="d-flex align-center mb-2">
                 <span class="text-subtitle-2 font-weight-bold">Faixa salarial:</span>
                 <span class="text-body-2 ml-2">{{ job.salary }}</span>
               </div>

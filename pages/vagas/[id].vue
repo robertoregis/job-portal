@@ -9,6 +9,7 @@
   const info: any = useInfo()
   const dialog = ref<boolean>(false)
   const dialogCreateCandidature = ref<boolean>(false)
+  const isExists = ref<boolean>(false);
   const { notify } = useNotification();
   definePageMeta({
     layout: 'default'
@@ -46,6 +47,31 @@
         }
       }
     })
+  }
+
+  const checkCandidatureExists = async () => {
+    
+    // 1. Chamar o novo endpoint com os parâmetros corretos
+    const { data, error, pending }: any = await useFetch(`/api/candidatures/check-exists`, {
+      method: 'GET',
+      params: {
+        candidate_id: info.user.id, // Envia o ID do candidato
+        job_id: job.value.id             // Envia o ID da vaga
+      }
+    })
+
+    // 2. Tratar o resultado
+    if (error.value) {
+      console.error("Erro ao verificar candidatura:", error.value)
+      // Tratar o erro (ex: exibir notificação)
+    } else if (data.value && data.value.exists) {
+      // Se o backend retornar { exists: true, ... }
+      isExists.value = true;
+    } else {
+      isExists.value = false;
+    }
+
+    loading.value = false;
   }
 
   const resetCandidature = () => {
@@ -112,7 +138,7 @@
         }
       ]
     })
-    loading.value = false;
+    checkCandidatureExists();
   }
 </script>
 
@@ -125,7 +151,7 @@
             <v-card class="mb-6 bg-gradient-primary" elevation="2">
               <v-card-text>
                 <p class="text-h4 font-weight-black">{{ job.title }}</p>
-                <p>{{ job.company_name }}</p>
+                <p v-if="!job.is_hidden_name_company">{{ job.company_name }}</p>
                 <div class="d-flex align-center">
                   <span>Faixa salarial:</span>
                   <span class="text-subtitle-1 ml-2 font-weight-bold">{{ job.salary }}</span>
@@ -137,7 +163,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-list>
-                    <v-list-item style="min-height: unset">
+                    <v-list-item v-if="!job.is_hidden_name_company" style="min-height: unset">
                       <div class="d-flex align-center">
                         <v-icon class="mr-2">mdi-office-building</v-icon>
                         <div class="d-flex align-center">
@@ -214,7 +240,7 @@
                     <span class="text-subtitle-2 font-weight-bold">Formato:</span>
                     <span class="text-body-2 ml-2">{{ job.work_format }}</span>
                   </div>
-                  <div class="d-flex align-center mb-2">
+                  <div v-if="!job.is_hidden_salary" class="d-flex align-center mb-2">
                     <span class="text-subtitle-2 font-weight-bold">Faixa salarial:</span>
                     <span class="text-body-2 ml-2">{{ job.salary }}</span>
                   </div>
@@ -287,11 +313,13 @@
                 <v-col v-if="info.user && (!info.user.id || info.user.id && info.user.type === 'candidate')" cols="12">
                   <div class="d-flex justify-end px-4 py-2">
                     <v-btn
+                      v-if="!isExists"
                       @click.prevent="apply"
                       text="Candidatar-me"
                       variant="flat"
                       class="bg-gradient-primary"
                     ></v-btn>
+                    <span v-else class="font-weight-bold text-caption text-red-darken-3">Você já se candidatou</span>
                   </div>
                 </v-col>
 
