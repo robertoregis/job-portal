@@ -40,7 +40,7 @@
     'Administrativa', 'Corporativa', 'Financeira', 'Comercial',
     'Marketing', 'Recursos Humanos', 'Operacional', 'Logística',
     'Tecnologia da Informação', 'Jurídica', 'Compras', 'Suprimentos',
-    'Departamento Pessoal', 'Fiscal'
+    'Departamento Pessoal', 'Fiscal', 'Segurança do Trabalho', 'Mecânica', 'Elétrica'
   ]
 
   const jobsEditList = ref<any[]>([])
@@ -253,6 +253,18 @@
               density="compact"
               hide-details
               class="mb-3"
+            />
+
+            <v-checkbox
+              v-model="job.is_hidden_name_company"
+              label="Ocultar dos candidatos o nome da empresa"
+              hide-details
+            />
+
+            <v-checkbox
+              v-model="job.is_hidden_salary"
+              label="Ocultar dos candidatos o salário"
+              hide-details
             />
 
             <v-btn

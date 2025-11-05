@@ -158,6 +158,7 @@
                 </div>
                 <div class="d-flex flex-wrap gap-3 mb-2">
                   <v-chip
+                    v-if="!item.is_hidden_salary"
                     small
                     color="green"
                     text-color="white"

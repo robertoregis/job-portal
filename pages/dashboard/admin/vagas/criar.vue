@@ -40,7 +40,9 @@
     is_active: false,
     is_closed: false,
     update_fields_at: null,
-    company_name: null
+    company_name: null,
+    is_hidden_name_company: false,
+    is_hidden_salary: false
   })
   const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
   const contractTypes = ['CLT', 'PJ', 'Freelancer', 'Estágio']
@@ -60,7 +62,7 @@
     'Administrativa', 'Corporativa', 'Financeira', 'Comercial',
     'Marketing', 'Recursos Humanos', 'Operacional', 'Logística',
     'Tecnologia da Informação', 'Jurídica', 'Compras', 'Suprimentos',
-    'Departamento Pessoal', 'Fiscal'
+    'Departamento Pessoal', 'Fiscal', 'Segurança do Trabalho', 'Mecânica', 'Elétrica'
   ]
 
   const sendMail = async (companyName: string, jobName: string, jobDescription: string) => {
@@ -309,6 +311,18 @@
                 class="mb-3"
               />
             </div>
+
+            <v-checkbox
+              v-model="job.is_hidden_name_company"
+              label="Ocultar dos candidatos o nome da empresa"
+              hide-details
+            />
+
+            <v-checkbox
+              v-model="job.is_hidden_salary"
+              label="Ocultar dos candidatos o salário"
+              hide-details
+            />
 
             <v-btn
               type="submit"

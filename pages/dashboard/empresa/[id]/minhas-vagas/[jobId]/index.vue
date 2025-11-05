@@ -205,6 +205,16 @@
             </ul>
           </v-list-item-content>
         </v-list-item>
+        <!-- Campos ocultos -->
+        <v-list-item class="mt-2 pa-3 bg-blue-grey-lighten-5" style="min-height: unset">
+          <v-list-item-content>
+            <v-list-item-title class="text-subtitle-1 font-weight-bold">Campos ocultos</v-list-item-title>
+            <ul>
+              <li v-if="job.is_hidden_name_company" class="text-body-2">- Nome da empresa</li>
+              <li v-if="job.is_hidden_salary" class="text-body-2">- Salário</li>
+            </ul>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-col>
 

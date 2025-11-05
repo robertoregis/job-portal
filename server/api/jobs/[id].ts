@@ -82,7 +82,9 @@ export default defineEventHandler(async (event) => {
         'knowledge_simple',
         'knowledge',
         'undergraduate_areas',
-        'company_id'
+        'company_id',
+        'is_hidden_name_company',
+        'is_hidden_salary'
       ]
 
       for (const field of fields) {

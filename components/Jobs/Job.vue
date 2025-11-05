@@ -17,6 +17,8 @@
       const router = useRouter();
       const { notify } = useNotification();
       const { createLog, createNotice } = useNotice();
+      const isExists = ref<boolean>(false);
+      const loading = ref<boolean>(true);
       const emailOfficial = useRuntimeConfig().public.EMAIL_OFFICIAL
       const apply = () => {
         if (info.user && info.user.id && info.user.type === 'candidate') {
@@ -50,6 +52,30 @@
             }
           }
         })
+      }
+
+      const checkCandidatureExists = async () => {
+        // 1. Chamar o novo endpoint com os parâmetros corretos
+        const { data, error, pending }: any = await useFetch(`/api/candidatures/check-exists`, {
+          method: 'GET',
+          params: {
+            candidate_id: info.user.id, // Envia o ID do candidato
+            job_id: job.value.id             // Envia o ID da vaga
+          }
+        })
+
+        // 2. Tratar o resultado
+        if (error.value) {
+          console.error("Erro ao verificar candidatura:", error.value)
+          // Tratar o erro (ex: exibir notificação)
+        } else if (data.value && data.value.exists) {
+          // Se o backend retornar { exists: true, ... }
+          isExists.value = true;
+        } else {
+          isExists.value = false;
+        }
+
+        loading.value = false;
       }
 
       const resetCandidature = () => {
@@ -100,6 +126,10 @@
         router.push(`/cadastrar/candidato`)
       }
 
+      onMounted(() => {
+        checkCandidatureExists()
+      })
+
       return {
         dialog,
         job,
@@ -107,7 +137,8 @@
         navigation,
         apply,
         info,
-        createCandidature
+        createCandidature,
+        isExists
       }
     }
   }
@@ -129,7 +160,7 @@
           <span class="text-caption text-titleLight">{{ job.created_at_formatted }}</span>
         </v-card-title>
 
-        <v-card-subtitle>
+        <v-card-subtitle v-if="!job.is_hidden_name_company">
           <span class="text-subtitle-1">{{ job.company_name }}</span>
         </v-card-subtitle>
 
@@ -149,6 +180,7 @@
               </v-chip>
 
               <v-chip
+                v-if="!job.is_hidden_salary"
                 small
                 color="green"
                 text-color="white"
@@ -195,14 +227,15 @@
           </div>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions v-if="info.user && (!info.user.id || info.user.id && info.user.type === 'candidate')">
           <v-btn
-            v-if="info.user && (!info.user.id || info.user.id && info.user.type === 'candidate')"
+            v-if="!isExists"
             @click.prevent="apply"
             class="bg-gradient-primary"
             text="Candidatar-me"
             variant="flat"
           ></v-btn>
+          <span v-else class="font-weight-bold text-caption text-red-darken-3">Você já se candidatou</span>
         </v-card-actions>
       </v-card>
     </NuxtLink>
