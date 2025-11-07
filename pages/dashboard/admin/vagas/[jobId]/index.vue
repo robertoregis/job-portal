@@ -67,6 +67,7 @@
       body: {
         status: job.value.status,
         icon_status: job.value.icon_status,
+        is_active: job.value.is_active
       }
     })
 
