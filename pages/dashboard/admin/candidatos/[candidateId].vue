@@ -46,9 +46,23 @@
       if (educationsError.value) throw educationsError.value
       educationsList.value = educationsData.value
       // Busca experiences
-      const { data: experiencesData, error: experiencesError } = await useFetch(`/api/experiences?candidate_id=${candidateId}`)
-      if (experiencesError.value) throw experiencesError.value
-      experiencesList.value = experiencesData.value
+      let experienceGroup = null
+      const { data: experienceGroupData, error: errorExperienceGroup } = await useFetch('/api/experience_group', {
+          method: 'GET',
+          params: {
+              candidate_id: candidateId
+          }
+      })
+      if (error.value) {}
+      if(experienceGroupData.value) {
+        const experiencesGroup: any[] = experienceGroupData.value as any[]
+        if(experiencesGroup.length) {
+          experienceGroup = experiencesGroup[0]
+          const { data: experiencesData, error: experiencesError } = await useFetch(`/api/experiences?candidate_id=${candidateId}&experience_group_id=${experienceGroup.id}`)
+          if (experiencesError.value) throw experiencesError.value
+          experiencesList.value = experiencesData.value
+        }
+      }
       // Busca languages
       const { data: languagesData, error: languagesError } = await useFetch(`/api/languages?candidate_id=${candidateId}`)
       if (languagesError.value) throw languagesError.value

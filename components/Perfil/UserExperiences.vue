@@ -203,16 +203,23 @@
   }
 
   const { data, error, refresh, pending } = await useFetch('/api/experience_group', {
-      method: 'GET',
-      params: {
-          candidate_id: info.user.id
-      }
+    method: 'GET',
+    params: {
+        candidate_id: info.user.id
+    }
   })
 
   if (error.value) {
-  } else {
-      experienceGroup.value = data.value
-      getExperiences()
+      console.error("Erro ao buscar grupo de experiência:", error.value);
+  }
+
+  if (data.value) { 
+      const experiences: any[] = data.value as any[] 
+      
+      if (experiences.length) {
+          experienceGroup.value = experiences[0]
+          getExperiences()
+      }
   }
 </script>
 
