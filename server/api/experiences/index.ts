@@ -41,8 +41,10 @@ export default defineEventHandler(async (event) => {
       candidate_id, order, experience_group_id, candidate_is_complete_experiences, 
       candidate_completion_percentage } = body
 
+    const isExistsExperienceGroup = experience_group_id ? true : false
+
     if (!candidate_id) {
-      throw createError({ statusCode: 400, statusMessage: 'candidate_id is required' })
+      throw createError({ statusCode: 400, statusMessage: 'candidate_id é requerido' })
     }
 
     // 👇 validação do order
@@ -59,6 +61,18 @@ export default defineEventHandler(async (event) => {
 
     start_date = toISODate(start_date)
     end_date = toISODate(end_date)
+    console.log(experience_group_id)
+    if(!isExistsExperienceGroup) {
+      const { data, error } = await supabase
+        .from('experience_group')
+        .insert([{
+          candidate_id: candidate_id
+        }])
+        .select()
+        .single()
+
+      experience_group_id = data.id
+    }
 
     const { data, error } = await supabase
       .from('experiences')

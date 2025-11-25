@@ -211,8 +211,9 @@
 
   if (error.value) {
   } else {
-      experienceGroup.value = data.value
-      getExperiences()
+    const experiences: any = data.value
+    experienceGroup.value = experiences[0]
+    getExperiences()
   }
 </script>
 
