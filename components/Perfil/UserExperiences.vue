@@ -6,6 +6,25 @@
   const { notify } = useNotification();
   const info: any = useInfo();
   const show = useShow();
+  const props = defineProps({
+    candidate: {
+      type: Object,
+      required: false,
+      default: {}
+    },
+    isAdmin: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  })
+  const candidate = computed(() => {
+    if(props.isAdmin) {
+      return props.candidate
+    } else {
+      return info.user
+    }
+  })
   const pickerVisible = ref(false)
   const typeDate = ref<string>('')
   const order = ref<string>('')
@@ -96,18 +115,19 @@
             end_date: experience.end_date,
             description: experience.description,
             company_name: experience.company_name,
-            candidate_id: info.user.id,
+            candidate_id: candidate.value.id,
             order: order,
             experience_group_id: experienceGroup.value.id,
-            candidate_is_complete_experiences: info.user.is_complete_experiences,
-            candidate_completion_percentage: info.user.completion_percentage
+            candidate_is_complete_experiences: candidate.value.is_complete_experiences,
+            candidate_completion_percentage: candidate.value.completion_percentage
           }
       })
       if (error.value) {
         return
       }
+      let title = `Criou a experiência: ${experience.position} - ${experience.company_name}${props.isAdmin ? ` do candidato de ID: ${candidate.value.id}` : ''}`
       createLog({
-        title: `Criou a experiência: ${experience.position} - ${experience.company_name}`,
+        title: title,
         profile_id: info.profile.id,
         type: 'create_experience'
       })
@@ -146,11 +166,11 @@
     setTimeout(() => {
       show.setOverlayDashboard(false)
       if(count > 0) {
-        notify({ title: 'Parabéns!', text: 'Você atualizou as suas experiências', type: 'success' })
+        notify({ title: 'Parabéns!', text: 'Você atualizou as experiências do candidato', type: 'success' })
         dialogExperience.value = false;
         getExperiences()
       }
-      if(!info.user.is_complete_experiences) {
+      if(!candidate.value.is_complete_experiences) {
         window.location.reload()
       }
     }, 500)
@@ -161,7 +181,7 @@
       const { data, error } = await useFetch('/api/experiences', {
           method: 'GET',
           params: {
-            candidate_id: info.user.id,
+            candidate_id: candidate.value.id,
             experience_group_id: experienceGroup.value.id
           }
       })
@@ -195,8 +215,9 @@
       if (error.value) {
         return
       }
+      let title = `Editou a experiência: ${experience.position} - ${experience.company_name}${props.isAdmin ? ` do candidato de ID: ${candidate.value.id}` : ''}`
       createLog({
-        title: `Editou a experiência: ${experience.position} - ${experience.company_name}`,
+        title: title,
         profile_id: info.profile.id,
         type: 'update_experience'
       })
@@ -205,7 +226,7 @@
   const { data, error, refresh, pending } = await useFetch('/api/experience_group', {
     method: 'GET',
     params: {
-        candidate_id: info.user.id
+        candidate_id: candidate.value.id
     }
   })
 
@@ -256,7 +277,6 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-
       <v-btn class="bg-gradient-primary" @click="dialogExperience = true">
         {{ experiencesList.length > 2 ? 'Editar' : 'Adicionar' }}
       </v-btn>

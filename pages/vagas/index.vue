@@ -52,6 +52,7 @@
   const getJobs = async () => {
     const params: Record<string, any> = {
       is_active: true,
+      is_closed: false,
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
     }
@@ -96,6 +97,7 @@
     method: 'GET',
     params: {
       is_active: true,
+      is_closed: false,
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }

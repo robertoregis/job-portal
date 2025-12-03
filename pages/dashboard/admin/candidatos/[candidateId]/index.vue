@@ -25,10 +25,18 @@
   const feedbackSelected = ref<any>({})
   const page = ref(1)
   const pageSize = ref(10)
+  const pageJobs = ref(1)
+  const pageSizeJobs = ref(100)
+  const jobsList = ref<any[]>([])
+  const selectedJobId = ref<any>(null)
   const totalPages = ref(1)
   const loading = ref<boolean>(true)
   const result_behavioral = ref<any>({})
   const behavioral = ref<any>({})
+
+  const navigation = (link: string) => {
+    router.push(`/dashboard/admin/candidatos/${route.params.candidateId}/editar`)
+  }
 
   const getFormatDate = (date: string) => {
     if (!date) return ''
@@ -81,7 +89,8 @@
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      candidate_id: route.params.candidateId
+      candidate_id: route.params.candidateId,
+      is_all: true
     }
 
     const { data, error } = await useFetch('/api/feedbacks', {
@@ -99,6 +108,35 @@
   watch(page, () => {
     getFeedbacks()
   })
+
+  const createFeedback = async () => {
+    show.setOverlayDashboard(true)
+    const { data, error } = await useFetch('/api/feedbacks', {
+        method: 'POST',
+        body: {
+          content: content.value,
+          candidate_id: candidate.value.id,
+          job_id: selectedJobId.value
+        }
+    })
+    show.setOverlayDashboard(false)
+    if (error.value) {
+      //console.log(error.value)
+      const message = error.value.data?.statusMessage || 'Erro ao criar parecer'
+      notify({ title: '', text: message, type: 'error' })
+      return
+    }
+    createLog({
+      title: `Criou o parecer avulso do candidato de ID: ${candidate.value.id}`,
+      profile_id: info.profile.id,
+      type: 'create_feedback'
+    })
+    notify({ title: 'Parabéns!', text: 'O parecer avulso foi criado', type: 'success' })
+    getFeedbacks()
+    setTimeout(() => {
+      dialogFeedback.value = false;
+    }, 1000)
+  }
 
   const openFeedback = (feedback: any) => {
     feedbackSelected.value = feedback;
@@ -177,6 +215,25 @@
     }
   }
 
+  const getJobs = async () => {
+    const params: Record<string, any> = {
+      page: pageJobs.value.toString(),
+      pageSize: pageSizeJobs.value.toString(),
+      is_active: true
+    }
+
+    const { data, error } = await useFetch('/api/jobs', {
+      method: 'GET',
+      params
+    })
+
+    if (error.value) {
+      //console.error('Erro ao carregar vagas:', error.value)
+    } else {
+      jobsList.value = data.value?.data || []
+    }
+  }
+
   const { data, error, pending } = await useFetch(`/api/candidates/${route.params.candidateId}`, {
     method: 'GET'
   })
@@ -197,6 +254,7 @@
     getFeedbacks()
     getBeharioval()
     getDataCandidate(candidate.value.id)
+    getJobs()
   }
 
   const formatSocialUrl = (value: string, type: string) => {
@@ -240,7 +298,17 @@
 
   <v-row v-if="candidate" no-gutters class="mt-5">
     <!-- Dados do Candidato -->
-    <v-col cols="12" class="border">
+    <v-col cols="12">
+      <div class="d-flex">
+        <v-btn
+          @click="navigation('editar')"
+          text="Editar perfil"
+          variant="flat"
+          class="bg-gradient-primary"
+        />
+      </div>
+    </v-col>
+    <v-col cols="12" class="border mt-4">
       <v-card>
         <v-card-title>
           <div class="d-flex align-center">
@@ -551,7 +619,7 @@
               >
                 <div class="d-flex justify-space-between align-center">
                   <!-- job_title à esquerda -->
-                  <span class="text-caption font-weight-bold">{{ feedback.job_title }}</span>
+                  <span class="text-caption font-weight-bold">{{ feedback.title }}</span>
                   
                   <!-- botão à direita -->
                    <v-tooltip text="Gerar relatório">
@@ -567,21 +635,82 @@
           </v-row>
           <span v-else>Não há parecer</span>
         </v-card-text>
+        <v-card-actions>
+            <v-btn
+              text="Adicionar"
+              class="bg-gradient-primary"
+              variant="flat"
+              @click="dialogFeedback = true"
+            />
+        </v-card-actions>
       </v-card>
     </v-col>
   </v-row>
+    <v-dialog
+        v-model="dialogFeedback"
+        max-width="600"
+    >
+        <v-card
+            prepend-icon="mdi-file-document"
+            title="Adicionar Parecer Avulso"
+        >
+        <v-card-text>
+            <v-row dense>
+              <v-col cols="12">
+                  <RichTextEditor v-model="content" />
+              </v-col>
+              <v-col cols="12">
+                <v-autocomplete
+                  v-model="selectedJobId"
+                  :items="jobsList"
+                  item-title="title"
+                  item-value="id"
+                  label="Vincular a uma vaga (Opcional)"
+                  placeholder="Digite o nome da vaga..."
+                  clearable
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="mt-2"
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions>
+            <v-spacer />
+            <v-btn
+              text="Fechar"
+              color="error"
+              variant="flat"
+              @click="dialogFeedback = false"
+            />
+            <v-btn
+              text="Adicionar"
+              color="success"
+              variant="flat"
+              @click="createFeedback()"
+            />
+        </v-card-actions>
+        </v-card>
+    </v-dialog>
     <v-dialog
         v-model="dialogFeedbackShow"
         max-width="600"
     >
         <v-card
             prepend-icon="mdi-file-document"
-            :title="feedbackSelected.job_title"
+            :title="feedbackSelected.title"
         >
         <v-card-text>
             <v-row>
               <v-col cols="12">
                   <div v-html="feedbackSelected.content" class="pa-2"></div>
+              </v-col>
+              <v-col v-if="feedbackSelected.job_title" cols="12">
+                  <span class="text-caption">Vaga vinculada: <b>{{ feedbackSelected.job_title }}</b></span>
               </v-col>
             </v-row>
         </v-card-text>

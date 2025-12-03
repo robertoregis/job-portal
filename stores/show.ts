@@ -2,9 +2,10 @@ import { defineStore } from "pinia";
 
 export interface InterfaceShow {
 	overlayDashboard: boolean
-	overlaySite: boolean
+	overlaySite: boolean,
 	navigation: boolean,
-	menu: boolean
+	menu: boolean,
+	applyJob: boolean
 }
 
 export const useShow = defineStore("show", {
@@ -12,7 +13,8 @@ export const useShow = defineStore("show", {
 		overlayDashboard: false,
 		overlaySite: false,
 		navigation: false,
-		menu: false
+		menu: false,
+		applyJob: false
 	}),
 	actions: {
 		setOverlayDashboard(data: boolean) {
@@ -26,6 +28,9 @@ export const useShow = defineStore("show", {
 		},
 		setMenu(data: boolean) {
 			this.menu = data;
+		},
+		setApplyJob(data: boolean) {
+			this.applyJob = data;
 		}
 	},
 	getters: {

@@ -14,23 +14,31 @@
   })
   const info: any = useInfo();
   const servicesList = ref<any[]>([])
+
   // Dados fictícios para os serviços
   const { data: services, error, refresh, pending } = await useFetch('/api/services', {
       method: 'GET',
-      params: {}
+      params: {},
+      key: 'services-list',
   })
 
   if (error.value) {
     console.log(error.value)
   } else {
+    console.log(services.value)
       servicesList.value = services.value
   }
+  console.log(services.value)
+
+  watch(services.value, (wl: any) => {
+    console.log(services)
+  })
 </script>
 
 <template>
   <main>
     <v-sheet width="100%">
-      <HomeVideoBackground video="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/videos/RH%20ANIMACAO%203D%2004.mp4" />
+      <!--<HomeVideoBackground video="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/videos/RH%20ANIMACAO%203D%2004.mp4" />-->
     </v-sheet>
 
     <v-sheet width="100%" class="mt-4">

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const { company_id, status, is_active, page, pageSize,
-      state, createdWithinDays, createdMoreThanDays, without_company
+      state, createdWithinDays, createdMoreThanDays, without_company, is_closed
     } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
@@ -40,6 +40,10 @@ export default defineEventHandler(async (event) => {
 
     if (typeof is_active !== 'undefined') {
       query = query.eq('is_active', is_active === 'true')
+    }
+
+    if (typeof is_closed !== 'undefined') {
+      query = query.eq('is_closed', is_closed === 'true')
     }
 
     if (state) {

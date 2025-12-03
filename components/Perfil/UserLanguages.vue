@@ -6,6 +6,25 @@
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
+    const props = defineProps({
+        candidate: {
+            type: Object,
+            required: false,
+            default: {}
+        },
+        isAdmin: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    })
+    const candidate = computed(() => {
+        if(props.isAdmin) {
+            return props.candidate
+        } else {
+            return info.user
+        }
+    })
     //// Idiomas
     const languagesArray = [
         { name: 'Português', code: 'pt' },
@@ -28,8 +47,8 @@
     const languageList = ref<any>([])
     const clearLanguage = () => {
         language.value = {
-        language: null,
-        level: null
+            language: null,
+            level: null
         }
         dialogLanguage.value = false
     }
@@ -60,7 +79,7 @@
             body: {
                 level: language.value.level,
                 name: language.value.name,
-                candidate_id: info.user.id
+                candidate_id: candidate.value.id
             }
         })
 
@@ -69,8 +88,9 @@
             notify({ title: 'Erro', text: 'Erro ao criar o idioma', type: 'error' })
             return
         }
+        let title = `Criou o idioma ${language.value.name}${props.isAdmin ? ` para o candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Criou o idioma`,
+            title: title,
             profile_id: info.profile.id,
             type: 'create_language'
         })
@@ -83,7 +103,7 @@
         const { data, error } = await useFetch('/api/languages', {
             method: 'GET',
             params: {
-                candidate_id: info.user.id
+                candidate_id: candidate.value.id
             }
         })
 
@@ -106,8 +126,9 @@
             notify({ title: 'Erro', text: 'Erro ao remover o idioma', type: 'error' })
             return
         }
+        let title = `Removeu o idioma ${language.value.name}${props.isAdmin ? ` para o candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Removeu o idioma`,
+            title: title,
             profile_id: info.profile.id,
             type: 'delete_language'
         })
@@ -118,7 +139,7 @@
     const { data: languages, error, refresh, pending } = await useFetch('/api/languages', {
         method: 'GET',
         params: {
-            candidate_id: info.user.id
+            candidate_id: candidate.value.id
         }
     })
 
