@@ -126,6 +126,9 @@
     <v-col cols="12" class="border mt-4">
       <AdminServices />
     </v-col>
+    <v-col cols="12" class="border mt-4">
+      <AdminCarousels />
+    </v-col>
   </v-row>
 </template>
 

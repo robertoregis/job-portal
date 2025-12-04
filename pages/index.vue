@@ -14,6 +14,31 @@
   })
   const info: any = useInfo();
   const servicesList = ref<any[]>([])
+  const carouselsList = ref<any[]>([])
+  const loading = ref<boolean>(true)
+
+  const getCarousels = async () => {
+    const { data, error } = await useFetch('/api/carousels', {
+        method: 'GET',
+    })
+    if (error.value) {
+        console.error('Erro ao carregar o carrossel:', error.value)
+        return null
+    }
+    carouselsList.value = data.value;
+    carouselsList.value.unshift(
+      {
+        id: 100,
+        type: 'video',
+        link: null,
+        is_external: false,
+        video: 'https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/videos/RH%20ANIMACAO%203D%2004.mp4',
+        image_lg_url: null,
+        image_sm_url: null,
+      }
+    )
+    loading.value = false
+  }
 
   // Dados fictícios para os serviços
   const { data: services, error, refresh, pending } = await useFetch('/api/services', {
@@ -25,20 +50,16 @@
   if (error.value) {
     console.log(error.value)
   } else {
-    console.log(services.value)
-      servicesList.value = services.value
+    servicesList.value = services.value
+    getCarousels()
   }
-  console.log(services.value)
 
-  watch(services.value, (wl: any) => {
-    console.log(services)
-  })
 </script>
 
 <template>
-  <main>
-    <v-sheet width="100%">
-      <!--<HomeVideoBackground video="https://uhwfvrjhlhvxyrrlaqna.supabase.co/storage/v1/object/public/jobportal/videos/RH%20ANIMACAO%203D%2004.mp4" />-->
+  <main v-if="!loading">
+    <v-sheet v-if="carouselsList.length > 0" width="100%">
+      <HomeSwiper :items="carouselsList" />
     </v-sheet>
 
     <v-sheet width="100%" class="mt-4">
