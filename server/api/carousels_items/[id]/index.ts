@@ -49,6 +49,19 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    const { data: carouselItem, error: errorItem } = await supabase
+      .from('carousels_items')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (errorItem) {
+      throw createError({ statusCode: 404, statusMessage: 'Not found' })
+    }
+
+    const oldImageIdSM = carouselItem.image_sm_id
+    const oldImageIdLG = carouselItem.image_lg_id
+
     const { error } = await supabase
       .from('carousels_items')
       .delete()
@@ -56,6 +69,26 @@ export default defineEventHandler(async (event) => {
 
     if (error) {
       throw createError({ statusCode: 500, statusMessage: error.message })
+    }
+
+    if (oldImageIdSM) {
+      const { error: removeError } = await supabase.storage
+        .from('jobportal')
+        .remove([oldImageIdSM]);
+    
+      if (removeError) {
+        console.error('Erro ao remover arquivo antigo (sm):', removeError.message);
+      }
+    }
+
+    if (oldImageIdLG) {
+      const { error: removeError } = await supabase.storage
+        .from('jobportal')
+        .remove([oldImageIdLG]);
+    
+      if (removeError) {
+        console.error('Erro ao remover arquivo antigo (sm):', removeError.message);
+      }
     }
 
     return { success: true }
