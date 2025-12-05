@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     const page = query.page as string | undefined
     const pageSize = query.pageSize as string | undefined
     const is_complete = query.is_complete as string | undefined
+    const name = query.name as string | undefined
 
     const pageNumber = page ? parseInt(page, 10) : 1
     const size = pageSize ? parseInt(pageSize, 10) : 10
@@ -26,6 +27,12 @@ export default defineEventHandler(async (event) => {
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to)
+
+    if (name) {
+      // Usa .ilike para buscar a string em qualquer parte do título,
+      // sem diferenciar maiúsculas/minúsculas.
+      queryBuilder = queryBuilder.ilike('name', `%${name as string}%`) 
+    }
 
     // filtro profile_id opcional
     if (profile_id) {

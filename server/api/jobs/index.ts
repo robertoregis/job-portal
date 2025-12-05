@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const { company_id, status, is_active, page, pageSize,
-      state, createdWithinDays, createdMoreThanDays, without_company, is_closed
+      state, createdWithinDays, createdMoreThanDays, without_company, is_closed, title
     } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
@@ -24,6 +24,12 @@ export default defineEventHandler(async (event) => {
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to)
+
+    if (title) {
+      // Usa .ilike para buscar a string em qualquer parte do título,
+      // sem diferenciar maiúsculas/minúsculas.
+      query = query.ilike('title', `%${title as string}%`) 
+    }
 
     if (without_company === 'true') {
         // Usa .is() para filtrar onde a coluna company_id é NULL

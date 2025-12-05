@@ -8,14 +8,17 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id } = getQuery(event)
+    const { profile_id, isNot } = getQuery(event)
 
     let query = supabase.from('carousels_items')
       .select('*')
-      .not('image_lg_url', 'is', null) 
-      .not('image_sm_url', 'is', null)
       .order('order_index', { ascending: true, nullsFirst: false }) 
       .order('created_at', { ascending: false })
+
+    if (isNot === 'true') {
+        query = query.not('image_lg_url', 'is', null) 
+        query = query.not('image_sm_url', 'is', null)
+    }
 
     const { data, error } = await query
 

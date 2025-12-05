@@ -13,6 +13,7 @@
       }
     ]
   })
+  const { notify } = useNotification();
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)
@@ -21,6 +22,8 @@
   const candidatesList = ref<any[]>([])
   const candidatesTotalCount = ref<number>(0)
   const candidatesFilterTotalCount = ref<number>(0)
+  const loadingSearch = ref<boolean>(false)
+  const nameSearch = ref<any>('')
   // Filtros
   const completOptions = ['Sim', 'Não']
   const selectedCompleted = ref<string | null>(null)
@@ -40,12 +43,14 @@
     router.push(`/dashboard/admin/candidatos/${id}`)
   }
 
-  const getCandidates = async () => {
+  const getCandidates = async (isSearch: boolean = false) => {
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }
-
+    if(isSearch) {
+      params.name = nameSearch.value
+    }
     if (selectedCompleted.value === 'Sim') {
       params.is_complete = true
     } else if (selectedCompleted.value === 'Não') {
@@ -63,6 +68,14 @@
       totalPages.value = data.value?.totalPages || 1
       candidatesFilterTotalCount.value = data.value?.count
     }
+  }
+
+  const onSearch = async () => {
+    if(nameSearch.value.length > 0 && nameSearch.value.length < 3) {
+      notify({ title: 'Erro', text: 'O nome precisa ser vazio ou ter 3 ou mais caracteres', type: 'error' })
+      return
+    }
+    getCandidates(true)
   }
 
   const { data: companies, error, refresh, pending } = await useFetch('/api/candidates', {
@@ -106,6 +119,21 @@
         class="mb-2"
         dense
       />
+    </v-col>
+    <v-col cols="12">
+      <v-text-field
+        :loading="loadingSearch"
+        v-model="nameSearch"
+        append-inner-icon="mdi-magnify"
+        label="Pesquisa por nome"
+        density="compact"
+        variant="solo"
+        hide-details
+        class="mb-2"
+        style="max-width: 400px;"
+        @click:append-inner="onSearch"
+        @keydown.enter="onSearch"
+      ></v-text-field>
     </v-col>
   </v-row>
 

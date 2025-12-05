@@ -21,6 +21,9 @@
   const getCarousels = async () => {
     const { data, error } = await useFetch('/api/carousels_items', {
         method: 'GET',
+        params: {
+          isNot: true
+        }
     })
     if (error.value) {
         console.error('Erro ao carregar o carrossel:', error.value)

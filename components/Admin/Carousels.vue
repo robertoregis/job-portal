@@ -106,9 +106,9 @@
     const getCarousels = async () => {
         const { data, error } = await useFetch('/api/carousels_items', {
             method: 'GET',
-            /*params: {
-                candidate_id: info.user.id
-            }*/
+            params: {
+                isNot: false
+            }
         })
         if (error.value) {
             console.error('Erro ao carregar o carrossel:', error.value)
@@ -205,7 +205,9 @@
 
     const { data: carousels, error, refresh, pending } = await useFetch('/api/carousels_items', {
         method: 'GET',
-        params: {}
+        params: {
+            isNot: false
+        }
     })
 
     if (error.value) {
@@ -310,48 +312,51 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-            <p class="text-caption font-weight-bold">Obs: Cada bloco do carrossel precisa ter as duas imagens para exibir no site</p>
+            <p class="text-caption font-weight-bold" :class="`${carouselsList.length > 0 ? '' : 'mb-2'}`">Obs: Cada bloco do carrossel precisa ter as duas imagens para exibir no site</p>
             <v-list v-if="carouselsList.length > 0" two-line class="mb-2">
-            <v-list-item
-                v-for="(item, i) in carouselsList"
-                :key="i"
-                class="pa-2 border mb-1 rounded"
-            >
-                <v-list-item-content class="d-flex align-center">
-                    <v-list-item-title class="font-weight-bold">
-                    {{ item.title }}
-                    </v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-content class="d-flex align-center mt-1">
+                <v-list-item
+                    v-for="(item, i) in carouselsList"
+                    :key="i"
+                    class="pa-2 border mb-1 rounded"
+                >
+                    <v-list-item-content class="d-flex align-center">
+                        <v-list-item-title class="font-weight-bold">
+                        {{ item.title }}
+                        </v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-content class="d-flex align-center mt-1">
+                        <template v-if="item.type === 'Imagem'">
+                            <v-btn @click="changeImages(i, item.id)" prepend-icon="mdi-image-plus" :color="`${!item.image_lg_url && !item.image_sm_url ? 'edit' : (item.image_lg_url && item.image_sm_url ? 'primary' : 'off')}`" size="small" class="mr-1">{{ !item.image_lg_url && !item.image_sm_url ? 'Adicionar' : 'Gerenciar' }} imagens</v-btn>
+                            <span class="font-weight-bold">: {{ !item.image_lg_url && !item.image_sm_url ? 0 : (item.image_lg_url && item.image_sm_url ? 2 : 1) }}</span>
+                        </template>
+                        <template v-if="item.type === 'Vídeo'">
+                            <span class="font-weight-semibold text-red text-caption">Componente de video</span>
+                        </template>
+                    </v-list-item-content>
 
-                    <v-btn @click="changeImages(i, item.id)" prepend-icon="mdi-image-plus" :color="`${!item.image_lg_url && !item.image_sm_url ? 'edit' : (item.image_lg_url && item.image_sm_url ? 'primary' : 'off')}`" size="small" class="mr-1">{{ !item.image_lg_url && !item.image_sm_url ? 'Adicionar' : 'Gerenciar' }} imagens</v-btn>
-                    <span class="font-weight-bold">: {{ !item.image_lg_url && !item.image_sm_url ? 0 : (item.image_lg_url && item.image_sm_url ? 2 : 1) }}</span>
-                </v-list-item-content>
+                    <template #append>
+                        <div class="d-flex align-center justify-end ga-1">
+                        <v-btn
+                            icon="mdi-pencil"
+                            size="x-small"
+                            @click="editCarousel(i, item.id)"
+                        ></v-btn>
 
-                <template #append>
-                    <div class="d-flex align-center justify-end ga-1">
-                    <v-btn
-                        icon="mdi-pencil"
-                        size="x-small"
-                        @click="editCarousel(i, item.id)"
-                    ></v-btn>
-
-                    <v-btn
-                        icon="mdi-delete"
-                        size="x-small"
-                        color="error"
-                        @click="removeCarousel(item.id)"
-                    ></v-btn>
-                    </div>
-                </template>
+                        <v-btn
+                            icon="mdi-delete"
+                            size="x-small"
+                            color="error"
+                            @click="removeCarousel(item.id)"
+                        ></v-btn>
+                        </div>
+                    </template>
                 </v-list-item>
-
             </v-list>
 
             <v-btn class="bg-gradient-primary mr-3" @click="openCreate()">
                 Adicionar
             </v-btn>
-            <v-btn color="edit" @click="isDialogOpen = true">
+            <v-btn :disabled="carouselsList.length < 1" color="edit" @click="isDialogOpen = true">
                 Reordenar
             </v-btn>
         </v-card-text>

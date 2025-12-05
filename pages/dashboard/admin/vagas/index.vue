@@ -13,6 +13,7 @@
       }
     ]
   })
+  const { notify } = useNotification();
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)
@@ -20,7 +21,8 @@
   const totalPages = ref(1)
   const jobsList = ref<any[]>([])
   const without_company = ref<boolean>(false)
-
+  const loadingSearch = ref<boolean>(false)
+  const titleSearch = ref<any>('')
   // Filtros
   const jobStatusOptions = [
     { name: 'Aberta', icon: 'mdi-briefcase-plus' },
@@ -53,13 +55,15 @@
     router.push(`/dashboard/admin/vagas/${id}`)
   }
 
-  const getJobs = async () => {
+  const getJobs = async (isSearch: boolean = false) => {
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
       without_company: without_company.value
     }
-
+    if(isSearch) {
+      params.title = titleSearch.value
+    }
     if (selectedStatus.value) params.status = selectedStatus.value
 
     const { data, error } = await useFetch('/api/jobs', {
@@ -73,6 +77,14 @@
       jobsList.value = data.value?.data || []
       totalPages.value = data.value?.totalPages || 1
     }
+  }
+
+  const onSearch = async () => {
+    if(titleSearch.value.length < 3) {
+      notify({ title: 'Erro', text: 'O título precisa ser vazio ou ter 3 ou mais caracteres', type: 'error' })
+      return
+    }
+    getJobs(true)
   }
 
   const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
@@ -131,7 +143,22 @@
       />
     </v-col>
     <v-col cols="12">
-      <v-checkbox v-model="without_company" label="Sem ligação com empresas"></v-checkbox>
+      <v-text-field
+        :loading="loadingSearch"
+        v-model="titleSearch"
+        append-inner-icon="mdi-magnify"
+        label="Pesquisa por título"
+        density="compact"
+        variant="solo"
+        hide-details
+        class="mb-2"
+        style="max-width: 400px;"
+        @click:append-inner="onSearch"
+        @keydown.enter="onSearch"
+      ></v-text-field>
+    </v-col>
+    <v-col cols="12">
+      <v-checkbox v-model="without_company" label="Sem ligação com empresas" hide-details></v-checkbox>
     </v-col>
   </v-row>
 
