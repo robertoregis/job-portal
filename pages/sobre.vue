@@ -62,7 +62,7 @@
             </div>
           </v-col>
 
-          <v-col cols="12">
+          <v-col v-if="servicesList.length > 0" cols="12">
             <h2 class="mb-2">Confira o que fazemos:</h2>
             <v-row no-gutters>
               <template v-for="(service, index) in servicesList" :key="index">

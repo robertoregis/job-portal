@@ -2,6 +2,9 @@
     import { useInfo } from '@/stores/info';
     import { useShow } from '@/stores/show';
     import { useNotice } from '@/composables/useNotice';
+    import { getImageDimensions } from '@/composables/image';
+    import { validateImageDimensions } from '@/composables/imageValidator';
+
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
@@ -227,7 +230,15 @@
         fileInput.value?.click()
     }*/
 
-    const uploadImage = async (id: string, type: string) => {
+    async function handleImageUpload(file: File, type: 'sm' | 'lg') {
+        try {
+            return await validateImageDimensions(file, type)
+        } catch (error: any) {
+            notify({ title: 'Erro de processamento', text: error.message, type: 'error', duration: 6000 })
+        }
+    }
+
+    const uploadImage = async (id: string, type: 'sm' | 'lg') => {
         show.setOverlayDashboard(true)
         if (!fileSM.value && !fileLG.value) {
             notify({ title: 'Erro', text: 'Selecione uma imagem', type: 'error' })
@@ -235,6 +246,11 @@
             return
         }
         const file: any = fileSM.value ? fileSM.value : fileLG.value
+        const result = await handleImageUpload(file, type)
+        if(!result) {
+            show.setOverlayDashboard(false)
+            return
+        }
         const formDataTy = new FormData()
         formDataTy.append('file', file)
         formDataTy.append('type', type)
