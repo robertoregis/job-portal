@@ -80,6 +80,12 @@
             </NuxtLink>
           </v-list-item>
           <v-list-item class="d-flex" style="min-height: unset">
+            <NuxtLink :to="`/dashboard/candidato/${authentication.user.id}/vagas-abertas`" class="d-flex align-center no-underline text-white text-subtitle-2">
+              <v-icon class="mr-1" size="18">mdi-briefcase</v-icon>
+              <span>Vagas abertas</span>
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item class="d-flex" style="min-height: unset">
             <NuxtLink :to="`/dashboard/candidato/${authentication.user.id}/minhas-candidaturas`" class="d-flex align-center no-underline text-white text-subtitle-2">
               <v-icon class="mr-1" size="18">mdi-clipboard-list</v-icon>
               <span>Minhas candidaturas</span>
@@ -145,7 +151,7 @@
           <div class="d-flex flex-column align-center mt-4">
             <v-avatar v-if="authentication.user.image_url" size="70">
               <v-img
-                alt="John"
+                alt="Imagem do usuário"
                 :src="authentication.user.image_url"
               ></v-img>
             </v-avatar>
@@ -224,7 +230,7 @@
           <div class="d-flex flex-column align-center mt-4">
             <v-avatar v-if="authentication.user.image_url" size="70">
               <v-img
-                alt="John"
+                alt="Imagem do usuário"
                 :src="authentication.user.image_url"
               ></v-img>
             </v-avatar>

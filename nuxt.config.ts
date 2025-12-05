@@ -8,7 +8,10 @@ export default defineNuxtConfig({
   css: [
     'vuetify/styles',
     '~/assets/sass/app.scss',
-    '@mdi/font/css/materialdesignicons.css'
+    '@mdi/font/css/materialdesignicons.css',
+    'swiper/css', 
+    'swiper/css/navigation', // Se for usar as setas de navegação
+    'swiper/css/pagination',
   ],
   build: {
     transpile: ['vuetify'],

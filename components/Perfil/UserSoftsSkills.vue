@@ -6,6 +6,25 @@
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
+    const props = defineProps({
+        candidate: {
+            type: Object,
+            required: false,
+            default: {}
+        },
+        isAdmin: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    })
+    const candidate = computed(() => {
+        if(props.isAdmin) {
+            return props.candidate
+        } else {
+            return info.user
+        }
+    })
     //// Soft Skill
     const dialogSoftSkill = ref(false)
     const softsList = ref<any>([])
@@ -61,9 +80,9 @@
                 level: softSkill.value.level,
                 name: softSkill.value.name,
                 notes: softSkill.value.notes,
-                candidate_id: info.user.id,
-                candidate_is_complete_soft_skills: info.user.is_complete_soft_skills,
-                candidate_completion_percentage: info.user.completion_percentage
+                candidate_id: candidate.value.id,
+                candidate_is_complete_soft_skills: candidate.value.is_complete_soft_skills,
+                candidate_completion_percentage: candidate.value.completion_percentage
             }
         })
 
@@ -72,15 +91,16 @@
             notify({ title: 'Erro', text: 'Erro ao criar a soft skill', type: 'error' })
             return
         }
+        let title = `Criou o soft skill ${softSkill.value.name}${props.isAdmin ? ` para o candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Criou o soft skill`,
+            title: title,
             profile_id: info.profile.id,
             type: 'create_soft_skill'
         })
         notify({ title: 'Parabéns!', text: 'A soft skill foi criada com sucesso', type: 'success' })
         getSoftSkills()
         clearSoftSkill()
-        if(!info.user.is_complete_soft_skills) {
+        if(!candidate.value.is_complete_soft_skills) {
             window.location.reload()
         }
     }
@@ -89,7 +109,7 @@
         const { data, error } = await useFetch('/api/soft_skills', {
             method: 'GET',
             params: {
-                candidate_id: info.user.id
+                candidate_id: candidate.value.id
             }
         })
 
@@ -97,7 +117,6 @@
             console.error('Erro ao carregar softSkills:', error.value)
             return null
         }
-
         softsList.value = data.value
     }
 
@@ -113,8 +132,9 @@
             notify({ title: 'Erro', text: 'Erro ao editar a soft skill', type: 'error' })
             return
         }
+        let title = `Editou o soft skill ${softSkill.value.name}${props.isAdmin ? ` para o candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Editou o soft skill`,
+            title: title,
             profile_id: info.profile.id,
             type: 'update_soft_skill'
         })
@@ -128,9 +148,9 @@
         const { data, error } = await useFetch(`/api/soft_skills/${id}`, {
             method: 'DELETE',
             body: {
-                candidate_id: info.user.id,
-                candidate_is_complete_soft_skills: info.user.is_complete_soft_skills,
-                candidate_completion_percentage: info.user.completion_percentage
+                candidate_id: candidate.value.id,
+                candidate_is_complete_soft_skills: candidate.value.is_complete_soft_skills,
+                candidate_completion_percentage: candidate.value.completion_percentage
             }
         })
 
@@ -139,22 +159,25 @@
             notify({ title: 'Erro', text: 'Erro ao remover a soft skill', type: 'error' })
             return
         }
+        let title = `Removeu o soft skill ${softSkill.value.name}${props.isAdmin ? ` para o candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Removeu o soft skill`,
+            title: title,
             profile_id: info.profile.id,
             type: 'delete_soft_skill'
         })
         notify({ title: 'Parabéns!', text: 'A soft skill foi removida com sucesso', type: 'success' })
         getSoftSkills()
-        if(softsList.value.length === 0) {
-            window.location.reload()
-        }
+        setTimeout(() => {
+            if(softsList.value.length === 0) {
+                window.location.reload()
+            }
+        }, 1000)
     }
 
     const { data: softSkills, error, refresh, pending } = await useFetch('/api/soft_skills', {
         method: 'GET',
         params: {
-            candidate_id: info.user.id
+            candidate_id: candidate.value.id
         }
     })
 

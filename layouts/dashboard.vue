@@ -8,6 +8,7 @@
   let wasLargeScreen = window.innerWidth >= 960
   const hasNotices = ref<boolean>(false)
   const countsNotices = ref<number>(0)
+  const dialogShowJobs = ref(true)
 
   const evaluateWidth = () => {
     const isLargeScreen = window.innerWidth >= 960
@@ -32,6 +33,20 @@
     router.push(link)
   }
 
+  const getCountsForCandidate = async () => {
+    const { data, error } = await useFetch('/api/candidatures/counts', {
+      method: 'GET',
+      params: { candidate_id: info.user.id }
+    })
+    if (error.value) {
+      //console.error('Erro ao buscar counts:', error.value)
+    } else {
+      if(data.value?.total === 0) {
+        show.setApplyJob(true)
+      }
+    }
+  }
+
   onMounted(() => {
     if(window.innerWidth >= 960) {
       show.setNavigation(true)
@@ -40,6 +55,9 @@
       evaluateWidth()
     })
     window.addEventListener('resize', evaluateWidth)
+    if(info.user && info.user.type === 'candidate' && info.user.is_complete) {
+      getCountsForCandidate()
+    }
   })
 
   const { data, error }: any = await useFetch('/api/notices/todaycount', {
@@ -110,6 +128,62 @@
           </v-container>
         </div>
       </v-main>
+
+      <v-dialog
+        v-model="show.applyJob"
+        max-width="440"
+      >
+        <v-card
+          class="bg-primary pa-3" 
+          rounded="lg" 
+          flat
+        >
+          <v-card-text class="text-center pa-2">    
+            <div class="text-h3 mb-4">
+              🚀
+            </div>
+
+            <h2 class="text-h5 font-weight-bold mb-2">
+              Perfil Completo, Parabéns!
+            </h2>
+
+            <p class="text-body-1 mb-4">
+              Oi, <b>{{ info.user.name }}</b>, você fez o mais difícil que é completar o teu perfil! Agora o último passo:
+            </p>
+
+            <v-chip 
+              color="white" 
+              class="font-weight-bold text-caption pa-4 mb-4"
+            >
+              Se candidatar e conquistar a sua vaga
+            </v-chip>
+
+            <p class="text-body-2 mb-4">
+              Não deixe todo esse esforço parado. Clique abaixo e confira as oportunidades que estão esperando pelo seu talento.
+            </p>
+          </v-card-text>
+
+          <v-card-actions class="d-flex justify-center pa-2">
+            <v-btn
+              text="Ver Vagas Agora!"
+              variant="flat"
+              color="bg-navigation text-primary" 
+              size="large"
+              class="font-weight-black"
+            />
+          </v-card-actions>
+              
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            size="small"
+            class="close-button"
+            style="position: absolute; top: 8px; right: 8px;"
+            @click="show.setApplyJob(false)"
+          />
+              
+        </v-card>
+      </v-dialog>
     </v-layout>
     <!--<GlobalSnackbar />-->
     <GlobalOverlay />

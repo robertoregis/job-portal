@@ -6,6 +6,25 @@
     const { notify } = useNotification();
     const info: any = useInfo();
     const show = useShow();
+    const props = defineProps({
+        candidate: {
+            type: Object,
+            required: false,
+            default: {}
+        },
+        isAdmin: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    })
+    const candidate = computed(() => {
+        if(props.isAdmin) {
+            return props.candidate
+        } else {
+            return info.user
+        }
+    })
     //// Escolaridade
     const dialogEducation = ref(false)
     const educationsList = ref<any>([])
@@ -73,9 +92,9 @@
                 institution: education.value.institution,
                 period: education.value.period,
                 notes: education.value.notes,
-                candidate_id: info.user.id,
-                candidate_is_complete_educations: info.user.is_complete_educations,
-                candidate_completion_percentage: info.user.completion_percentage
+                candidate_id: candidate.value.id,
+                candidate_is_complete_educations: candidate.value.is_complete_educations,
+                candidate_completion_percentage: candidate.value.completion_percentage
             }
         })
         show.setOverlayDashboard(false)
@@ -83,15 +102,16 @@
             notify({ title: 'Erro', text: 'Erro ao criar a escolaridade', type: 'error' })
             return
         }
+        let title = `Criou a escolaridade${props.isAdmin ? ` do candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Criou a escolaridade`,
+            title: title,
             profile_id: info.profile.id,
             type: 'create_education'
         })
         notify({ title: 'Parabéns!', text: 'A escolaridade foi criada com sucesso', type: 'success' })
         getEducations()
         clearEducation()
-        if(!info.user.is_complete_educations) {
+        if(!candidate.value.is_complete_educations) {
             window.location.reload()
         }
     }
@@ -100,7 +120,7 @@
         const { data, error } = await useFetch('/api/educations', {
             method: 'GET',
             params: {
-                candidate_id: info.user.id
+                candidate_id: candidate.value.id
             }
         })
 
@@ -122,8 +142,9 @@
             notify({ title: 'Erro', text: 'Erro ao editar a escolaridade', type: 'error' })
             return
         }
+        let title = `Editou a escolaridade${props.isAdmin ? ` do candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Editou a escolaridade`,
+            title: title,
             profile_id: info.profile.id,
             type: 'update_education'
         })
@@ -136,9 +157,9 @@
         const { data, error } = await useFetch(`/api/educations/${id}`, {
             method: 'DELETE',
             body: {
-                candidate_id: info.user.id,
-                candidate_is_complete_educations: info.user.is_complete_educations,
-                candidate_completion_percentage: info.user.completion_percentage
+                candidate_id: candidate.value.id,
+                candidate_is_complete_educations: candidate.value.is_complete_educations,
+                candidate_completion_percentage: candidate.value.completion_percentage
             }
         })
         show.setOverlayDashboard(false)
@@ -146,8 +167,9 @@
             notify({ title: 'Erro', text: 'Erro ao remover a escolaridade', type: 'error' })
             return
         }
+        let title = `Removeu a escolaridade${props.isAdmin ? ` do candidato de ID: ${candidate.value.id}` : ''}`
         createLog({
-            title: `Removeu a escolaridade`,
+            title: title,
             profile_id: info.profile.id,
             type: 'delete_education'
         })
@@ -157,13 +179,13 @@
             if(educationsList.value.length === 0) {
                 window.location.reload()
             }
-        }, 500)
+        }, 1000)
     }
 
     const { data: educations, error, refresh, pending } = await useFetch('/api/educations', {
         method: 'GET',
         params: {
-            candidate_id: info.user.id
+            candidate_id: candidate.value.id
         }
     })
 

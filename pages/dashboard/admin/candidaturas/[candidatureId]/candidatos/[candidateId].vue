@@ -95,7 +95,8 @@
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      candidate_id: route.params.candidateId
+      candidate_id: route.params.candidateId,
+      is_all: false
     }
 
     const { data, error } = await useFetch('/api/feedbacks', {
@@ -171,7 +172,8 @@
         method: 'POST',
         body: {
           content: content.value,
-          candidature_id: candidature.value.id
+          candidature_id: candidature.value.id,
+          candidate_id: candidate.value.id
         }
     })
     show.setOverlayDashboard(false)
@@ -182,7 +184,7 @@
       return
     }
     createLog({
-      title: `Criou o parecer`,
+      title: `Criou o parecer do candidato de ID: ${candidate.value.id}`,
       profile_id: info.profile.id,
       type: 'create_feedback'
     })
@@ -672,7 +674,7 @@
               >
                 <div class="d-flex justify-space-between align-center">
                   <!-- job_title à esquerda -->
-                  <span class="text-caption font-weight-bold">{{ feedback.job_title }}</span>
+                  <span class="text-caption font-weight-bold">{{ feedback.title }}</span>
                   
                   <!-- botão à direita -->
                    <v-tooltip text="Gerar relatório">
@@ -740,12 +742,15 @@
     >
         <v-card
             prepend-icon="mdi-file-document"
-            :title="feedbackSelected.job_title"
+            :title="feedbackSelected.title"
         >
         <v-card-text>
             <v-row>
               <v-col cols="12">
                   <div v-html="feedbackSelected.content" class="pa-2"></div>
+              </v-col>
+              <v-col v-if="feedbackSelected.job_title" cols="12">
+                  <span class="text-caption">Vaga vinculada: <b>{{ feedbackSelected.job_title }}</b></span>
               </v-col>
             </v-row>
         </v-card-text>

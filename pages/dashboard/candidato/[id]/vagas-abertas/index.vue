@@ -5,46 +5,20 @@
     layout: 'dashboard',
   })
   useHead({
-    title: `Vagas - Conect One RH`,
+    title: `Vagas abertas - Conect One RH`,
     meta: [
       {
         name: 'description',
-        content: 'Gerencie todas as vagas publicadas na Conect One RH.'
+        content: 'Encontre as vagas aberta e publicadas na Conect One RH.'
       }
     ]
   })
-  const { notify } = useNotification();
   const info: any = useInfo();
   const router = useRouter()
   const page = ref(1)
   const pageSize = ref(10)
   const totalPages = ref(1)
   const jobsList = ref<any[]>([])
-  const without_company = ref<boolean>(false)
-  const loadingSearch = ref<boolean>(false)
-  const titleSearch = ref<any>('')
-  // Filtros
-  const jobStatusOptions = [
-    { name: 'Aberta', icon: 'mdi-briefcase-plus' },
-    { name: 'Encerrada', icon: 'mdi-briefcase-off' },
-  ]
-  const selectedStatus = ref<string | null>('Aberta')
-  const selectedIconStatus = ref<string>('mdi-briefcase-plus')
-  const onStatusSelect = (selected: any) => {
-    const result = jobStatusOptions.find(option => option.name === selected)
-    selectedIconStatus.value = result?.icon || ''
-  }
-
-  // Resetar página ao mudar filtro
-  watch([selectedStatus], () => {
-    page.value = 1
-    getJobs()
-  })
-
-  watch([without_company], (newValue) => {
-    page.value = 1
-    getJobs()
-  })
 
   watch(page, () => {
     getJobs()
@@ -52,19 +26,16 @@
 
   // Navegação
   const navigation = (id: number) => {
-    router.push(`/dashboard/admin/vagas/${id}`)
+    window.open(`/vagas/${id}`, '_blank');
   }
 
-  const getJobs = async (isSearch: boolean = false) => {
+  const getJobs = async () => {
     const params: Record<string, any> = {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      without_company: without_company.value
+      is_active: true,
+      is_closed: false
     }
-    if(isSearch) {
-      params.title = titleSearch.value
-    }
-    if (selectedStatus.value) params.status = selectedStatus.value
 
     const { data, error } = await useFetch('/api/jobs', {
       method: 'GET',
@@ -79,26 +50,20 @@
     }
   }
 
-  const onSearch = async () => {
-    if(titleSearch.value.length < 3) {
-      notify({ title: 'Erro', text: 'O título precisa ser vazio ou ter 3 ou mais caracteres', type: 'error' })
-      return
-    }
-    getJobs(true)
-  }
-
   const { data: jobs, error, refresh, pending } = await useFetch('/api/jobs', {
     method: 'GET',
     params: {
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
-      status: selectedStatus.value,
+      is_active: true,
+      is_closed: false
     }
   })
 
   if (error.value) {
     //console.error('Erro ao carregar jobs:', error.value)
   } else {
+    console.log(jobs.value)
     jobsList.value = jobs.value?.data || []
     totalPages.value = jobs.value?.totalPages || 1
   }
@@ -109,73 +74,11 @@
   <v-row no-gutters>
     <v-col cols="12">
       <div class="d-flex flex-column">
-        <span class="text-gradient-primary font-weight-bold">Vagas!</span>
-        <span class="text-caption">Confira todas as vagas publicadas.</span>
+        <span class="text-gradient-primary font-weight-bold">Vagas abertas!</span>
+        <span class="text-caption">Confira todas as vagas abertas que foram publicadas.</span>
       </div>
     </v-col>
     <LayoutButtonBack />
-  </v-row>
-
-  <!-- Botão criar -->
-  <v-row no-gutters class="mt-4">
-    <v-col cols="12">
-      <div class="d-flex">
-        <v-btn text="Criar vaga" variant="flat" class="bg-gradient-primary" @click="$router.push(`/dashboard/admin/vagas/criar`)" />
-      </div>
-    </v-col>
-  </v-row>
-
-  <!-- Filtros -->
-  <v-row no-gutters class="mt-4">
-    <v-col cols="12" md="4" class="pr-md-2">
-      <v-select
-        v-model="selectedStatus"
-        :items="jobStatusOptions"
-        item-title="name"
-        item-value="name"
-        label="Filtrar por status"
-        clearable
-        variant="outlined"
-        hide-details
-        class="mb-2"
-        dense
-        @update:modelValue="onStatusSelect"
-      />
-    </v-col>
-    <v-col cols="12">
-      <v-text-field
-        :loading="loadingSearch"
-        v-model="titleSearch"
-        append-inner-icon="mdi-magnify"
-        label="Pesquisa por título"
-        density="compact"
-        variant="solo"
-        hide-details
-        class="mb-2"
-        style="max-width: 400px;"
-        @click:append-inner="onSearch"
-        @keydown.enter="onSearch"
-      ></v-text-field>
-    </v-col>
-    <v-col cols="12">
-      <v-checkbox v-model="without_company" label="Sem ligação com empresas" hide-details></v-checkbox>
-    </v-col>
-  </v-row>
-
-  <!-- Chips com filtros selecionados -->
-  <v-row no-gutters>
-    <v-col v-if="selectedStatus" cols="12">
-      <div class="d-flex align-center">
-        <v-chip
-          v-if="selectedStatus"
-          class="bg-gradient-status"
-          variant="flat"
-        >
-          <v-icon :icon="selectedIconStatus" start></v-icon>
-          Status: <span class="text-subtitle-1 font-weight-bold ml-2">{{ selectedStatus }}</span>
-        </v-chip>
-      </div>
-    </v-col>
   </v-row>
 
   <!-- Lista de vagas -->
@@ -187,7 +90,7 @@
             <v-list-subheader class="text-h6 font-weight-bold text-gradient-primary">Vagas</v-list-subheader>
 
             <v-list-item v-if="jobsList.length === 0" class="px-4 text-grey">
-              Nenhuma vaga encontrada com os filtros selecionados.
+              Nenhuma vaga aberta encontrada.
             </v-list-item>
 
             <v-list-item

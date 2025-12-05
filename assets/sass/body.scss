@@ -11,8 +11,13 @@ body {
 
 .videoWrapper {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 */
   height: 0;
+  @media(min-width: 300px) {
+    padding-bottom: 75%; /* 16:9 */
+  }
+  @media(min-width: 600px) {
+    padding-bottom: 40%; /* 16:9 */
+  }
 }
 .videoWrapper video {
   position: absolute;

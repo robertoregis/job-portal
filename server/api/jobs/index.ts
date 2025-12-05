@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const { company_id, status, is_active, page, pageSize,
-      state, createdWithinDays, createdMoreThanDays, without_company
+      state, createdWithinDays, createdMoreThanDays, without_company, is_closed, title
     } = getQuery(event)
 
     const pageNumber = page ? parseInt(page as string, 10) : 1
@@ -24,6 +24,12 @@ export default defineEventHandler(async (event) => {
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to)
+
+    if (title) {
+      // Usa .ilike para buscar a string em qualquer parte do título,
+      // sem diferenciar maiúsculas/minúsculas.
+      query = query.ilike('title', `%${title as string}%`) 
+    }
 
     if (without_company === 'true') {
         // Usa .is() para filtrar onde a coluna company_id é NULL
@@ -40,6 +46,10 @@ export default defineEventHandler(async (event) => {
 
     if (typeof is_active !== 'undefined') {
       query = query.eq('is_active', is_active === 'true')
+    }
+
+    if (typeof is_closed !== 'undefined') {
+      query = query.eq('is_closed', is_closed === 'true')
     }
 
     if (state) {
@@ -70,7 +80,7 @@ export default defineEventHandler(async (event) => {
 
     // Busca imagens das empresas relacionadas
     const companyIds = [...new Set(data.map((job: any) => job.company_id))]
-      .filter(id => id !== null && id !== undefined); // <-- Adicione este filtro!
+      .filter(id => id !== null && id !== undefined);
 
     // 🌟 CORREÇÃO: Declarar 'companiesData' UMA ÚNICA VEZ antes do IF/ELSE,
     // e usar 'let' ou 'const' (dependendo se você for reatribuir)
@@ -89,7 +99,6 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 500, statusMessage: companyError.message })
         }
         
-        // 2. ATRIBUIÇÃO (Sem 'var' ou 'let' na frente)
         companiesData = cData || []; 
     }
 

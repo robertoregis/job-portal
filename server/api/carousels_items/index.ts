@@ -8,20 +8,17 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id, place } = getQuery(event);
+    const { profile_id, isNot } = getQuery(event)
 
-    let query = supabase.from('services').select('*');
+    let query = supabase.from('carousels_items')
+      .select('*')
+      .order('order_index', { ascending: true, nullsFirst: false }) 
+      .order('created_at', { ascending: false })
 
-    if (place) {
-        const allowedPlaces = [place, 'all'];
-        query = query.in('place', allowedPlaces);
+    if (isNot === 'true') {
+        query = query.not('image_lg_url', 'is', null) 
+        query = query.not('image_sm_url', 'is', null)
     }
-
-    if (profile_id) {
-        query = query.eq('profile_id', profile_id);
-    }
-
-    query = query.order('created_at', { ascending: false });
 
     const { data, error } = await query
 
@@ -35,18 +32,20 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'POST') {
     const body = await readBody(event)
-    let { title, icon, description, subtitle } = body
+    let { title, type, link, video, is_external, profile_id } = body
 
 
     // Converte strings vazias para null
     title = emptyStringToNull(title)
-    icon = emptyStringToNull(icon)
-    description = emptyStringToNull(description)
-    subtitle = emptyStringToNull(subtitle)
+    type = emptyStringToNull(type)
+    link = emptyStringToNull(link)
+    video = emptyStringToNull(video)
+    is_external = emptyStringToNull(is_external)
+    profile_id = emptyStringToNull(profile_id)
 
     const { data, error } = await supabase
-      .from('services')
-      .insert([{ title, icon, description, subtitle }])
+      .from('carousels_items')
+      .insert([{ title, type, link, video, is_external, profile_id }])
       .select()
       .single()
 

@@ -19,17 +19,6 @@
   })
   const info: any = useInfo();
 
-
-  const states = [
-    'São Paulo',
-    'Rio de Janeiro',
-    'Minas Gerais',
-    'Bahia',
-    'Paraná',
-    'Santa Catarina',
-    'Rio Grande do Sul'
-  ]
-
   const dateCreated = [
     'Últimos 7 dias',
     'Últimos 30 dias',
@@ -52,6 +41,7 @@
   const getJobs = async () => {
     const params: Record<string, any> = {
       is_active: true,
+      is_closed: false,
       page: page.value.toString(),
       pageSize: pageSize.value.toString(),
     }
@@ -96,6 +86,7 @@
     method: 'GET',
     params: {
       is_active: true,
+      is_closed: false,
       page: page.value.toString(),
       pageSize: pageSize.value.toString()
     }

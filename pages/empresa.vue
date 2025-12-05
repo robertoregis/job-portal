@@ -147,7 +147,7 @@
 <template>
   <main>
     <v-sheet width="100%">
-      <HomeImageBackground image="/background-company.jpeg" />
+      <HomeImageBackgroundFixe image="/background-company.jpeg" />
     </v-sheet>
 
     <v-sheet width="100%" class="mt-4">

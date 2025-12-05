@@ -22,34 +22,45 @@ export default defineEventHandler(async (event) => {
     .from("feedbacks")
     .select(`
       *,
-      candidatures!inner(
-        candidate: candidates(
-          *,
-          experiences(*),
-          educations(*),
-          languages(*),
-          soft_skills(*)
-        ),
+      candidate_direct: candidates( 
+        *,
+        experiences(*),
+        educations(*),
+        languages(*),
+        soft_skills(*)
+      ),
+      job_direct: jobs(title), 
+      candidatures (
         job: jobs(title)
       )
     `)
     .eq("id", feedbackId)
     .single();
-
   if (feedbackError || !feedback) {
+    console.log(feedbackError)
     event.node.res.statusCode = 404;
     return event.node.res.end("Feedback não encontrado");
   }
 
-  const candidate = feedback.candidatures?.candidate;
-  const jobTitle = feedback.candidatures?.job?.title || '';
+  const candidate = feedback.candidate_direct; // <--- AGORA USA O ALIAS DIRETO DA QUERY
+  const jobTitleViaCandidature = feedback.candidatures?.job?.title;
+  const jobTitleViaDirectJob = feedback.job_direct?.title;
+  
+  let finalJobTitle = '';
+  const isLinked = !!feedback.candidatures;
 
-  // Agora você já tem tudo em `candidate`:
-  const experiences = candidate?.experiences || [];
-  const educations = candidate?.educations || [];
-  const languages = candidate?.languages || [];
-  const soft_skills = candidate?.soft_skills || [];
+  if (jobTitleViaCandidature) {
+    finalJobTitle = jobTitleViaCandidature;
+  } else if (jobTitleViaDirectJob) {
+    finalJobTitle = `${jobTitleViaDirectJob} - Avulso`;
+  } else if (!isLinked) {
+    finalJobTitle = 'Parecer Avulso';
+  }
 
+  const experiences = candidate?.experiences || [];
+  const educations = candidate?.educations || [];
+  const languages = candidate?.languages || [];
+  const soft_skills = candidate?.soft_skills || [];
   let browser;
   try {
     if (process.env.VERCEL) {
@@ -66,7 +77,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const page = await browser.newPage();
-
     const html = `
       <html>
         <head>

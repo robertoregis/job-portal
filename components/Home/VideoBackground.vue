@@ -22,7 +22,6 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="videoWrapper"
-    style="height: 400px;"
   >
     <!-- Vídeo de fundo -->
     <video
