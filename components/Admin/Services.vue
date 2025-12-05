@@ -13,7 +13,8 @@
         title: null,
         subtitle: null,
         icon: null,
-        description: null
+        description: null,
+        place: null
     })
     const serviceId = ref<string>('')
     const editingServiceIndex = ref<any>(null)
@@ -24,11 +25,17 @@
         editingServiceIndex.value = index
         dialogServices.value = true
     }
+    const places = ['Início', 'Sobre', 'Ambas']
+    const placeComputed = computed(() => {
+        return service.value.place === 'Iníco' ? 'home' : (service.value.place === 'about' ? 'Sobre' : 'Ambas');
+    })
     const clearService = () => {
         service.value = {
             title: null,
             icon: null,
-            description: null
+            description: null,
+            subtitle: null,
+            place: null
         }
         dialogServices.value = false
         editingServiceIndex.value = null
@@ -55,7 +62,9 @@
             body: {
                 title: service.value.title,
                 icon: service.value.icon,
+                subtitle: service.value.subtitle,
                 description: service.value.description,
+                place: placeComputed.value
             }
         })
         show.setOverlayDashboard(false)
@@ -83,14 +92,24 @@
             console.error('Erro ao carregar o serviço:', error.value)
             return null
         }
-        servicesList.value = data.value
+        servicesList.value = data.value.map((service: any) => {
+            return {
+                ...service,
+                place: service.place === 'home' ? 'Início' : (service.place === 'about' ? 'Sobre' : 'Ambas')
+            }
+        })
     }
 
     const updateService = async (id: string) => {
         show.setOverlayDashboard(true)
+
+        const newBody = {
+            ...service.value,
+            place: placeComputed.value
+        }
         const { data, error } = await useFetch(`/api/services/${id}`, {
             method: 'PATCH',
-            body: service.value
+            body: newBody
         })
         show.setOverlayDashboard(false)
         if (error.value) {
@@ -133,7 +152,12 @@
 
     if (error.value) {
     } else {
-        servicesList.value = services.value
+        servicesList.value = services.value.map((service: any) => {
+            return {
+                ...service,
+                place: service.place === 'home' ? 'Início' : (service.place === 'about' ? 'Sobre' : 'Ambas')
+            }
+        })
     }
 
     const dialogIcon = ref(false)
@@ -389,6 +413,16 @@
                         density="compact"
                         hide-details
                         class="mb-1"
+                    />
+                </v-col>
+                <v-col cols="12">
+                    <v-select
+                        v-model="service.place"
+                        :items="places"
+                        label="Página"
+                        density="compact"
+                        hide-details
+                        class="mb-2"
                     />
                 </v-col>
                 <v-col cols="12">

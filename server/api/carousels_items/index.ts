@@ -10,7 +10,12 @@ export default defineEventHandler(async (event) => {
   if (method === 'GET') {
     const { profile_id } = getQuery(event)
 
-    let query = supabase.from('carousels').select('*').order('created_at', { ascending: false })
+    let query = supabase.from('carousels_items')
+      .select('*')
+      .not('image_lg_url', 'is', null) 
+      .not('image_sm_url', 'is', null)
+      .order('order_index', { ascending: true, nullsFirst: false }) 
+      .order('created_at', { ascending: false })
 
     const { data, error } = await query
 
@@ -36,7 +41,7 @@ export default defineEventHandler(async (event) => {
     profile_id = emptyStringToNull(profile_id)
 
     const { data, error } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .insert([{ title, type, link, video, is_external, profile_id }])
       .select()
       .single()

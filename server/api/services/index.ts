@@ -8,9 +8,20 @@ export default defineEventHandler(async (event) => {
   const method = event.req.method
 
   if (method === 'GET') {
-    const { profile_id } = getQuery(event)
-    console.log('veio aqui')
-    let query = supabase.from('services').select('*').order('created_at', { ascending: false })
+    const { profile_id, place } = getQuery(event);
+
+    let query = supabase.from('services').select('*');
+
+    if (place) {
+        const allowedPlaces = [place, 'all'];
+        query = query.in('place', allowedPlaces);
+    }
+
+    if (profile_id) {
+        query = query.eq('profile_id', profile_id);
+    }
+
+    query = query.order('created_at', { ascending: false });
 
     const { data, error } = await query
 

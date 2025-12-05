@@ -14,10 +14,26 @@
   })
   //const content = ref('<p>Conteúdo inicial</p>')
   const loading = ref<boolean>(true)
+  const servicesList = ref<any[]>([])
 
   onMounted(() => {
     loading.value = false;
   })
+
+  const { data: services, error, refresh, pending } = await useFetch('/api/services', {
+    method: 'GET',
+    params: {
+      place: 'about'
+    },
+    key: 'services-list-about',
+  })
+
+  if (error.value) {
+    console.log(error.value)
+  } else {
+    servicesList.value = services.value
+    loading.value = false
+  }
 </script>
 
 <template>
@@ -44,6 +60,26 @@
                 Na Conect One RH, cada conexão importa. Transformamos dados em decisões estratégicas, processos em experiências humanas e oportunidades em sucesso real.
               </p>
             </div>
+          </v-col>
+
+          <v-col cols="12">
+            <h2 class="mb-2">Confira o que fazemos:</h2>
+            <v-row no-gutters>
+              <template v-for="(service, index) in servicesList" :key="index">
+                <v-col cols="12" class="px-2 mb-4">
+                  <v-card class="mx-auto" elevation="2" hover>
+                    <v-card-title class="d-flex align-center bg-primary">
+                      <v-icon class="mr-2" size="28">{{ service.icon }}</v-icon>
+                      <span class="text-subtitle-1 font-weight-bold custom-subtitle-and-title">{{ service.title }}</span>
+                    </v-card-title>
+                    <v-card-subtitle v-if="service.subtitle" class="py-1 custom-subtitle-and-title">{{ service.subtitle }}</v-card-subtitle>
+                    <v-card-text class="bg-surface-light pt-2">
+                      {{ service.description }}
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </template>
+            </v-row>
           </v-col>
         </v-row>
       </v-container>

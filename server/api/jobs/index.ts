@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
 
     // Busca imagens das empresas relacionadas
     const companyIds = [...new Set(data.map((job: any) => job.company_id))]
-      .filter(id => id !== null && id !== undefined); // <-- Adicione este filtro!
+      .filter(id => id !== null && id !== undefined);
 
     // 🌟 CORREÇÃO: Declarar 'companiesData' UMA ÚNICA VEZ antes do IF/ELSE,
     // e usar 'let' ou 'const' (dependendo se você for reatribuir)
@@ -93,7 +93,6 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 500, statusMessage: companyError.message })
         }
         
-        // 2. ATRIBUIÇÃO (Sem 'var' ou 'let' na frente)
         companiesData = cData || []; 
     }
 

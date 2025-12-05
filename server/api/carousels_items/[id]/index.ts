@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     const { data, error } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .select('*')
       .eq('id', id)
       .single()
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     )
 
     const { data, error } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'DELETE') {
     const { error } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .delete()
       .eq('id', id)
 

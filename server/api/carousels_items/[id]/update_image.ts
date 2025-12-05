@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
     
     // Busca o ID do arquivo antigo no banco ANTES de qualquer upload
     const { data: oldData } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .select(oldIdColumn)
       .eq('id', itemId)
       .single();
@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
     };
     
     const { error: updateError } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .update(updateObject)
       .eq('id', itemId);
 
@@ -163,7 +163,7 @@ export default defineEventHandler(async (event) => {
     };
 
     const { error: updateError } = await supabase
-      .from('carousels')
+      .from('carousels_items')
       .update(updateObject)
       .eq('id', itemId);
 

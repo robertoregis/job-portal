@@ -19,17 +19,6 @@
   })
   const info: any = useInfo();
 
-
-  const states = [
-    'São Paulo',
-    'Rio de Janeiro',
-    'Minas Gerais',
-    'Bahia',
-    'Paraná',
-    'Santa Catarina',
-    'Rio Grande do Sul'
-  ]
-
   const dateCreated = [
     'Últimos 7 dias',
     'Últimos 30 dias',

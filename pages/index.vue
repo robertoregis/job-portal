@@ -16,9 +16,10 @@
   const servicesList = ref<any[]>([])
   const carouselsList = ref<any[]>([])
   const loading = ref<boolean>(true)
+  const isDialogOpen = ref(false);
 
   const getCarousels = async () => {
-    const { data, error } = await useFetch('/api/carousels', {
+    const { data, error } = await useFetch('/api/carousels_items', {
         method: 'GET',
     })
     if (error.value) {
@@ -40,10 +41,11 @@
     loading.value = false
   }
 
-  // Dados fictícios para os serviços
   const { data: services, error, refresh, pending } = await useFetch('/api/services', {
       method: 'GET',
-      params: {},
+      params: {
+        place: 'home'
+      },
       key: 'services-list',
   })
 

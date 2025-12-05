@@ -21,6 +21,7 @@
     const typeComputed = computed(() => {
         return carousel.value.type === 'Imagem' ? 'image' : 'video';
     })
+    const isDialogOpen = ref(false);
     /*const typeSelected = ref<any>('Imagem')*/
     const carouselId = ref<string>('')
     const editingCarouselIndex = ref<any>(null)
@@ -82,7 +83,7 @@
             ...carousel.value,
             type: typeComputed.value
         }
-        const { data, error } = await useFetch('/api/carousels', {
+        const { data, error } = await useFetch('/api/carousels_items', {
             method: 'POST',
             body: newBody
         })
@@ -103,7 +104,7 @@
     }
 
     const getCarousels = async () => {
-        const { data, error } = await useFetch('/api/carousels', {
+        const { data, error } = await useFetch('/api/carousels_items', {
             method: 'GET',
             /*params: {
                 candidate_id: info.user.id
@@ -137,7 +138,7 @@
             ...carousel.value,
             type: typeComputed.value
         }
-        const { data, error } = await useFetch(`/api/carousels/${id}`, {
+        const { data, error } = await useFetch(`/api/carousels_items/${id}`, {
             method: 'PATCH',
             body: newBody
         })
@@ -158,7 +159,7 @@
 
     const removeCarousel = async (id: string) => {
         show.setOverlayDashboard(true)
-        const { data, error } = await useFetch(`/api/carousels/${id}`, {
+        const { data, error } = await useFetch(`/api/carousels_items/${id}`, {
             method: 'DELETE'
         })
         show.setOverlayDashboard(false)
@@ -178,7 +179,7 @@
 
     const removeImage = async (id: string, type: string, imageId: string) => {
         show.setOverlayDashboard(true)
-        const { data, error } = await useFetch(`/api/carousels/${id}/update_image`, {
+        const { data, error } = await useFetch(`/api/carousels_items/${id}/update_image`, {
             method: 'DELETE',
             body: {
                 type: type,
@@ -202,7 +203,7 @@
 
     }
 
-    const { data: carousels, error, refresh, pending } = await useFetch('/api/carousels', {
+    const { data: carousels, error, refresh, pending } = await useFetch('/api/carousels_items', {
         method: 'GET',
         params: {}
     })
@@ -235,7 +236,7 @@
         const formDataTy = new FormData()
         formDataTy.append('file', file)
         formDataTy.append('type', type)
-        const url = `/api/carousels/${id}/update_image`
+        const url = `/api/carousels_items/${id}/update_image`
 
         const { data: imageData, error: imageError }: any = await useFetch(url, {
             method: 'PATCH',
@@ -269,6 +270,33 @@
         }, 1000)
     }
 
+    const handleOrderChange = async (updatedOrderArray: any) => {
+        show.setOverlayDashboard(true)
+        try {
+            // 1. Chame a API (o endpoint que criamos na resposta anterior)
+            const { error } = await useFetch('/api/carousels_items/reoder', {
+                method: 'PUT',
+                body: updatedOrderArray,
+            });
+
+            if (error.value) {
+                console.log(error.value.message);
+                show.setOverlayDashboard(false)
+                notify({ title: 'Deu erro!', text: 'Erro ao atualizar a ordem dos itens', type: 'error' })
+            }
+            
+            isDialogOpen.value = false;
+            notify({ title: 'Parabéns!', text: 'A ordem dos itens foi atualizada', type: 'success' })
+            getCarousels()
+            setTimeout(() => {
+                show.setOverlayDashboard(false)
+            }, 500)
+        } catch (e) {
+            // Tratar erro
+            console.log(e)
+        }
+    };
+
 </script>
 
 <template>
@@ -296,7 +324,7 @@
                 </v-list-item-content>
                 <v-list-item-content class="d-flex align-center mt-1">
 
-                    <v-btn @click="changeImages(i, item.id)" prepend-icon="mdi-image-plus" :color="`${!item.image_lg_url && !item.image_sm_url ? 'edit' : (item.image_lg_url && item.image_sm_url ? 'primary' : 'off')}`" size="small" class="mr-1">Adicionar imagens</v-btn>
+                    <v-btn @click="changeImages(i, item.id)" prepend-icon="mdi-image-plus" :color="`${!item.image_lg_url && !item.image_sm_url ? 'edit' : (item.image_lg_url && item.image_sm_url ? 'primary' : 'off')}`" size="small" class="mr-1">{{ !item.image_lg_url && !item.image_sm_url ? 'Adicionar' : 'Gerenciar' }} imagens</v-btn>
                     <span class="font-weight-bold">: {{ !item.image_lg_url && !item.image_sm_url ? 0 : (item.image_lg_url && item.image_sm_url ? 2 : 1) }}</span>
                 </v-list-item-content>
 
@@ -320,15 +348,18 @@
 
             </v-list>
 
-            <v-btn class="bg-gradient-primary" @click="openCreate()">
-            Adicionar
+            <v-btn class="bg-gradient-primary mr-3" @click="openCreate()">
+                Adicionar
+            </v-btn>
+            <v-btn color="edit" @click="isDialogOpen = true">
+                Reordenar
             </v-btn>
         </v-card-text>
     </v-card>
 
     <v-dialog
         v-model="dialogCarousels"
-        max-width="400"
+        max-width="480"
     >
         <v-card
             prepend-icon="mdi-view-carousel"
@@ -505,6 +536,11 @@
         </v-card-text>
     </v-card>
 </v-dialog>
+<AdminReoderCarousel
+    v-model="isDialogOpen"
+    :items="carouselsList"
+    @order-changed="handleOrderChange"
+/>
 </template>
 
 <style scoped>
